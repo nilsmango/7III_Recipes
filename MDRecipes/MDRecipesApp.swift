@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct MDRecipesApp: App {
+    @StateObject private var fileManager = MarkdownFileManager()
+    
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RecipesListView(fileManager: fileManager)
         }
     }
 }
