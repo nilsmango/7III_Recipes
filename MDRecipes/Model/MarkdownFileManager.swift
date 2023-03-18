@@ -57,6 +57,108 @@ class MarkdownFileManager: ObservableObject {
     func move(from offset: IndexSet, to newPlace: Int) {
         markdownFiles.move(fromOffsets: offset, toOffset: newPlace)
     }
+    
+    /// Search and filter the recipes
+    func filterTheRecipes(string: String, ingredients: [String], categories: [String]) -> [MarkdownFile] {
+        var filteredRecipes = markdownFiles
+        // first is the searchString
+        if string.isEmpty == false {
+            if string.contains(" ") {
+                let cleanArray = makeCleanArray(from: string)
+                filteredRecipes = filteredRecipes.filter { file in
+                            cleanArray.allSatisfy { word in
+                                    file.content.range(of: word, options: .caseInsensitive) != nil
+                                }
+                            }
+                
+            } else {
+                filteredRecipes = filteredRecipes.filter { $0.content.range(of: string, options: .caseInsensitive) != nil }
+            }
+        }
+        // second stage: filtering the result by the ingredients - which are always shown like - [ ] string
+        
+        if ingredients.isEmpty == false {
+            let mappedIngredients = ingredients.map( { "- [ ] " + $0 })
+            filteredRecipes = filteredRecipes.filter { recipe in
+                        mappedIngredients.allSatisfy { word in
+                                recipe.content.range(of: word, options: .caseInsensitive) != nil
+                            }
+                        }
+        }
+        
+        // third stage: filtering the results by the categories
+        
+        if categories.isEmpty == false {
+            
+            filteredRecipes = filteredRecipes.filter { recipe in
+                categories.allSatisfy { word in
+                    if let contentRange = recipe.content.range(of: "Categories:.*\n", options: .regularExpression) {
+                        let categoryString = String(recipe.content[contentRange])
+                        return categoryString.contains(word)
+                    } else {
+                        return false
+                    }
+                }
+            }
+        }
+        
+        return filteredRecipes
+        
+        
+        
+    }
+    
+    
+    
+    
+    // TODO: make this one function to find ingredients, categories, tags
+    /// get a list of all categories in the recipes
+    func getAllCategories() -> [String] {
+        var categories = [String]()
+        
+        for recipe in markdownFiles {
+            let content = recipe.content
+            if let range = content.range(of: "Categories:.*\n", options: .regularExpression) {
+                let categoryString = content[range]
+                let cleanedCategories = categoryString.replacingOccurrences(of: "Categories: ", with: "").replacingOccurrences(of: "\n", with: "")
+                let stringArray = cleanedCategories.components(separatedBy: ", ")
+                let cleanArray = stringArray.filter( { $0 != "" })
+                for string in cleanArray {
+                    if categories.contains(string) == false {
+                        categories.append(string)
+                    }
+                }
+            }
+            
+        }
+        return categories
+    }
+    
+    
+    
+    /// get a list of all ingredients in the recipes
+    func getAllIngredients() -> [String] {
+        var ingredients: [String] = []
+        
+        let regex = try? NSRegularExpression(pattern: "- \\[ \\] ([^\\n]+)", options: .anchorsMatchLines)
+        
+        for recipe in markdownFiles {
+            let content = recipe.content
+            let matches = regex?.matches(in: content, options: [], range: NSRange(content.startIndex..<content.endIndex, in: content))
+                for match in matches ?? [] {
+                    if let range = Range(match.range, in: content) {
+                        let almostIngredient = String(content[range]).capitalized
+                        let ingredient = almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")
+                        if !ingredients.contains(ingredient) {
+                            ingredients.append(ingredient)
+                        }
+                    }
+            }
+        }
+        return ingredients
+        
+    }
+    
 }
 
 
