@@ -16,8 +16,10 @@ struct FilterTesting: View {
     
     @State private var activeCategories = [String]()
     
+    @State private var activeTags = [String]()
+    
     private func isSelected(button: String) -> Bool {
-        if activeIngredients.contains(button) || activeCategories.contains(button) {
+        if activeIngredients.contains(button) || activeCategories.contains(button) || activeTags.contains(button) {
             return true
         } else {
             return false
@@ -27,25 +29,28 @@ struct FilterTesting: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories)) { recipe in
+                ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories, tags: activeTags)) { recipe in
                     NavigationLink(destination: RecipeView(recipe: recipe)) {
                         ListItemView(recipe: recipe)
                     }
                 }
                 
             }
-            
+            Text("Ingredients")
             HStack {
                 
                 ForEach(fileManager.getAllIngredients(), id: \.self) { ingredient in
                     
                     Button(action: {
-                        // TODO: make a func for this
-                        if isSelected(button: ingredient) {
-                            activeIngredients.removeAll(where: { $0 == ingredient })
-                        } else {
-                            activeIngredients.append(ingredient)
-                        }
+                       
+                            // TODO: make a func for this
+                            if isSelected(button: ingredient) {
+                                activeIngredients.removeAll(where: { $0 == ingredient })
+                            } else {
+                                activeIngredients.append(ingredient)
+                            }
+                        
+                        
                         
                     }) {
                         
@@ -68,7 +73,7 @@ struct FilterTesting: View {
                
         }
             }
-            
+            Text("Categories")
             HStack {
                 
                 ForEach(fileManager.getAllCategories(), id: \.self) { category in
@@ -103,6 +108,38 @@ struct FilterTesting: View {
         }
             }
             
+            Text("Tags")
+            
+            HStack {
+                
+                ForEach(fileManager.getAllTags(), id: \.self) { tag in
+                    
+                    Button(action: {
+                        // TODO: make a func for this
+                        if isSelected(button: tag) {
+                            activeTags.removeAll(where: { $0 == tag })
+                        } else {
+                            activeTags.append(tag)
+                        }
+                        
+                    }) {
+                        if isSelected(button: tag) {
+                            Text(tag)
+                                .fixedSize()
+                            
+                        } else {
+                            Text(tag)
+                                .fixedSize()
+                                .foregroundColor(.secondary)
+                        }
+                        }
+                    
+                    .buttonStyle(.bordered)
+                            
+                    
+               
+        }
+            }
             
                     
             Spacer()
