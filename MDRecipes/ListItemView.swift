@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct ListItemView: View {
+    @ObservedObject var fileManager: MarkdownFileManager
     var recipe: MarkdownFile
     
     var body: some View {
         VStack(alignment: .leading) {
             Text(recipe.name)
                 .accessibilityLabel("Recipe name")
-            Text("Takes 5 minutes")
+            Text("Takes \(String(fileManager.extractTotalTime(from: recipe.content))) minutes")
                 .font(.caption)
         }
     }
@@ -22,6 +23,6 @@ struct ListItemView: View {
 
 struct ListItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ListItemView(recipe: MarkdownFile.sampleData.first!)
+        ListItemView(fileManager: MarkdownFileManager(), recipe: MarkdownFile.sampleData.first!)
     }
 }

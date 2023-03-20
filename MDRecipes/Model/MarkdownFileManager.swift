@@ -51,11 +51,21 @@ class MarkdownFileManager: ObservableObject {
     }
     
     func delete(at indexSet: IndexSet) {
+        
+        // we have to keep our manuallySorted array up to date
+        let idsToDelete = indexSet.map { markdownFiles[$0].id }
+        
+        
         markdownFiles.remove(atOffsets: indexSet)
+        for id in idsToDelete {
+            manuallySortedMarkdownFiles.removeAll(where: { $0.id == id })
+        }
+        
     }
     
     func move(from offset: IndexSet, to newPlace: Int) {
         markdownFiles.move(fromOffsets: offset, toOffset: newPlace)
+        updateManualList()
     }
     
     /// Search and filter the recipes
@@ -201,15 +211,17 @@ class MarkdownFileManager: ObservableObject {
         
     }
     
+    // useful
+    private let decimalCharacters = CharacterSet.decimalDigits
     
     private func extractIngredient(from string: String) -> String {
         // Define the units that can be removed
-        let units = ["g", "kg", "ml", "l", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "Eine", "Prise", "mg", "L", "Liter", "ounce", "ounces", "approx.", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped"]
+        let units = ["g", "kg", "ml", "l", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "pinches", "Eine", "Prise", "Prisen", "mg", "L", "Liter", "ounce", "ounces", "approx.", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped", "clove", "cloves", "Zehe", "Zehen", "whole", "ganze", "ganz", "zum Anbraten", "wenig", "Messerspitze", ]
         
         // Split the string by spaces
         let words = string.split(separator: " ")
         
-        let decimalCharacters = CharacterSet.decimalDigits
+        
         
         var ingredient = String()
         
@@ -222,9 +234,92 @@ class MarkdownFileManager: ObservableObject {
         
         return ingredient
         
-        
     }
     
+    func extractTotalTime(from string: String) -> Int {
+        var totalTime = 0
+        
+        if let range = string.range(of: "Total time:.*\n", options: .regularExpression) ?? string.range(of: "Gesamtzeit:.*\n", options: .regularExpression) {
+            let categoryString = string[range]
+            let cleanedTime = categoryString.replacingOccurrences(of: "Total time: ", with: "").replacingOccurrences(of: "Gesamtzeit: ", with: "").replacingOccurrences(of: "\n", with: "")
+            totalTime = calculateTimeInMinutes(input: cleanedTime)
+            }
+            return totalTime
+        }
+    
+    
+    private func calculateTimeInMinutes(input: String) -> Int  {
+        let cleanedString = input.replacingOccurrences(of: " ", with: "")
+        
+        var numberArr = [Int]()
+        var hours = 0
+        var minutes = 0
+        
+        for element in cleanedString {
+            let stringElement = String(element)
+            //check if number or character
+            if element.isNumber {
+                numberArr.append(Int(stringElement)!)
+            } else if element.isLetter {
+                
+                if stringElement.lowercased() == "h" || stringElement.lowercased() == "s" {
+                    if numberArr.count > 1 {
+                        var count = numberArr.count
+                        for number in numberArr {
+                            hours += number * Int(pow(10, Double(count - 1)))
+                            count = count - 1
+                        }
+                        numberArr.removeAll()
+                        
+                        
+                    } else {
+                        hours = numberArr.first ?? 0
+                        numberArr.removeAll()
+                    }
+                } else if stringElement.lowercased() == "m" {
+                    if numberArr.count > 1 {
+                        print(numberArr)
+                                        var count = numberArr.count
+                                        for number in numberArr {
+                                            minutes += number * Int(pow(10, Double(count - 1)))
+                                            count = count - 1
+                                        }
+                                    } else {
+                                        minutes = numberArr.first ?? 0
+                                    }
+                }
+            }
+        }
+
+        return hours * 60 + minutes
+    }
+        
+    
+    
+    var manuallySortedMarkdownFiles = [MarkdownFile]()
+    
+    private func updateManualList() {
+            manuallySortedMarkdownFiles = markdownFiles
+        }
+        
+        
+    func sortRecipes(selection: Sorting) {
+        if manuallySortedMarkdownFiles.isEmpty {
+            updateManualList()
+        }
+        
+        switch selection {
+            
+        case .manual:
+                markdownFiles = manuallySortedMarkdownFiles
+        case .name:
+            markdownFiles.sort(by: { $0.name < $1.name })
+        case .time:
+            markdownFiles.sort(by:  { extractTotalTime(from: $0.content) < extractTotalTime(from: $1.content) })
+        case .categories:
+            return
+        }
+    }
     
 }
 
