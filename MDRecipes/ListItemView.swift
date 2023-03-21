@@ -10,14 +10,26 @@ import SwiftUI
 struct ListItemView: View {
     @ObservedObject var fileManager: MarkdownFileManager
     var recipe: MarkdownFile
+    var rating: String { fileManager.extractRating(from: recipe.content) }
     
     var body: some View {
         VStack(alignment: .leading) {
             Text(recipe.name)
                 .accessibilityLabel("Recipe name")
-            Text("Takes \(String(fileManager.extractTotalTime(from: recipe.content))) minutes")
-                .font(.caption)
+            HStack {
+                if rating != "-" {
+                    Image(systemName: "star")
+                    Text(rating)
+                }
+                
+                Image(systemName: "clock")
+                Text("\(String(fileManager.extractTotalTime(from: recipe.content))) min")
+                    
+            }
+            .font(.caption)
+            
         }
+        
     }
 }
 

@@ -12,15 +12,14 @@ struct RecipesListView: View {
     
     @State private var editMode: EditMode = .inactive
     
-    
-    
     @State private var sortingSelection: Sorting = .manual
 
+    var category: String
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
-                ForEach(fileManager.markdownFiles) { recipe in
+                ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
                     NavigationLink(destination: RecipeView(recipe: recipe)) {
                             // TODO: show tags, how long it takes etc.
                         ListItemView(fileManager: fileManager, recipe: recipe)
@@ -35,7 +34,8 @@ struct RecipesListView: View {
                     sortingSelection = .manual
                 }
             }
-            .navigationTitle("MD Recipes")
+            .navigationTitle(Text(category.isEmpty ? "All" : category).fontDesign(.rounded))
+            
             
             .toolbar {
                 // TODO: check if I don't need the editButton to move things
@@ -50,6 +50,7 @@ struct RecipesListView: View {
                     } ) {
                         Label("Tip us 1 USD!", systemImage: "heart")
                     }
+                    
                     Menu {
                         Picker("Sorting", selection: $sortingSelection) {
                             ForEach(Sorting.allCases) { sortCase in
@@ -91,6 +92,6 @@ struct RecipesListView_Previews: PreviewProvider {
         let fileManager = MarkdownFileManager()
         fileManager.markdownFiles = MarkdownFile.sampleData
         
-        return RecipesListView(fileManager: fileManager)
+        return RecipesListView(fileManager: fileManager, category: "Desert")
     }
 }

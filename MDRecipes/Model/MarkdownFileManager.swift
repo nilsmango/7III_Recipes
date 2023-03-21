@@ -236,6 +236,18 @@ class MarkdownFileManager: ObservableObject {
         
     }
     
+    func extractRating(from string: String) -> String {
+        if let range = string.range(of: "Rating:.*\n", options: .regularExpression) ?? string.range(of: "Bewertung:.*\n", options: .regularExpression) {
+            let ratingString = string[range]
+            let cleanedRating = ratingString.replacingOccurrences(of: "Rating: ", with: "").replacingOccurrences(of: "Bewertung: ", with: "").replacingOccurrences(of: "\n", with: "")
+            return cleanedRating
+        } else {
+            return "-"
+            
+        }
+    }
+    
+    
     func extractTotalTime(from string: String) -> Int {
         var totalTime = 0
         
@@ -311,13 +323,13 @@ class MarkdownFileManager: ObservableObject {
         switch selection {
             
         case .manual:
-                markdownFiles = manuallySortedMarkdownFiles
+            markdownFiles = manuallySortedMarkdownFiles
         case .name:
             markdownFiles.sort(by: { $0.name < $1.name })
         case .time:
             markdownFiles.sort(by:  { extractTotalTime(from: $0.content) < extractTotalTime(from: $1.content) })
-        case .categories:
-            return
+        case .rating:
+            markdownFiles.sort(by: { extractRating(from: $0.content) > extractRating(from: $1.content) })
         }
     }
     

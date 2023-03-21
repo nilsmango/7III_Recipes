@@ -14,7 +14,7 @@ struct MDRecipesApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RecipesListView(fileManager: fileManager)
+            HomeView(fileManager: fileManager)
         }
     }
 }

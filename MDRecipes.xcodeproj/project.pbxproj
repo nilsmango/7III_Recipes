@@ -26,7 +26,9 @@
 		786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0329C851A400CAA48B /* _FlexibleView.swift */; };
 		786F9A0629C8520400CAA48B /* FlexibleContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0529C8520400CAA48B /* FlexibleContentView.swift */; };
 		786F9A0829C8678100CAA48B /* CategoriesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0729C8678100CAA48B /* CategoriesTest.swift */; };
-		786F9A0A29C86D9D00CAA48B /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0929C86D9D00CAA48B /* Enums.swift */; };
+		786F9A0A29C86D9D00CAA48B /* EnumSorting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0929C86D9D00CAA48B /* EnumSorting.swift */; };
+		786F9A0C29C8E0C000CAA48B /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0B29C8E0C000CAA48B /* HomeView.swift */; };
+		786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A0D29C8E18300CAA48B /* FolderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,7 +53,9 @@
 		786F9A0329C851A400CAA48B /* _FlexibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _FlexibleView.swift; sourceTree = "<group>"; };
 		786F9A0529C8520400CAA48B /* FlexibleContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleContentView.swift; sourceTree = "<group>"; };
 		786F9A0729C8678100CAA48B /* CategoriesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTest.swift; sourceTree = "<group>"; };
-		786F9A0929C86D9D00CAA48B /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		786F9A0929C86D9D00CAA48B /* EnumSorting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumSorting.swift; sourceTree = "<group>"; };
+		786F9A0B29C8E0C000CAA48B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		786F9A0D29C8E18300CAA48B /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,7 +89,9 @@
 			isa = PBXGroup;
 			children = (
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
+				786F9A0B29C8E0C000CAA48B /* HomeView.swift */,
 				782EB6C029C3B0A70086D2E7 /* RecipesListView.swift */,
+				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782EB6C429C460FF0086D2E7 /* ListItemView.swift */,
 				782EB6C229C460800086D2E7 /* RecipeView.swift */,
 				786F9A0729C8678100CAA48B /* CategoriesTest.swift */,
@@ -136,7 +142,7 @@
 			children = (
 				786F99FC29C5BD8800CAA48B /* MakeCleanArrayFromStrings.swift */,
 				786F99FF29C84E5C00CAA48B /* View+readSize.swift */,
-				786F9A0929C86D9D00CAA48B /* Enums.swift */,
+				786F9A0929C86D9D00CAA48B /* EnumSorting.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -221,14 +227,16 @@
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,
 				782EB6C129C3B0A70086D2E7 /* RecipesListView.swift in Sources */,
 				782EB6BF29C3A4650086D2E7 /* MarkdownFileManager.swift in Sources */,
+				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
 				782EB6C529C460FF0086D2E7 /* ListItemView.swift in Sources */,
 				786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */,
 				782EB6AD29C3A3A20086D2E7 /* MDRecipesApp.swift in Sources */,
 				786F9A0029C84E5C00CAA48B /* View+readSize.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
-				786F9A0A29C86D9D00CAA48B /* Enums.swift in Sources */,
+				786F9A0A29C86D9D00CAA48B /* EnumSorting.swift in Sources */,
 				782EB6C329C460800086D2E7 /* RecipeView.swift in Sources */,
+				786F9A0C29C8E0C000CAA48B /* HomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
