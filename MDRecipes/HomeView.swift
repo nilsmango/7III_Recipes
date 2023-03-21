@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var searchText = ""
     
     
+    
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     var body: some View {
@@ -56,13 +57,12 @@ struct HomeView: View {
                 List {
   
                     
-                    // TODO: make that list into sections of the categories!
                     
                         ForEach(fileManager.getAllCategories(), id: \.self) { category in
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(recipe: recipe)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                                             ListItemView(fileManager: fileManager, recipe: recipe)
                                         }
                                         

@@ -150,10 +150,31 @@ class MarkdownFileManager: ObservableObject {
                     }
                 }
             }
-            
         }
         return categories
     }
+    
+    /// extract the categories from a recipe
+    func extractCategories(from string: String) -> [String] {
+        var categories = [String]()
+        
+            if let range = string.range(of: "Categories:.*\n", options: .regularExpression) ?? string.range(of: "Kategorien:.*\n", options: .regularExpression) {
+                let categoryString = string[range]
+                let cleanedCategories = categoryString.replacingOccurrences(of: "Categories: ", with: "").replacingOccurrences(of: "Kategorien: ", with: "").replacingOccurrences(of: "\n", with: "")
+                let stringArray = cleanedCategories.components(separatedBy: ", ")
+                let cleanArray = stringArray.filter( { $0 != "" })
+                for string in cleanArray {
+                    if categories.contains(string) == false {
+                        categories.append(string)
+                    }
+                }
+            }
+        return categories
+        }
+    
+    
+    
+    
     
     /// get a list of tags from the recipes
     func getAllTags() -> [String] {
@@ -192,10 +213,10 @@ class MarkdownFileManager: ObservableObject {
             let matches = regex?.matches(in: content, options: [], range: NSRange(content.startIndex..<content.endIndex, in: content))
                 for match in matches ?? [] {
                     if let range = Range(match.range, in: content) {
-                        let almostIngredient = String(content[range]).capitalized
-                        let ingredient = extractIngredient(from: almostIngredient.replacingOccurrences(of: "- [ ] ", with: ""))
+                        let almostIngredient = String(content[range])
+                        let ingredient = extractOnlyIngredient(from: almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")).capitalized
                         
-                        // trying get plural form where possible
+                        // trying get plural form where possible and don't add the singular form (it works great this way)
                         let oneIngredient = String(ingredient.dropLast())
                         let pluralIngredient = ingredient + "s"
                         
@@ -208,20 +229,16 @@ class MarkdownFileManager: ObservableObject {
             }
         }
         return ingredients
-        
     }
     
-    // useful
+    // useful constants
     private let decimalCharacters = CharacterSet.decimalDigits
     
-    private func extractIngredient(from string: String) -> String {
-        // Define the units that can be removed
-        let units = ["g", "kg", "ml", "l", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "pinches", "Eine", "Prise", "Prisen", "mg", "L", "Liter", "ounce", "ounces", "approx.", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped", "clove", "cloves", "Zehe", "Zehen", "whole", "ganze", "ganz", "zum Anbraten", "wenig", "Messerspitze", ]
-        
+    private let units = ["g", "kg", "ml", "l", "dl", "hl", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "pinches", "Eine", "Prise", "Prisen", "mg", "L", "Liter", "Ltr.", "ounce", "ounces", "approx.", "approximately", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped", "clove", "cloves", "Zehe", "Zehen", "whole", "ganze", "ganz", "zum Anbraten", "wenig", "Messerspitze"]
+    
+    private func extractOnlyIngredient(from string: String) -> String {
         // Split the string by spaces
         let words = string.split(separator: " ")
-        
-        
         
         var ingredient = String()
         
@@ -231,10 +248,37 @@ class MarkdownFileManager: ObservableObject {
                 ingredient = ingredient + " " + word
             }
         }
-        
         return ingredient
-        
     }
+    
+    /// extracting all ingredients from a string
+    func extractIngredients(from string: String) -> [String] {
+        let regex = try? NSRegularExpression(pattern: "- \\[ \\] ([^\\n]+)", options: .anchorsMatchLines)
+        var ingredients = [String]()
+        
+        let matches = regex?.matches(in: string, options: [], range: NSRange(string.startIndex..<string.endIndex, in: string))
+            for match in matches ?? [] {
+                if let range = Range(match.range, in: string) {
+                    let almostIngredient = String(string[range])
+                    let ingredient = almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")
+                    ingredients.append(ingredient)
+                }
+        }
+        return ingredients
+    }
+    
+    
+    func extractServings(from string: String) -> Int {
+    
+        if let range = string.range(of: "Servings:.*\n", options: .regularExpression) ?? string.range(of: "Portionen:.*\n", options: .regularExpression) {
+            let ratingString = string[range]
+            let cleanedRating = ratingString.replacingOccurrences(of: "Servings: ", with: "").replacingOccurrences(of: "Portionen: ", with: "").replacingOccurrences(of: "\n", with: "")
+            return Int(cleanedRating) ?? 1
+        } else {
+            return 1
+        }
+    }
+    
     
     func extractRating(from string: String) -> String {
         if let range = string.range(of: "Rating:.*\n", options: .regularExpression) ?? string.range(of: "Bewertung:.*\n", options: .regularExpression) {
@@ -243,7 +287,6 @@ class MarkdownFileManager: ObservableObject {
             return cleanedRating
         } else {
             return "-"
-            
         }
     }
     
@@ -306,7 +349,29 @@ class MarkdownFileManager: ObservableObject {
         return hours * 60 + minutes
     }
         
+    /// Extract the instructions from the string
+    func extractDirections(from string: String, withNumbers: Bool) -> [String] {
+        var range = 1
+        if withNumbers {
+            range = 0
+        }
+        let pattern = "^\\d+\\.\\s(.+)$"
+
+            do {
+                let regex = try NSRegularExpression(pattern: pattern, options: .anchorsMatchLines)
+                let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
+                let directions = matches.map { match in
+                    return (string as NSString).substring(with: match.range(at: range))
+                }
+                return directions
+            } catch {
+                return ["Could not find Directions. Try to write them with 1., 2. etc"]
+            }
+        }
     
+    
+    
+    // Sorting
     
     var manuallySortedMarkdownFiles = [MarkdownFile]()
     

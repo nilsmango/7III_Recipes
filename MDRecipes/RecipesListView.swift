@@ -13,6 +13,8 @@ struct RecipesListView: View {
     @State private var editMode: EditMode = .inactive
     
     @State private var sortingSelection: Sorting = .manual
+    
+    @AppStorage("Servings") var chosenServings = 4
 
     var category: String
     
@@ -20,7 +22,7 @@ struct RecipesListView: View {
         NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, chosenServings: chosenServings)) {
                             // TODO: show tags, how long it takes etc.
                         ListItemView(fileManager: fileManager, recipe: recipe)
                     }
@@ -74,7 +76,7 @@ struct RecipesListView: View {
                 
                 Button(action: {
                     // TODO: change that to an edit view / see qrCoder
-                    fileManager.createMarkdownFile(name: "New Recipe", content: "")
+                    fileManager.createMarkdownFile(name: "New Recipe", content: "# Curry\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: 1/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: 1h40min\nServings:\nTimes cooked:\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\nEnjoy!")
                 }) { Label("New Recipe", systemImage: "plus.circle")}
             }
             .environment(\.editMode, $editMode)
@@ -92,6 +94,6 @@ struct RecipesListView_Previews: PreviewProvider {
         let fileManager = MarkdownFileManager()
         fileManager.markdownFiles = MarkdownFile.sampleData
         
-        return RecipesListView(fileManager: fileManager, category: "Desert")
+        return RecipesListView(fileManager: fileManager, category: "Main Course")
     }
 }

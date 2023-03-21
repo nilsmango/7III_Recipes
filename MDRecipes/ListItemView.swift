@@ -17,13 +17,14 @@ struct ListItemView: View {
             Text(recipe.name)
                 .accessibilityLabel("Recipe name")
             HStack {
+                Image(systemName: "clock")
+                Text("\(String(fileManager.extractTotalTime(from: recipe.content))) min")
                 if rating != "-" {
                     Image(systemName: "star")
                     Text(rating)
                 }
                 
-                Image(systemName: "clock")
-                Text("\(String(fileManager.extractTotalTime(from: recipe.content))) min")
+                
                     
             }
             .font(.caption)

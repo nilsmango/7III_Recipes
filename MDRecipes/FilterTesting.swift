@@ -44,7 +44,7 @@ struct FilterTesting: View {
                 
                 
                 ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories, tags: activeTags)) { recipe in
-                    NavigationLink(destination: RecipeView(recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                         ListItemView(fileManager: fileManager, recipe: recipe)
                     }
                 }
@@ -55,41 +55,41 @@ struct FilterTesting: View {
             
             
             
-            Text("Categories")
-            FlexibleView(
-                data: fileManager.getAllCategories(),
-              spacing: 5,
-                alignment: .leading
-            ) { category in
-                
-                Button(action: {
-                    // TODO: make a func for this
-                    if isSelected(button: category) {
-                        activeCategories.removeAll(where: { $0 == category })
-                    } else {
-                        activeCategories.append(category)
-                    }
-                    
-                }) {
-                    
-                        
-                    if isSelected(button: category) {
-                        Text(category)
-                            .fixedSize()
-                        
-                            
-                    } else {
-                        Text(category)
-                            .fixedSize()
-                            .foregroundColor(.secondary)
-                    }
-                    }
-                
-                .buttonStyle(.bordered)
-            }
-            .padding(.horizontal)
-            
-            
+//            Text("Categories")
+//            FlexibleView(
+//                data: fileManager.getAllCategories(),
+//              spacing: 5,
+//                alignment: .leading
+//            ) { category in
+//                
+//                Button(action: {
+//                    // TODO: make a func for this
+//                    if isSelected(button: category) {
+//                        activeCategories.removeAll(where: { $0 == category })
+//                    } else {
+//                        activeCategories.append(category)
+//                    }
+//                    
+//                }) {
+//                    
+//                        
+//                    if isSelected(button: category) {
+//                        Text(category)
+//                            .fixedSize()
+//                        
+//                            
+//                    } else {
+//                        Text(category)
+//                            .fixedSize()
+//                            .foregroundColor(.secondary)
+//                    }
+//                    }
+//                
+//                .buttonStyle(.bordered)
+//            }
+//            .padding(.horizontal)
+//            
+//            
             Text("Tags")
             FlexibleView(
                 data: fileManager.getAllTags(),
