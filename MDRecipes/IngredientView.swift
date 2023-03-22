@@ -30,7 +30,7 @@ struct IngredientView: View {
     
     private func stringMaker() -> String {
         
-        let cleanIngredient = cleanUpIngredientString(string: ingredient)
+        let cleanIngredient = Parser.cleanUpIngredientString(string: ingredient)
         
         let numbersRange = cleanIngredient.rangeOfCharacter(from: .decimalDigits)
         

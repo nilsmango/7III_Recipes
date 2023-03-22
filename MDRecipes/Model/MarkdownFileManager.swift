@@ -40,14 +40,7 @@ class MarkdownFileManager: ObservableObject {
     }
     
     func createMarkdownFile(name: String, content: String) {
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentsDirectory.appendingPathComponent(name).appendingPathExtension("md")
-        do {
-            try content.write(to: fileURL, atomically: true, encoding: .utf8)
-            self.markdownFiles.append(MarkdownFile(name: name, content: content))
-        } catch {
-            print("Error creating Markdown file: \(error.localizedDescription)")
-        }
+        markdownFiles.append(MarkdownFile(name: name, content: content))
     }
     
     func delete(at indexSet: IndexSet) {
@@ -68,13 +61,27 @@ class MarkdownFileManager: ObservableObject {
         updateManualList()
     }
     
+    
+    // TODO: do we need to save to file after this?
+    func setTimesCooked(of recipe: MarkdownFile, to count: Int) {
+        guard let index = markdownFiles.firstIndex(where: { $0.id == recipe.id }) else {
+            fatalError("couldn't find the index for recipe")
+        }
+        
+        markdownFiles[index].content = Parser.changeTimesCooked(of: markdownFiles[index].content, to: count)
+    }
+    
+    
+    
+    
+    
     /// Search and filter the recipes
     func filterTheRecipes(string: String, ingredients: [String], categories: [String], tags: [String]) -> [MarkdownFile] {
         var filteredRecipes = markdownFiles
         // first is the searchString
         if string.isEmpty == false {
             if string.contains(" ") {
-                let cleanArray = makeCleanArray(from: string)
+                let cleanArray = Parser.makeCleanArray(from: string)
                 filteredRecipes = filteredRecipes.filter { file in
                             cleanArray.allSatisfy { word in
                                     file.content.range(of: word, options: .caseInsensitive) != nil
@@ -154,23 +161,7 @@ class MarkdownFileManager: ObservableObject {
         return categories
     }
     
-    /// extract the categories from a recipe
-    func extractCategories(from string: String) -> [String] {
-        var categories = [String]()
-        
-            if let range = string.range(of: "Categories:.*\n", options: .regularExpression) ?? string.range(of: "Kategorien:.*\n", options: .regularExpression) {
-                let categoryString = string[range]
-                let cleanedCategories = categoryString.replacingOccurrences(of: "Categories: ", with: "").replacingOccurrences(of: "Kategorien: ", with: "").replacingOccurrences(of: "\n", with: "")
-                let stringArray = cleanedCategories.components(separatedBy: ", ")
-                let cleanArray = stringArray.filter( { $0 != "" })
-                for string in cleanArray {
-                    if categories.contains(string) == false {
-                        categories.append(string)
-                    }
-                }
-            }
-        return categories
-        }
+    
     
     
     
@@ -214,7 +205,7 @@ class MarkdownFileManager: ObservableObject {
                 for match in matches ?? [] {
                     if let range = Range(match.range, in: content) {
                         let almostIngredient = String(content[range])
-                        let ingredient = extractOnlyIngredient(from: almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")).capitalized
+                        let ingredient = Parser.extractOnlyIngredient(from: almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")).capitalized
                         
                         // trying get plural form where possible and don't add the singular form (it works great this way)
                         let oneIngredient = String(ingredient.dropLast())
@@ -230,144 +221,6 @@ class MarkdownFileManager: ObservableObject {
         }
         return ingredients
     }
-    
-    // useful constants
-    private let decimalCharacters = CharacterSet.decimalDigits
-    
-    private let units = ["g", "kg", "ml", "l", "dl", "hl", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "pinches", "Eine", "Prise", "Prisen", "mg", "L", "Liter", "Ltr.", "ounce", "ounces", "approx.", "approximately", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped", "clove", "cloves", "Zehe", "Zehen", "whole", "ganze", "ganz", "zum Anbraten", "wenig", "Messerspitze"]
-    
-    private func extractOnlyIngredient(from string: String) -> String {
-        // Split the string by spaces
-        let words = string.split(separator: " ")
-        
-        var ingredient = String()
-        
-        // Find all the words not containing digits and units, adding them back together.
-        for word in words {
-            if word.rangeOfCharacter(from: decimalCharacters) == nil && units.description.lowercased().contains(String(word).lowercased()) == false {
-                ingredient = ingredient + " " + word
-            }
-        }
-        return ingredient
-    }
-    
-    /// extracting all ingredients from a string
-    func extractIngredients(from string: String) -> [String] {
-        let regex = try? NSRegularExpression(pattern: "- \\[ \\] ([^\\n]+)", options: .anchorsMatchLines)
-        var ingredients = [String]()
-        
-        let matches = regex?.matches(in: string, options: [], range: NSRange(string.startIndex..<string.endIndex, in: string))
-            for match in matches ?? [] {
-                if let range = Range(match.range, in: string) {
-                    let almostIngredient = String(string[range])
-                    let ingredient = almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")
-                    ingredients.append(ingredient)
-                }
-        }
-        return ingredients
-    }
-    
-    
-    func extractServings(from string: String) -> Int {
-    
-        if let range = string.range(of: "Servings:.*\n", options: .regularExpression) ?? string.range(of: "Portionen:.*\n", options: .regularExpression) {
-            let ratingString = string[range]
-            let cleanedRating = ratingString.replacingOccurrences(of: "Servings: ", with: "").replacingOccurrences(of: "Portionen: ", with: "").replacingOccurrences(of: "\n", with: "")
-            return Int(cleanedRating) ?? 1
-        } else {
-            return 1
-        }
-    }
-    
-    
-    func extractRating(from string: String) -> String {
-        if let range = string.range(of: "Rating:.*\n", options: .regularExpression) ?? string.range(of: "Bewertung:.*\n", options: .regularExpression) {
-            let ratingString = string[range]
-            let cleanedRating = ratingString.replacingOccurrences(of: "Rating: ", with: "").replacingOccurrences(of: "Bewertung: ", with: "").replacingOccurrences(of: "\n", with: "")
-            return cleanedRating
-        } else {
-            return "-"
-        }
-    }
-    
-    
-    func extractTotalTime(from string: String) -> Int {
-        var totalTime = 0
-        
-        if let range = string.range(of: "Total time:.*\n", options: .regularExpression) ?? string.range(of: "Gesamtzeit:.*\n", options: .regularExpression) {
-            let categoryString = string[range]
-            let cleanedTime = categoryString.replacingOccurrences(of: "Total time: ", with: "").replacingOccurrences(of: "Gesamtzeit: ", with: "").replacingOccurrences(of: "\n", with: "")
-            totalTime = calculateTimeInMinutes(input: cleanedTime)
-            }
-            return totalTime
-        }
-    
-    
-    private func calculateTimeInMinutes(input: String) -> Int  {
-        let cleanedString = input.replacingOccurrences(of: " ", with: "")
-        
-        var numberArr = [Int]()
-        var hours = 0
-        var minutes = 0
-        
-        for element in cleanedString {
-            let stringElement = String(element)
-            //check if number or character
-            if element.isNumber {
-                numberArr.append(Int(stringElement)!)
-            } else if element.isLetter {
-                
-                if stringElement.lowercased() == "h" || stringElement.lowercased() == "s" {
-                    if numberArr.count > 1 {
-                        var count = numberArr.count
-                        for number in numberArr {
-                            hours += number * Int(pow(10, Double(count - 1)))
-                            count = count - 1
-                        }
-                        numberArr.removeAll()
-                        
-                        
-                    } else {
-                        hours = numberArr.first ?? 0
-                        numberArr.removeAll()
-                    }
-                } else if stringElement.lowercased() == "m" {
-                    if numberArr.count > 1 {
-                        print(numberArr)
-                                        var count = numberArr.count
-                                        for number in numberArr {
-                                            minutes += number * Int(pow(10, Double(count - 1)))
-                                            count = count - 1
-                                        }
-                                    } else {
-                                        minutes = numberArr.first ?? 0
-                                    }
-                }
-            }
-        }
-
-        return hours * 60 + minutes
-    }
-        
-    /// Extract the instructions from the string
-    func extractDirections(from string: String, withNumbers: Bool) -> [String] {
-        var range = 1
-        if withNumbers {
-            range = 0
-        }
-        let pattern = "^\\d+\\.\\s(.+)$"
-
-            do {
-                let regex = try NSRegularExpression(pattern: pattern, options: .anchorsMatchLines)
-                let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
-                let directions = matches.map { match in
-                    return (string as NSString).substring(with: match.range(at: range))
-                }
-                return directions
-            } catch {
-                return ["Could not find Directions. Try to write them with 1., 2. etc"]
-            }
-        }
     
     
     
@@ -392,9 +245,9 @@ class MarkdownFileManager: ObservableObject {
         case .name:
             markdownFiles.sort(by: { $0.name < $1.name })
         case .time:
-            markdownFiles.sort(by:  { extractTotalTime(from: $0.content) < extractTotalTime(from: $1.content) })
+            markdownFiles.sort(by:  { Parser.extractTotalTime(from: $0.content) < Parser.extractTotalTime(from: $1.content) })
         case .rating:
-            markdownFiles.sort(by: { extractRating(from: $0.content) > extractRating(from: $1.content) })
+            markdownFiles.sort(by: { Parser.extractRating(from: $0.content) > Parser.extractRating(from: $1.content) })
         }
     }
     
