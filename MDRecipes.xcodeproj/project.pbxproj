@@ -30,6 +30,11 @@
 		786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1329CA381F00CAA48B /* IngredientView.swift */; };
 		786F9A1829CAE74D00CAA48B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1729CAE74D00CAA48B /* Parser.swift */; };
 		786F9A1E29CB08EF00CAA48B /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1D29CB08EF00CAA48B /* TimerView.swift */; };
+		786F9A2029CB9E4100CAA48B /* TimerViewTop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */; };
+		786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2129CC418800CAA48B /* NotificationDelegate.swift */; };
+		786F9A2B29CC589600CAA48B /* TimerListButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2A29CC589600CAA48B /* TimerListButton.swift */; };
+		786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2C29CC7F6D00CAA48B /* VisibilityView.swift */; };
+		786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2E29CC84CE00CAA48B /* AnotherVisibilityTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +66,11 @@
 		786F9A1B29CAF2D800CAA48B /* RoundedCross.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCross.swift; sourceTree = "<group>"; };
 		786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiSwiftUI.swift; sourceTree = "<group>"; };
 		786F9A1D29CB08EF00CAA48B /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewTop.swift; sourceTree = "<group>"; };
+		786F9A2129CC418800CAA48B /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
+		786F9A2A29CC589600CAA48B /* TimerListButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerListButton.swift; sourceTree = "<group>"; };
+		786F9A2C29CC7F6D00CAA48B /* VisibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibilityView.swift; sourceTree = "<group>"; };
+		786F9A2E29CC84CE00CAA48B /* AnotherVisibilityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnotherVisibilityTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,10 +108,12 @@
 				782EB6C029C3B0A70086D2E7 /* RecipesListView.swift */,
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782EB6C429C460FF0086D2E7 /* ListItemView.swift */,
-				782EB6C229C460800086D2E7 /* RecipeView.swift */,
 				786F9A1329CA381F00CAA48B /* IngredientView.swift */,
-				786F9A1D29CB08EF00CAA48B /* TimerView.swift */,
 				7864173729C4770B00D67DE0 /* FilterTesting.swift */,
+				782EB6C229C460800086D2E7 /* RecipeView.swift */,
+				786F9A2A29CC589600CAA48B /* TimerListButton.swift */,
+				786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */,
+				786F9A2329CC46A400CAA48B /* Experiments */,
 				786F9A0129C84EFE00CAA48B /* FlexibleView.swift */,
 				786F9A0329C851A400CAA48B /* _FlexibleView.swift */,
 				786F9A0529C8520400CAA48B /* FlexibleContentView.swift */,
@@ -150,6 +162,7 @@
 			children = (
 				786F99FF29C84E5C00CAA48B /* View+readSize.swift */,
 				786F9A0929C86D9D00CAA48B /* EnumSorting.swift */,
+				786F9A2129CC418800CAA48B /* NotificationDelegate.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -162,6 +175,16 @@
 				786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */,
 			);
 			path = ConfettiSwiftUI;
+			sourceTree = "<group>";
+		};
+		786F9A2329CC46A400CAA48B /* Experiments */ = {
+			isa = PBXGroup;
+			children = (
+				786F9A1D29CB08EF00CAA48B /* TimerView.swift */,
+				786F9A2C29CC7F6D00CAA48B /* VisibilityView.swift */,
+				786F9A2E29CC84CE00CAA48B /* AnotherVisibilityTest.swift */,
+			);
+			path = Experiments;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +259,7 @@
 			files = (
 				786F9A1E29CB08EF00CAA48B /* TimerView.swift in Sources */,
 				786F99F629C4F05700CAA48B /* ViewArrayBuilder.swift in Sources */,
+				786F9A2029CB9E4100CAA48B /* TimerViewTop.swift in Sources */,
 				7864173829C4770B00D67DE0 /* FilterTesting.swift in Sources */,
 				786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */,
 				786F99F829C4F0A100CAA48B /* WrapStack.swift in Sources */,
@@ -243,13 +267,17 @@
 				786F9A0629C8520400CAA48B /* FlexibleContentView.swift in Sources */,
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,
 				782EB6C129C3B0A70086D2E7 /* RecipesListView.swift in Sources */,
+				786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */,
 				782EB6BF29C3A4650086D2E7 /* MarkdownFileManager.swift in Sources */,
+				786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */,
+				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
 				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
 				786F9A1829CAE74D00CAA48B /* Parser.swift in Sources */,
 				782EB6C529C460FF0086D2E7 /* ListItemView.swift in Sources */,
 				786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */,
 				782EB6AD29C3A3A20086D2E7 /* MDRecipesApp.swift in Sources */,
+				786F9A2B29CC589600CAA48B /* TimerListButton.swift in Sources */,
 				786F9A0029C84E5C00CAA48B /* View+readSize.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
 				786F9A0A29C86D9D00CAA48B /* EnumSorting.swift in Sources */,

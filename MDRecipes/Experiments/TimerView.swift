@@ -9,14 +9,14 @@ import SwiftUI
 
 struct TimerView: View {
     // timerTime in minutes
-    var timerTime: Int
+    var timerTime: Double
     @State private var remainingTime = 60
     @State private var timerRunning = false
     let notificationCenter = UNUserNotificationCenter.current()
     
     private func timerTrigger() {
         if !timerRunning {
-            remainingTime = timerTime * 60
+            remainingTime = Int(timerTime * 60)
             
             timerRunning = true
             let currentDate = Date()
@@ -57,9 +57,19 @@ struct TimerView: View {
             Button(action: {
                 timerTrigger()
                 }) {
-                    Label(timerRunning ? "Time Remaining: \(remainingTime) seconds" : "Start \(timerTime) minute timer", systemImage: "timer")
+                    Label(timerRunning ? "Time Remaining: \(remainingTime) seconds" : "Start \(Int(timerTime)) min Timer", systemImage: "timer")
                         .monospacedDigit()
-            }
+                }.foregroundColor(.white)
+                .buttonStyle(.borderedProminent)
+                .onAppear() {
+                    notificationCenter.requestAuthorization(options: [.alert, .sound]) { success, error in
+                        if success {
+                            print("All set!")
+                        } else if let error = error {
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
                 
             
     }

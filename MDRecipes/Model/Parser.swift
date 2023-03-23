@@ -194,7 +194,7 @@ struct Parser {
     }
     
     /// Find a timer in a direction and extract minutes, nil if nothing found
-    static func extractTimerInMinutes(from string: String) -> Int {
+    static func extractTimerInMinutes(from string: String) -> Double {
         // Define the regular expression pattern
         let pattern = "(\\d*\\.?\\d+)\\s*([a-zA-Z]+)"
         
@@ -224,7 +224,7 @@ struct Parser {
         
         var index = 0
         for time in times {
-            if units[index].first!.lowercased() == "h" {
+            if units[index].first!.lowercased() == "h" || units[index].first!.lowercased() == "st" {
                 times[index] = time * 60
             } else if units[index].first!.lowercased() == "m" {
                 // all good
@@ -233,7 +233,7 @@ struct Parser {
             }
             index += 1
         }
-        return Int(times.reduce(0, +))
+        return Double(times.reduce(0, +))
     }
     
     
@@ -284,4 +284,20 @@ struct Parser {
             return string
         }
     }
+    
+    /// formatting time to show h, min and s if and where we need to in a button
+    static func formatTime(_ time: Double) -> String {
+        if time >= 60 {
+            if time.truncatingRemainder(dividingBy: 60) == 0 {
+                return "\(Int(time / 60)) h"
+            } else {
+                return "\(Int(time / 60)) h \(Int(time.truncatingRemainder(dividingBy: 60))) min"
+            }
+        } else if time >= 1 {
+            return "\(Int(time)) min"
+        } else {
+            return "\(Int(time * 60)) s"
+        }
+    }
+    
 }
