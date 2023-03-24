@@ -149,8 +149,6 @@ struct RecipeView: View {
                                     }
                                 }
                                 
-                                
-                                
                             }
                             .padding(.vertical)
                             
@@ -205,37 +203,23 @@ struct RecipeView: View {
         HStack {
             HStack {
                 Button(action: {
-                    if directionForTimer[makeIndex(of: direction)] != "" {
-                        let newDirection = directionForTimer[makeIndex(of: direction)]
-                        timerTrigger(of: newDirection)
-                        targetDateArray[makeIndex(of: direction)] = targetDate(of: newDirection)
-                    } else {
-                        timerTrigger(of: direction)
-                        targetDateArray[makeIndex(of: direction)] = targetDate(of: direction)
-                    }
-                    
+                    let targetDirection = directionForTimer[makeIndex(of: direction)] != "" ? directionForTimer[makeIndex(of: direction)] : direction
+                    timerTrigger(of: targetDirection)
+                    targetDateArray[makeIndex(of: direction)] = targetDate(of: targetDirection)
                 }) {
-                    
-                        Image(systemName: "timer")
-                        if timerRunningArray[makeIndex(of: direction)] {
-                            Text(targetDateArray[makeIndex(of: direction)], style: .timer)
-                                .monospacedDigit()
-                        } else {
-                            if let timerDirection = directionForTimer[makeIndex(of: direction)], !timerDirection.isEmpty {
-                                let timerTime = Parser.extractTimerInMinutes(from: timerDirection)
-                                let timeText = Parser.formatTime(timerTime)
-                                Text(timeText)
-                            } else {
-                                let timerTime = Parser.extractTimerInMinutes(from: direction)
-                                let timeText = Parser.formatTime(timerTime)
-                                Text(timeText)
-                            }
-
-                            
-                        }
-                    
+                    Image(systemName: "timer")
+                    if timerRunningArray[makeIndex(of: direction)] {
+                        Text(targetDateArray[makeIndex(of: direction)], style: .timer)
+                            .monospacedDigit()
+                    } else {
+                        let timerDirection = directionForTimer[makeIndex(of: direction)]
+                        let timerTime = Parser.extractTimerInMinutes(from: timerDirection.isEmpty ? direction : timerDirection)
+                        let timeText = Parser.formatTime(timerTime)
+                        Text(timeText)
+                            .monospacedDigit()
                     }
                 }
+            }
                 .foregroundColor(.white)
                 .buttonStyle(.borderedProminent)
             
@@ -253,17 +237,54 @@ struct RecipeView: View {
             
             if !timerRunningArray[makeIndex(of: direction)] {
                 Button(action: {
-                    // TODO: I need the newDirection here in the beginning, taken from the time Parser.extractTimerInMinutes(from: direction), but then use the new after?!
-                    if Parser.extractTimerInMinutes(from: direction) >= 10 {
-                        let stepperValue = 5.0
-                        let timerString = Parser.extractTimerInMinutes(from: direction) + stepperValue
-                        directionForTimer[makeIndex(of: direction)] = String(makeIndex(of: direction)) + " \(timerString) min"
+                    let directionIndex = makeIndex(of: direction)
+                    let timerMinutes: Double
+                    if directionForTimer[directionIndex] == "" {
+                        timerMinutes = Parser.extractTimerInMinutes(from: direction)
                     } else {
-                        let stepperValue = 1.0
-                        let timerString = Parser.extractTimerInMinutes(from: direction) + stepperValue
-                        directionForTimer[makeIndex(of: direction)] = String(makeIndex(of: direction)) + " \(timerString) min"
+                        timerMinutes = Parser.extractTimerInMinutes(from: directionForTimer[directionIndex])
                     }
-                    
+
+                    let stepperValue: Double
+                    if timerMinutes >= 25 {
+                        stepperValue = -5.0
+                    } else if timerMinutes >= 12 {
+                        stepperValue = -2.0
+                    } else if timerMinutes >= 2{
+                        stepperValue = -1.0
+                    } else {
+                        stepperValue = 0.0
+                    }
+
+                    let newTimerMinutes = timerMinutes + stepperValue
+                    directionForTimer[directionIndex] = "\(directionIndex) \(newTimerMinutes) min"
+
+                }) {
+                        Image(systemName: "minus.circle")
+                }
+                .buttonStyle(.bordered)
+                
+                Button(action: {
+                    let directionIndex = makeIndex(of: direction)
+                    let timerMinutes: Double
+                    if directionForTimer[directionIndex] == "" {
+                        timerMinutes = Parser.extractTimerInMinutes(from: direction)
+                    } else {
+                        timerMinutes = Parser.extractTimerInMinutes(from: directionForTimer[directionIndex])
+                    }
+
+                    let stepperValue: Double
+                    if timerMinutes >= 20 {
+                        stepperValue = 5.0
+                    } else if timerMinutes >= 10 {
+                        stepperValue = 2.0
+                    } else {
+                        stepperValue = 1.0
+                    }
+
+                    let newTimerMinutes = timerMinutes + stepperValue
+                    directionForTimer[directionIndex] = "\(directionIndex) \(newTimerMinutes) min"
+
                 }) {
                         Image(systemName: "plus.circle")
                 }
