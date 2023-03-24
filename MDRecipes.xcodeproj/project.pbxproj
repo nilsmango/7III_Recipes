@@ -30,11 +30,13 @@
 		786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1329CA381F00CAA48B /* IngredientView.swift */; };
 		786F9A1829CAE74D00CAA48B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1729CAE74D00CAA48B /* Parser.swift */; };
 		786F9A1E29CB08EF00CAA48B /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1D29CB08EF00CAA48B /* TimerView.swift */; };
-		786F9A2029CB9E4100CAA48B /* TimerViewTop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */; };
 		786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2129CC418800CAA48B /* NotificationDelegate.swift */; };
 		786F9A2B29CC589600CAA48B /* TimerListButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2A29CC589600CAA48B /* TimerListButton.swift */; };
 		786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2C29CC7F6D00CAA48B /* VisibilityView.swift */; };
 		786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A2E29CC84CE00CAA48B /* AnotherVisibilityTest.swift */; };
+		786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */; };
+		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
+		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,11 +68,13 @@
 		786F9A1B29CAF2D800CAA48B /* RoundedCross.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCross.swift; sourceTree = "<group>"; };
 		786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiSwiftUI.swift; sourceTree = "<group>"; };
 		786F9A1D29CB08EF00CAA48B /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
-		786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewTop.swift; sourceTree = "<group>"; };
 		786F9A2129CC418800CAA48B /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
 		786F9A2A29CC589600CAA48B /* TimerListButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerListButton.swift; sourceTree = "<group>"; };
 		786F9A2C29CC7F6D00CAA48B /* VisibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibilityView.swift; sourceTree = "<group>"; };
 		786F9A2E29CC84CE00CAA48B /* AnotherVisibilityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnotherVisibilityTest.swift; sourceTree = "<group>"; };
+		786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimer.swift; sourceTree = "<group>"; };
+		786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTimerView.swift; sourceTree = "<group>"; };
+		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +115,8 @@
 				786F9A1329CA381F00CAA48B /* IngredientView.swift */,
 				7864173729C4770B00D67DE0 /* FilterTesting.swift */,
 				782EB6C229C460800086D2E7 /* RecipeView.swift */,
+				786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */,
 				786F9A2A29CC589600CAA48B /* TimerListButton.swift */,
-				786F9A1F29CB9E4100CAA48B /* TimerViewTop.swift */,
 				786F9A2329CC46A400CAA48B /* Experiments */,
 				786F9A0129C84EFE00CAA48B /* FlexibleView.swift */,
 				786F9A0329C851A400CAA48B /* _FlexibleView.swift */,
@@ -137,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				782EB6BC29C3A3F70086D2E7 /* MarkdownFile.swift */,
+				786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */,
 				782EB6BE29C3A4650086D2E7 /* MarkdownFileManager.swift */,
 				786F9A1729CAE74D00CAA48B /* Parser.swift */,
 				786F9A1929CAF2D800CAA48B /* ConfettiSwiftUI */,
@@ -163,6 +168,7 @@
 				786F99FF29C84E5C00CAA48B /* View+readSize.swift */,
 				786F9A0929C86D9D00CAA48B /* EnumSorting.swift */,
 				786F9A2129CC418800CAA48B /* NotificationDelegate.swift */,
+				786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -259,20 +265,22 @@
 			files = (
 				786F9A1E29CB08EF00CAA48B /* TimerView.swift in Sources */,
 				786F99F629C4F05700CAA48B /* ViewArrayBuilder.swift in Sources */,
-				786F9A2029CB9E4100CAA48B /* TimerViewTop.swift in Sources */,
 				7864173829C4770B00D67DE0 /* FilterTesting.swift in Sources */,
 				786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */,
 				786F99F829C4F0A100CAA48B /* WrapStack.swift in Sources */,
 				782EB6BD29C3A3F70086D2E7 /* MarkdownFile.swift in Sources */,
 				786F9A0629C8520400CAA48B /* FlexibleContentView.swift in Sources */,
+				786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */,
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,
 				782EB6C129C3B0A70086D2E7 /* RecipesListView.swift in Sources */,
+				786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */,
 				786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */,
 				782EB6BF29C3A4650086D2E7 /* MarkdownFileManager.swift in Sources */,
 				786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */,
 				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
 				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
+				786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */,
 				786F9A1829CAE74D00CAA48B /* Parser.swift in Sources */,
 				782EB6C529C460FF0086D2E7 /* ListItemView.swift in Sources */,
 				786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */,

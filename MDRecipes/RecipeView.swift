@@ -41,6 +41,9 @@ struct RecipeView: View {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + remainingTime) {
                 timerRunningArray[makeIndex(of: direction)] = false
+                if let indexToRemove = floatingTimers.firstIndex(where: { $0.step == makeIndex(of: direction) }) {
+                    floatingTimers.remove(at: indexToRemove)
+                }
             }
             
         } else {
@@ -59,6 +62,7 @@ struct RecipeView: View {
     @State private var timerRunningArray = Array(repeating: false, count: 50)
     @State private var targetDateArray = Array(repeating: Date.now, count: 50)
     @State private var directionForTimer = Array(repeating: "", count: 50)
+    @State private var floatingTimers = [DirectionTimer]()
     
     private func targetDate(of direction: String) -> Date {
         Date.now.addingTimeInterval(TimeInterval(Parser.extractTimerInMinutes(from: direction) * 60))
@@ -88,7 +92,7 @@ struct RecipeView: View {
     var body: some View {
         
             NavigationStack {
-//                ZStack {
+                ZStack {
                 
                 List {
                     Section {
@@ -184,15 +188,21 @@ struct RecipeView: View {
                 .listStyle(.insetGrouped)
                 .navigationTitle(recipe.name)
                     
-//                    VStack {
-//                        HStack {
-//                            Spacer()
-//                            TimerViewTop(timerTime: 0.1, step: "3", timerRunning: $timerRunning)
-//                                .padding()
-//                        }
-//                        Spacer()
-//                    }
-//            }
+                    
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            VStack {
+                                ForEach(floatingTimers) { timer in
+                                    FloatingTimerView(targetDate: timer.targetDate, step: timer.step, running: timer.running)
+                                        .padding([.top, .horizontal])
+                                }
+                            }
+                        }
+                        
+                    }
+            }
             
                 
             }
@@ -202,6 +212,7 @@ struct RecipeView: View {
     func ButtonView(direction: String) -> some View {
         HStack {
             HStack {
+                if !floatingTimers.contains(where: { $0.step == makeIndex(of: direction)}) {
                 Button(action: {
                     let targetDirection = directionForTimer[makeIndex(of: direction)] != "" ? directionForTimer[makeIndex(of: direction)] : direction
                     timerTrigger(of: targetDirection)
@@ -220,6 +231,7 @@ struct RecipeView: View {
                     }
                 }
             }
+            }
                 .foregroundColor(.white)
                 .buttonStyle(.borderedProminent)
             
@@ -231,7 +243,6 @@ struct RecipeView: View {
                             print(error.localizedDescription)
                         }
                     }
-                    
                     notificationCenter.delegate = delegate
                 }
             
@@ -289,8 +300,42 @@ struct RecipeView: View {
                         Image(systemName: "plus.circle")
                 }
                 .buttonStyle(.bordered)
+            } else {
+                // activate / deactivate floating timer
+                if let indexToRemove = floatingTimers.firstIndex(where: { $0.step == makeIndex(of: direction) }) {
+                    
+                    Button(action: {
+                        // stop timer and remove
+                        let targetDirection = directionForTimer[makeIndex(of: direction)] != "" ? directionForTimer[makeIndex(of: direction)] : direction
+                        timerTrigger(of: targetDirection)
+                        targetDateArray[makeIndex(of: direction)] = targetDate(of: targetDirection)
+                        floatingTimers.remove(at: indexToRemove)
+                    }) {
+                        Image(systemName: "stop.circle")
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button(action: {
+                        floatingTimers.remove(at: indexToRemove)
+                    }) {
+                        Image(systemName: "arrow.up.left.circle")
+                    }
+                    .buttonStyle(.bordered)
+                } else {
+                    Button(action: {
+                        let newTimer = DirectionTimer(targetDate: targetDateArray[makeIndex(of: direction)],
+                                                      step: makeIndex(of: direction),
+                                                      running: true,
+                                                      backgroundColor: .blue,
+                                                      fontColor: .white)
+                        floatingTimers.append(newTimer)
+                    }) {
+                        Image(systemName: "arrow.down.right.circle")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
             }
-            
             
         }
     }
