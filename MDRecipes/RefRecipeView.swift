@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RecipeView: View {
+struct RefRecipeView: View {
     @ObservedObject var fileManager: MarkdownFileManager
     
     // in-App notification
@@ -347,10 +347,10 @@ struct RecipeView: View {
 
 
 
-struct RecipeView_Previews: PreviewProvider {
+struct RefRecipeView_Previews: PreviewProvider {
     static var previews: some View {
      
-        RecipeView(fileManager: MarkdownFileManager(), recipe: MarkdownFile.sampleData.last!)
+        RefRecipeView(fileManager: MarkdownFileManager(), recipe: MarkdownFile.sampleData.last!)
         
         
     }
