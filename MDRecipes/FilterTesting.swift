@@ -44,7 +44,7 @@ struct FilterTesting: View {
                 
                 
                 ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories, tags: activeTags)) { recipe in
-                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                    NavigationLink(destination: RecipeViewTryOne(fileManager: fileManager, recipe: recipe)) {
                         ListItemView(recipe: recipe)
                     }
                 }

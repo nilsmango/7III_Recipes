@@ -22,7 +22,7 @@ struct RecipesListView: View {
         NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, chosenServings: chosenServings)) {
+                    NavigationLink(destination: RecipeView(recipe: Parser.makeRecipeFromMarkdown(markdown: recipe))) {
                             // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }

@@ -62,7 +62,7 @@ struct HomeView: View {
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                                        NavigationLink(destination: RecipeViewTryOne(fileManager: fileManager, recipe: recipe)) {
                                             ListItemView(recipe: recipe)
                                         }
                                         

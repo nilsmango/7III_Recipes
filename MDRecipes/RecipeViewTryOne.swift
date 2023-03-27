@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RefRecipeView: View {
+struct RecipeViewTryOne: View {
     @ObservedObject var fileManager: MarkdownFileManager
     
     // in-App notification
@@ -97,7 +97,7 @@ struct RefRecipeView: View {
                         HStack {
                             Image(systemName: "clock")
                             Text("\(String(Parser.extractTotalTime(from: recipe.content))) min")
-                            if rating != "-" {
+                            if rating != "" {
                                 Image(systemName: "star")
                                 Text(rating)
                             }
@@ -110,9 +110,10 @@ struct RefRecipeView: View {
                     Section("Servings") {
                         Stepper("\(chosenServings)", value: $chosenServings, in: 1...1000)
                     }
+                    
                     Section(header: Text("Ingredients")) {
                         ForEach(Parser.extractIngredients(from: recipe.content), id: \.self) { ingredient in
-                            IngredientView(ingredient: ingredient, recipeServings: Parser.extractServings(from: recipe.content), chosenServings: chosenServings, selected: selectionChecker(ingredient))
+                            IngredientView(ingredientString: ingredient, recipeServings: Parser.extractServings(from: recipe.content), chosenServings: chosenServings, selected: selectionChecker(ingredient))
                                 .monospacedDigit()
                                 .onTapGesture {
                                     if selectionChecker(ingredient) {
@@ -344,13 +345,10 @@ struct RefRecipeView: View {
     }
 }
 
-
-
-
-struct RefRecipeView_Previews: PreviewProvider {
+struct RecipeViewTryOne_Previews: PreviewProvider {
     static var previews: some View {
      
-        RefRecipeView(fileManager: MarkdownFileManager(), recipe: MarkdownFile.sampleData.last!)
+        RecipeViewTryOne(fileManager: MarkdownFileManager(), recipe: MarkdownFile.sampleData.last!)
         
         
     }

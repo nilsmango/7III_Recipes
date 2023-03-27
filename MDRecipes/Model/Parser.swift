@@ -68,7 +68,7 @@ struct Parser {
     }
     
     /// cleaning up the ingredient string
-    static func cleanUpIngredientString(string: String) -> String {
+    private static func cleanUpIngredientString(string: String) -> String {
         
         var newString = string
         
@@ -109,7 +109,7 @@ struct Parser {
             let cleanedRating = ratingString.replacingOccurrences(of: "Rating: ", with: "").replacingOccurrences(of: "Bewertung: ", with: "").replacingOccurrences(of: "\n", with: "")
             return cleanedRating
         } else {
-            return "-"
+            return ""
         }
     }
     
@@ -148,8 +148,7 @@ struct Parser {
                             count = count - 1
                         }
                         numberArr.removeAll()
-                        
-                        
+
                     } else {
                         hours = numberArr.first ?? 0
                         numberArr.removeAll()
@@ -300,6 +299,71 @@ struct Parser {
         }
     }
     
+    /// getting a flexible string of the ingredient
+    static func stringMaker(of cleanIngredient: String, selectedServings: Int, recipeServings: Int) -> String {
+    
+        
+        let numbersRange = cleanIngredient.rangeOfCharacter(from: .decimalDigits)
+        
+        if numbersRange != nil || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "one" ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "two" ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "a"  ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "an" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "ein" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "eine" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "zwei"  {
+            
+            let input = cleanIngredient.components(separatedBy: .whitespaces).map { String($0) }
+            
+            var rawAmount = 1.0
+            // hier auch checken ob "one" oder "two" ist
+            if input.first!.lowercased() == "two" || input.first!.lowercased() == "zwei" {
+                rawAmount = 2.0
+            } else {
+                rawAmount = Double(input.first!) ?? 1
+            }
+            
+            
+            let amount = (rawAmount * Double(selectedServings)) / Double(recipeServings)
+            
+            var amountString: String
+            
+            if floor(amount) == amount {
+                amountString = String(Int(amount))
+            } else {
+                amountString = String((amount*10).rounded()/10)
+            }
+            
+            let rest = input.dropFirst()
+            // getting complicated pluralizing
+            if rest.count > 1  {
+                // TODO: ideas: check if one ingredient word is capitalized, if yes, then only capitalize that word.
+                
+                let output = rest.joined(separator: " ")
+                let secondPart = " " + output
+    
+                return amountString + secondPart
+                
+                // easy to pluralize
+            } else {
+                let output = rest.joined(separator: " ")
+                let secondPart = " " + output
+                
+                // TODO: if amount is 1. try to singularize ingredient
+                if rawAmount == 1.0 && amount != 1.0 {
+                    if secondPart.lowercased() == " lauch" {
+                        return amountString + " Lauch"
+                    } else {
+                        return amountString + secondPart.pluralized
+                    }
+                    
+                } else {
+                    return amountString + secondPart
+                }
+            }
+            
+        } else {
+            return cleanIngredient
+        
+        }
+    }
+    
+    
+    
     
     // RECIPE to MARKDOWN and vice versa
     
@@ -317,31 +381,32 @@ struct Parser {
         return nil
     }
     
+    // extracting, cleaning and calculating prep, cook, etc. times
+    private static func parsingTimes(for english: String, or german: String, in lines: [String]) -> String {
+        if let rawValue = findValue(for: english, or: german, in: lines) {
+            let minuteValue = Double(calculateTimeInMinutes(input: rawValue))
+            let outputString = formatTime(minuteValue)
+            
+            return outputString
+        }
+        return ""
+        
+    }
     
     // find the Ingredients or Zutaten list in the markdown file
     private static func findIngredients(in lines: [String]) -> [Ingredient] {
         var ingredients: [Ingredient] = []
         if let ingredientIndex = lines.firstIndex(where: { $0 == "## Ingredients" || $0 == "## Zutaten" }) {
-            let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex(where: { $0 == "## "}) ?? lines.count-1
+            let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
-                let components = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: " ")
-                var name = ""
-                var amount = 0
-                var unit = ""
-                for word in components {
-                    if word.rangeOfCharacter(from: decimalCharacters) != nil {
-                        amount = Int(word) ?? 0
-                    } else if units.description.lowercased().contains(String(word).lowercased()) {
-                        unit = word
-                    } else {
-                        name = name + " " + word
-                    }
-                }
+                let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                 
-                let ingredient = Ingredient(amount: amount, unit: unit, name: name)
+                let ingredientString = cleanUpIngredientString(string: rawString)
+                let ingredient = Ingredient(name: ingredientString)
                 
                 ingredients.append(ingredient)
+                
             }
         }
         return ingredients
@@ -422,6 +487,8 @@ struct Parser {
     }
     
     
+    
+    
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     ///
@@ -435,11 +502,11 @@ struct Parser {
         let categories = findValue(for: "Categories: ", or: "Kategorien: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? [""]
         let tags = findValue(for: "Tags: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? [""]
         let rating = findValue(for: "Rating: ", or: "Bewertung: ", in: lines) ?? ""
-        let prepTime = findValue(for: "Prep time: ", or: "Vorbereitungszeit: ", in: lines) ?? ""
-        let cookTime = findValue(for: "Cook time: ", or: "Kochzeit: ", in: lines) ?? ""
-        let additionalTime = findValue(for: "Additional time: ", or: "Zusätzliche Zeit: ", in: lines) ?? ""
-        let totalTime = findValue(for: "Total time: ", or: "Gesamtzeit: ", in: lines) ?? ""
-        let servings = findValue(for: "Servings:", or: "Portionen: ", in: lines).flatMap { Int($0) } ?? 0
+        let prepTime = parsingTimes(for: "Prep time: ", or: "Vorbereitungszeit: ", in: lines)
+        let cookTime = parsingTimes(for: "Cook time: ", or: "Kochzeit: ", in: lines)
+        let additionalTime = parsingTimes(for: "Additional time: ", or: "Zusätzliche Zeit: ", in: lines)
+        let totalTime = parsingTimes(for: "Total time: ", or: "Gesamtzeit: ", in: lines)
+        let servings = findValue(for: "Servings:", or: "Portionen: ", in: lines).flatMap { Int($0) } ?? 4
         let timesCooked = findValue(for: "Times cooked:", or: "Zubereitungen:", in: lines).flatMap { Int($0) } ?? 0
         let ingredients = findIngredients(in: lines)
         let directions = findDirections(in: lines)
@@ -516,10 +583,8 @@ struct Parser {
         let ingredientsTitle = recipe.language == .german ? "## Zutaten" : "## Ingredients"
         lines.append(ingredientsTitle)
         for ingredient in recipe.ingredients {
-            let amount = ingredient.amount > 0 ? " \(ingredient.amount)" : ""
-            let unit = ingredient.unit.isEmpty ? "" : " \(ingredient.unit)"
             let name = " \(ingredient.name)"
-            lines.append("- [ ]\(amount)\(unit)\(name)")
+            lines.append("- [ ]\(name)")
         }
         
         // Directions
