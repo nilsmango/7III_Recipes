@@ -10,8 +10,9 @@ import UIKit
 
 class MarkdownFileManager: ObservableObject {
     
-    @Published var markdownFiles = [MarkdownFile]()
-    
+    @Published var recipes = [Recipe]()
+
+    /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
     func loadMarkdownFiles() {
         // TODO: Change that to something that makes more sense.
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -21,54 +22,53 @@ class MarkdownFileManager: ObservableObject {
             for markdownFile in markdownFiles {
                 let name = markdownFile.lastPathComponent
                 let content = try String(contentsOf: markdownFile)
-                self.markdownFiles.append(MarkdownFile(name: name, content: content))
+                self.recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
             }
         } catch {
             print("Error loading Markdown files: \(error.localizedDescription)")
         }
     }
     
-    func saveMarkdownFile(name: String, content: String) {
+    /// Save a new recipe as a Markdown file in the chosen directory and add it to the recipes array
+    // TODO: Load und save like in qrCoder, or save und update immediately after creation ?
+    func saveMarkdownFile(recipe: Recipe) {
+        let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentsDirectory.appendingPathComponent(name).appendingPathExtension("md")
+        let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
         do {
-            try content.write(to: fileURL, atomically: true, encoding: .utf8)
-            self.markdownFiles.append(MarkdownFile(name: name, content: content))
+            try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
+            self.recipes.append(recipe)
         } catch {
             print("Error saving Markdown file: \(error.localizedDescription)")
         }
     }
     
     func createMarkdownFile(name: String, content: String) {
-        markdownFiles.append(MarkdownFile(name: name, content: content))
+        recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
     }
     
     func delete(at indexSet: IndexSet) {
         
         // we have to keep our manuallySorted array up to date
-        let idsToDelete = indexSet.map { markdownFiles[$0].id }
-        
-        
-        markdownFiles.remove(atOffsets: indexSet)
+        let idsToDelete = indexSet.map { recipes[$0].id }
+        recipes.remove(atOffsets: indexSet)
         for id in idsToDelete {
-            manuallySortedMarkdownFiles.removeAll(where: { $0.id == id })
+            manuallySortedRecipes.removeAll(where: { $0.id == id })
         }
-        
     }
     
     func move(from offset: IndexSet, to newPlace: Int) {
-        markdownFiles.move(fromOffsets: offset, toOffset: newPlace)
+        recipes.move(fromOffsets: offset, toOffset: newPlace)
         updateManualList()
     }
     
     
     // TODO: do we need to save to file after this?
-    func setTimesCooked(of recipe: MarkdownFile, to count: Int) {
-        guard let index = markdownFiles.firstIndex(where: { $0.id == recipe.id }) else {
+    func setTimesCooked(of recipe: Recipe, to count: Int) {
+        guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
             fatalError("couldn't find the index for recipe")
         }
-        
-        markdownFiles[index].content = Parser.changeTimesCooked(of: markdownFiles[index].content, to: count)
+        recipes[index].timesCooked = count
     }
     
     
@@ -76,23 +76,24 @@ class MarkdownFileManager: ObservableObject {
     
     
     /// Search and filter the recipes
-    func filterTheRecipes(string: String, ingredients: [String], categories: [String], tags: [String]) -> [MarkdownFile] {
-        var filteredRecipes = markdownFiles
+    func filterTheRecipes(string: String, ingredients: [String], categories: [String], tags: [String]) -> [Recipe] {
+        var filteredRecipes = recipes
         // first is the searchString
         if string.isEmpty == false {
             if string.contains(" ") {
                 let cleanArray = Parser.makeCleanArray(from: string)
-                filteredRecipes = filteredRecipes.filter { file in
+                filteredRecipes = filteredRecipes.filter { recipe in
                             cleanArray.allSatisfy { word in
-                                    file.content.range(of: word, options: .caseInsensitive) != nil
+                                let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
+                                return markdownText.range(of: word, options: .caseInsensitive) != nil
                                 }
                             }
                 
             } else {
-                filteredRecipes = filteredRecipes.filter { $0.content.range(of: string, options: .caseInsensitive) != nil }
+                filteredRecipes = filteredRecipes.filter { Parser.makeMarkdownFromRecipe(recipe: $0).content.range(of: string, options: .caseInsensitive) != nil }
             }
         }
-        // second stage: filtering the result by the ingredients - which are always shown like - [ ] string
+        // second stage: filtering the result by the ingredients
         
         if ingredients.isEmpty == false {
             
@@ -100,8 +101,15 @@ class MarkdownFileManager: ObservableObject {
                         ingredients.allSatisfy { word in
                             // we have to also find the singular ingredients now.
                             let singularForm = String(word.dropLast())
-                                    return recipe.content.range(of: word, options: .caseInsensitive) != nil ||
-                                        recipe.content.range(of: singularForm, options: .caseInsensitive) != nil
+                            var ingredientsString = ""
+                            for ingredient in recipe.ingredients {
+                                ingredientsString.append(ingredient.lowercased())
+                            }
+                            
+                            return ingredientsString.contains(word.lowercased()) || ingredientsString.contains(singularForm.lowercased())
+//                            let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
+//                            return markdownText.range(of: word, options: .caseInsensitive) != nil ||
+//                                        markdownText.range(of: singularForm, options: .caseInsensitive) != nil
                             }
                         }
         }
@@ -112,22 +120,21 @@ class MarkdownFileManager: ObservableObject {
             
             filteredRecipes = filteredRecipes.filter { recipe in
                 categories.allSatisfy { word in
-                    if let contentRange = recipe.content.range(of: "Categories:.*\n", options: .regularExpression) ?? recipe.content.range(of: "Kategorien:.*\n", options: .regularExpression) {
-                        let categoryString = String(recipe.content[contentRange])
-                        return categoryString.contains(word)
-                    } else {
-                        return false
+                    let categoriesString = recipe.categories.joined(separator: " ")
+                    
+                        return categoriesString.contains(word)
                     }
                 }
             }
-        }
+        
         
         // fourth stage: filtering the results by the tags
         
         if tags.isEmpty == false {
             filteredRecipes = filteredRecipes.filter { recipe in
                 tags.allSatisfy { word in
-                    recipe.content.range(of: word, options: .caseInsensitive) != nil
+                    let tagsString = recipe.tags.joined(separator: " ").lowercased()
+                    return tagsString.contains(word.lowercased())
                 }
             }
         }
@@ -144,51 +151,28 @@ class MarkdownFileManager: ObservableObject {
     func getAllCategories() -> [String] {
         var categories = [String]()
         
-        for recipe in markdownFiles {
-            let content = recipe.content
-            if let range = content.range(of: "Categories:.*\n", options: .regularExpression) ?? recipe.content.range(of: "Kategorien:.*\n", options: .regularExpression) {
-                let categoryString = content[range]
-                let cleanedCategories = categoryString.replacingOccurrences(of: "Categories: ", with: "").replacingOccurrences(of: "Kategorien: ", with: "").replacingOccurrences(of: "\n", with: "")
-                let stringArray = cleanedCategories.components(separatedBy: ", ")
-                let cleanArray = stringArray.filter( { $0 != "" })
-                for string in cleanArray {
-                    if categories.contains(string) == false {
-                        categories.append(string)
-                    }
+        for recipe in recipes {
+            for category in recipe.categories {
+                if categories.contains(category.capitalized) == false {
+                    categories.append(category.capitalized)
                 }
             }
         }
         return categories
     }
     
-    
-    
-    
-    
-    
-    
     /// get a list of tags from the recipes
     func getAllTags() -> [String] {
         var tags = [String]()
-        let regex = try! NSRegularExpression(pattern: "#\\w+")
         
-        for recipe in markdownFiles {
-            let content = recipe.content
-            
-            let results = regex.matches(in: content, range: NSRange(content.startIndex..., in: content))
-
-            let foundTags = results.map { String(content[Range($0.range, in: content)!]) }
-            
-            for tag in foundTags {
+        for recipe in recipes {
+            for tag in recipe.tags {
                 // lowercasing everything so we only get one unique tag, first one in will set the style
                 if !tags.contains(where: { $0.lowercased() == tag.lowercased() }) {
                     tags.append(tag)
                 }
             }
         }
-        
-        
-        
         return tags
     }
     
@@ -197,26 +181,17 @@ class MarkdownFileManager: ObservableObject {
     func getAllIngredients() -> [String] {
         var ingredients: [String] = []
         
-        let regex = try? NSRegularExpression(pattern: "- \\[ \\] ([^\\n]+)", options: .anchorsMatchLines)
-        
-        for recipe in markdownFiles {
-            let content = recipe.content
-            let matches = regex?.matches(in: content, options: [], range: NSRange(content.startIndex..<content.endIndex, in: content))
-                for match in matches ?? [] {
-                    if let range = Range(match.range, in: content) {
-                        let almostIngredient = String(content[range])
-                        let ingredient = Parser.extractOnlyIngredient(from: almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")).capitalized
-                        
-                        // trying get plural form where possible and don't add the singular form (it works great this way)
-                        let oneIngredient = String(ingredient.dropLast())
-                        let pluralIngredient = ingredient + "s"
-                        
-                        if let i = ingredients.firstIndex(of: oneIngredient) {
-                            ingredients[i] = ingredient
-                        } else if !ingredients.contains(ingredient) && !ingredients.contains(pluralIngredient) {
-                            ingredients.append(ingredient)
-                        }
-                    }
+        for recipe in recipes {
+            for ingredient in recipe.ingredients {
+                let cleanIngredient = ingredient.capitalized
+                let oneIngredient = String(cleanIngredient.dropLast())
+                let pluralIngredient = cleanIngredient + "s"
+                
+                if let i = ingredients.firstIndex(of: oneIngredient) {
+                    ingredients[i] = cleanIngredient
+                } else if !ingredients.contains(cleanIngredient) && !ingredients.contains(pluralIngredient) {
+                    ingredients.append(cleanIngredient)
+                }
             }
         }
         return ingredients
@@ -226,28 +201,28 @@ class MarkdownFileManager: ObservableObject {
     
     // Sorting
     
-    var manuallySortedMarkdownFiles = [MarkdownFile]()
+    var manuallySortedRecipes = [Recipe]()
     
     private func updateManualList() {
-            manuallySortedMarkdownFiles = markdownFiles
+        manuallySortedRecipes = recipes
         }
         
         
     func sortRecipes(selection: Sorting) {
-        if manuallySortedMarkdownFiles.isEmpty {
+        
+        if manuallySortedRecipes.isEmpty {
             updateManualList()
         }
-        
+
         switch selection {
-            
-        case .manual:
-            markdownFiles = manuallySortedMarkdownFiles
+        case .standard:
+            recipes = manuallySortedRecipes
         case .name:
-            markdownFiles.sort(by: { $0.name < $1.name })
+            recipes.sort(by: { $0.title < $1.title })
         case .time:
-            markdownFiles.sort(by:  { Parser.extractTotalTime(from: $0.content) < Parser.extractTotalTime(from: $1.content) })
+            recipes.sort(by:  { $0.timesCooked < $1.timesCooked })
         case .rating:
-            markdownFiles.sort(by: { Parser.extractRating(from: $0.content) > Parser.extractRating(from: $1.content) })
+            recipes.sort(by: { $0.rating > $1.rating })
         }
     }
     

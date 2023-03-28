@@ -12,7 +12,7 @@ struct RecipesListView: View {
     
     @State private var editMode: EditMode = .inactive
     
-    @State private var sortingSelection: Sorting = .manual
+    @State private var sortingSelection: Sorting = .standard
     
     @AppStorage("Servings") var chosenServings = 4
 
@@ -22,7 +22,7 @@ struct RecipesListView: View {
         NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(recipe: Parser.makeRecipeFromMarkdown(markdown: recipe))) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                             // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }
@@ -33,7 +33,7 @@ struct RecipesListView: View {
                 }
                 .onMove { indexSet, newPlace in
                     fileManager.move(from: indexSet, to: newPlace)
-                    sortingSelection = .manual
+                    sortingSelection = .standard
                 }
             }
             .navigationTitle(Text(category.isEmpty ? "All" : category))
@@ -92,7 +92,7 @@ struct RecipesListView: View {
 struct RecipesListView_Previews: PreviewProvider {
     static var previews: some View {
         let fileManager = MarkdownFileManager()
-        fileManager.markdownFiles = MarkdownFile.sampleData
+        fileManager.recipes = Recipe.sampleData
         
         return RecipesListView(fileManager: fileManager, category: "Main Course")
     }

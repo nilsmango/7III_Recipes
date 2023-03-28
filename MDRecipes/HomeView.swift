@@ -21,12 +21,11 @@ struct HomeView: View {
             if searchText.isEmpty {
                 ScrollView {
                     VStack {
-                        
                         LazyVGrid(columns: columns) {
                             NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
                                 FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
                             }
-                                
+                            
                             ForEach(fileManager.getAllCategories(), id: \.self) { category in
                                 NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
                                     FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
@@ -62,7 +61,7 @@ struct HomeView: View {
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeViewTryOne(fileManager: fileManager, recipe: recipe)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                                             ListItemView(recipe: recipe)
                                         }
                                         
@@ -101,7 +100,7 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
             let fileManager = MarkdownFileManager()
-            fileManager.markdownFiles = MarkdownFile.sampleData
+            fileManager.recipes = Recipe.sampleData
             
             return HomeView(fileManager: fileManager)
         }

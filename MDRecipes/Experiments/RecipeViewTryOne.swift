@@ -164,7 +164,7 @@ struct RecipeViewTryOne: View {
                     Section("Achievements") {
                         Button(confettiStopper ? "Well done!" : "I have finished this recipe!") {
                             
-                            fileManager.setTimesCooked(of: recipe, to: timesCooked + 1)
+//                            fileManager.setTimesCooked(of: recipe, to: timesCooked + 1)
                             
                             confettiStopper = true
                         }

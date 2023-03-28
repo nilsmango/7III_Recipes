@@ -8,20 +8,18 @@
 import SwiftUI
 
 struct ListItemView: View {
-    
-    var recipe: MarkdownFile
-    var rating: String { Parser.extractRating(from: recipe.content) }
+    var recipe: Recipe
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(recipe.name)
+            Text(recipe.title)
                 .accessibilityLabel("Recipe name")
             HStack {
                 Image(systemName: "clock")
-                Text("\(String(Parser.extractTotalTime(from: recipe.content))) min")
-                if rating != "-" {
+                Text(recipe.totalTime)
+                if recipe.rating != "" {
                     Image(systemName: "star")
-                    Text(rating)
+                    Text(recipe.rating)
                 }
                 
                 
@@ -36,6 +34,6 @@ struct ListItemView: View {
 
 struct ListItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ListItemView(recipe: MarkdownFile.sampleData.first!)
+        ListItemView(recipe: Recipe.sampleData.first!)
     }
 }

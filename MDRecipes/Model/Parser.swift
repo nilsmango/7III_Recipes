@@ -394,18 +394,19 @@ struct Parser {
     }
     
     // find the Ingredients or Zutaten list in the markdown file
-    private static func findIngredients(in lines: [String]) -> [Ingredient] {
-        var ingredients: [Ingredient] = []
+    private static func findIngredients(in lines: [String]) -> [String] {
+        var ingredients: [String] = []
         if let ingredientIndex = lines.firstIndex(where: { $0 == "## Ingredients" || $0 == "## Zutaten" }) {
             let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
                 let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                let ingredientString = cleanUpIngredientString(string: rawString)
-                let ingredient = Ingredient(name: ingredientString)
-                
-                ingredients.append(ingredient)
+                if rawString != "" {
+                    let ingredientString = cleanUpIngredientString(string: rawString)
+                    
+                    
+                    ingredients.append(ingredientString)
+                }
                 
             }
         }
@@ -413,7 +414,7 @@ struct Parser {
     }
     
     // find the Directions or Zubereitung in the markdown file
-    private static func findDirections(in lines: [String]) -> [Direction] {
+    private static func findDirections2(in lines: [String]) -> [Direction] {
         var directions: [Direction] = []
         if let directionIndex = lines.firstIndex(where: { $0 == "## Directions" || $0 == "## Zubereitung"}) {
             for i in directionIndex+1..<lines.count {
@@ -433,31 +434,51 @@ struct Parser {
     }
     
     
-    // find the nutrition facts
-    private static func findNutrition(in lines: [String]) -> String {
-        if let nutritionIndex = lines.firstIndex(where: { $0 == "## Nutrition" || $0 == "## Nährwertangaben"}) {
-            let nextTitleIndex = lines[nutritionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ")}) ?? lines.count - 1
-            let nutritionLines = lines[nutritionIndex+1..<nextTitleIndex].map { $0.trimmingCharacters(in: .whitespaces) }
-            let nutritionText = nutritionLines.joined(separator: "\n")
-            return nutritionText
+    private static func findDirections(in lines: [String]) -> [Direction] {
+        var directions: [Direction] = []
+        if let directionIndex = lines.firstIndex(where: { $0 == "## Directions" || $0 == "## Zubereitung"}) {
+            let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
+            let directionArray = lines[directionIndex+1..<directionEndIndex]
+            var currentString = ""
+            
+            for line in directionArray {
+                // use regular expression to match the first string that begins with a number
+                if line.range(of: #"^\d+\."#, options: .regularExpression) != nil {
+                    // append the current string to the result array if it's not empty
+                    if !currentString.isEmpty {
+                        let timerInMinutes = extractTimerInMinutes(from: currentString)
+                        let hasTimer = timerInMinutes > 0 ? true : false
+                        currentString = currentString.trimmingCharacters(in: .newlines)
+                        let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                        directions.append(direction)
+                    }
+                    // start a new string with the matched string
+                    currentString = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                } else {
+                    // append the current string to the current string with a newline character
+                    currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+            }
+            let timerInMinutes = extractTimerInMinutes(from: currentString)
+            let hasTimer = timerInMinutes > 0 ? true : false
+            currentString = currentString.trimmingCharacters(in: .newlines)
+            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+            directions.append(direction)
         }
-        return ""
-    }
-    
-    
-    // find the notes section in the markdown file
-    private static func findNotes(in lines: [String]) -> String {
-        if let notesIndex = lines.firstIndex(where: { $0 == "## Notes" || $0 == "## Notizen"}) {
-            let nextTitleIndex = lines[notesIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ")}) ?? lines.count - 1
-            let noteLines = lines[notesIndex+1..<nextTitleIndex].map { $0.trimmingCharacters(in: .whitespaces) }
-            let noteText = noteLines.joined(separator: "\n")
-            return noteText
-        }
-        return ""
+        return directions
     }
     
    
-    
+    // find a certain section in the markdown file
+    private static func findSection(in lines: [String], for string: String, and string2: String) -> String {
+        if let sectionIndex = lines.firstIndex(where: { $0 == string || $0 == string2}) {
+            let nextTitleIndex = lines[sectionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ")}) ?? lines.count - 1
+            let sectionLines = lines[sectionIndex+1..<nextTitleIndex].map { $0.trimmingCharacters(in: .whitespaces) }
+            let sectionText = sectionLines.joined(separator: "\n").trimmingCharacters(in: .newlines)
+            return sectionText
+        }
+        return ""
+    }
     
     // find the images section in the markdown file
     private static func findImages(in lines: [String]) -> String {
@@ -471,6 +492,7 @@ struct Parser {
                 let imagePath = imageLine.components(separatedBy: "(")[1].replacingOccurrences(of: ")", with: "")
                 imagesString.append("\(title): \(imagePath)\n")
             }
+            imagesString = imagesString.trimmingCharacters(in: .newlines)
             return imagesString
         }
         return ""
@@ -494,8 +516,7 @@ struct Parser {
     ///
     static func makeRecipeFromMarkdown(markdown: MarkdownFile) -> Recipe {
         
-        var lines = markdown.content.components(separatedBy: "\n")
-        lines.removeAll(where: { $0 == "\n" || $0 == "" } )
+        let lines = markdown.content.components(separatedBy: "\n")
         
         let title = findValue(for: "# ", in: lines) ?? "No Title Found"
         let source = findValue(for: "Source: ", or: "Quelle: ", in: lines) ?? "Unknown"
@@ -510,8 +531,8 @@ struct Parser {
         let timesCooked = findValue(for: "Times cooked:", or: "Zubereitungen:", in: lines).flatMap { Int($0) } ?? 0
         let ingredients = findIngredients(in: lines)
         let directions = findDirections(in: lines)
-        let nutrition = findValue(for: "Nutrition", or: "Nährwertangaben", in: lines) ?? ""
-        let notes = findNotes(in: lines)
+        let nutrition = findSection(in: lines, for: "## Nutrition", and: "## Nährwertangaben")
+        let notes = findSection(in: lines, for: "## Notes", and: "## Notizen")
         let images = findImages(in: lines)
         let language = findLanguage(in: lines)
         
@@ -583,7 +604,7 @@ struct Parser {
         let ingredientsTitle = recipe.language == .german ? "## Zutaten" : "## Ingredients"
         lines.append(ingredientsTitle)
         for ingredient in recipe.ingredients {
-            let name = " \(ingredient.name)"
+            let name = " \(ingredient)"
             lines.append("- [ ]\(name)")
         }
         

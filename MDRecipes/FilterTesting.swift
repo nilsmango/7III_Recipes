@@ -44,7 +44,7 @@ struct FilterTesting: View {
                 
                 
                 ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories, tags: activeTags)) { recipe in
-                    NavigationLink(destination: RecipeViewTryOne(fileManager: fileManager, recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                         ListItemView(recipe: recipe)
                     }
                 }
@@ -192,7 +192,7 @@ struct FilterTesting: View {
 struct FilterTesting_Previews: PreviewProvider {
     static var previews: some View {
         let fileManager = MarkdownFileManager()
-        fileManager.markdownFiles = MarkdownFile.sampleData
+        fileManager.recipes = Recipe.sampleData
         
         return FilterTesting(fileManager: fileManager)
     }
