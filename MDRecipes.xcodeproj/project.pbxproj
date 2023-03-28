@@ -20,6 +20,8 @@
 		782EB6C529C460FF0086D2E7 /* ListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782EB6C429C460FF0086D2E7 /* ListItemView.swift */; };
 		7864173829C4770B00D67DE0 /* FilterTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864173729C4770B00D67DE0 /* FilterTesting.swift */; };
 		78676B0C29D2EE4C002205B5 /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78676B0B29D2EE4C002205B5 /* TimerManager.swift */; };
+		78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1B29CAF2D800CAA48B /* RoundedCross.swift */; };
+		78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */; };
 		786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F329C4EF2900CAA48B /* WHStack.swift */; };
 		786F99F629C4F05700CAA48B /* ViewArrayBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F529C4F05700CAA48B /* ViewArrayBuilder.swift */; };
 		786F99F829C4F0A100CAA48B /* WrapStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F729C4F0A100CAA48B /* WrapStack.swift */; };
@@ -321,6 +323,8 @@
 				786F9A0029C84E5C00CAA48B /* View+readSize.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
 				786F9A0A29C86D9D00CAA48B /* EnumSorting + Language.swift in Sources */,
+				78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */,
+				78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */,
 				782EB6C329C460800086D2E7 /* RecipeViewTryOne.swift in Sources */,
 				786F9A0C29C8E0C000CAA48B /* HomeView.swift in Sources */,
 			);

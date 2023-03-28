@@ -11,11 +11,14 @@ import UIKit
 class MarkdownFileManager: ObservableObject {
     
     @Published var recipes = [Recipe]()
+    
+    /// The document directory
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
     func loadMarkdownFiles() {
         // TODO: Change that to something that makes more sense.
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
         do {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
@@ -30,32 +33,74 @@ class MarkdownFileManager: ObservableObject {
     }
     
     /// Save a new recipe as a Markdown file in the chosen directory and add it to the recipes array
-    // TODO: Load und save like in qrCoder, or save und update immediately after creation ?
     func saveMarkdownFile(recipe: Recipe) {
+        recipes.append(recipe)
+        
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
         let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
         do {
             try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
-            self.recipes.append(recipe)
+            
         } catch {
-            print("Error saving Markdown file: \(error.localizedDescription)")
+            print("Error saving Markdown file for recipe \(recipe.title): \(error.localizedDescription)")
         }
     }
+    
+    /// Update a recipe in the Markdown file as well the recipes array
+    func updateRecipe(updatedRecipe: Recipe) {
+        if let index = recipes.firstIndex(where: { $0.id == updatedRecipe.id }) {
+            // Update the recipe in the array
+            recipes[index] = updatedRecipe
+            
+            // Save the updated recipe to the Markdown file
+            let markdownFile = Parser.makeMarkdownFromRecipe(recipe: updatedRecipe)
+            
+            let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+            do {
+                try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
+            } catch {
+                print("Error saving updated Markdown file for recipe \(updatedRecipe.title): \(error.localizedDescription)")
+            }
+        }
+    }
+    
     
     func createMarkdownFile(name: String, content: String) {
         recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
     }
     
+    
     func delete(at indexSet: IndexSet) {
-        
+        // Remove the Recipe from the Recipes Arrays
+        recipes.remove(atOffsets: indexSet)
         // we have to keep our manuallySorted array up to date
         let idsToDelete = indexSet.map { recipes[$0].id }
-        recipes.remove(atOffsets: indexSet)
+        
+        // we use the titles to remove the Markdown files later on
+        var recipeTitles = [String]()
+        
         for id in idsToDelete {
             manuallySortedRecipes.removeAll(where: { $0.id == id })
+            let title = recipes.first(where: { $0.id == id })?.title
+            recipeTitles.append(title ?? "")
+        }
+        
+        // Delete the Markdown files
+        for title in recipeTitles {
+            let fileName = "\(title).md"
+            let fileURL = documentsDirectory.appendingPathComponent(fileName)
+            do {
+                try FileManager.default.removeItem(at: fileURL)
+            } catch {
+                print("Error deleting Markdown file for recipe with title \(title): \(error.localizedDescription)")
+            }
         }
     }
+    
+    
+    
+    
     
     func move(from offset: IndexSet, to newPlace: Int) {
         recipes.move(fromOffsets: offset, toOffset: newPlace)
@@ -63,12 +108,18 @@ class MarkdownFileManager: ObservableObject {
     }
     
     
-    // TODO: do we need to save to file after this?
+    /// set the times Cooked of a recipe, update also the Markdown file
     func setTimesCooked(of recipe: Recipe, to count: Int) {
-        guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
-            fatalError("couldn't find the index for recipe")
-        }
-        recipes[index].timesCooked = count
+        var updatedRecipe = recipe
+        updatedRecipe.timesCooked = count
+        updateRecipe(updatedRecipe: updatedRecipe)
+    }
+    
+    /// set the note section of a recipe, update the Markdown file too
+    func updateNoteSection(of recipe: Recipe, to string: String) {
+        var updatedRecipe = recipe
+        updatedRecipe.notes = string
+        updateRecipe(updatedRecipe: updatedRecipe)
     }
     
     
@@ -220,9 +271,11 @@ class MarkdownFileManager: ObservableObject {
         case .name:
             recipes.sort(by: { $0.title < $1.title })
         case .time:
-            recipes.sort(by:  { $0.timesCooked < $1.timesCooked })
+            recipes.sort(by:  { Double(Parser.calculateTimeInMinutes(input: $0.totalTime)) < Double(Parser.calculateTimeInMinutes(input: $1.totalTime)) })
         case .rating:
             recipes.sort(by: { $0.rating > $1.rating })
+        case .cooked:
+            recipes.sort(by: { $0.timesCooked > $1.timesCooked })
         }
     }
     

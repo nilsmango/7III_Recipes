@@ -29,8 +29,12 @@ struct RecipeView: View {
     
     // confetti
     @State private var confettiStopper = false
+    @State private var counter = 0
+    private let numberArray = [5, 70, 20]
     
-    
+    // notes
+    @State private var note = ""
+    @State private var saveNotes = false
     
     var body: some View {
         NavigationStack {
@@ -78,9 +82,8 @@ struct RecipeView: View {
                     
                     Section("Achievements") {
                         Button(confettiStopper ? "Well done!" : "I have finished this recipe!") {
-                            // TODO: wenn recipe binding hier einfach grad ändern saving!!
-//                            fileManager.setTimesCooked(of: Parser.makeMarkdownFromRecipe(recipe: recipe), to: recipe.timesCooked + 1)
-                            
+                            fileManager.setTimesCooked(of: recipe, to: recipe.timesCooked + 1)
+                            counter += 1
                             confettiStopper = true
                         }
                         .disabled(confettiStopper)
@@ -97,10 +100,27 @@ struct RecipeView: View {
                     
                     
                     Section("Notes") {
-                        // TODO: 1. wenn recipe binding hat dann einfach textfield mit binding hier
+                    
+//                            TextEditor(text: $note)
+//                                .scrollDisabled(true)
+
+                        ZStack {
+                                        TextEditor(text: $note)
+                                        Text(note).opacity(0).padding(.all, 8)
+                                    }
                         
-                            Text(recipe.notes)
-                        
+                            
+                    }
+                    .onAppear {
+                        note = recipe.notes
+                    }
+                    .onChange(of: note) { _ in
+                        saveNotes = true
+                    }
+                    .onDisappear {
+                        if saveNotes {
+                            fileManager.updateNoteSection(of: recipe, to: note)
+                        }
                     }
                     
                     if recipe.images != "" {
@@ -115,6 +135,8 @@ struct RecipeView: View {
                     
                 }
                 .listStyle(.insetGrouped)
+                
+                ConfettiCannon(counter: $counter, num: numberArray, colors: [.blue, .red, .yellow, .purple, .green, .black])
             }
             .navigationTitle(recipe.title)
         }

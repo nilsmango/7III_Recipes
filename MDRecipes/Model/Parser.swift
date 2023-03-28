@@ -126,7 +126,7 @@ struct Parser {
     }
     
     /// calculate the time in minutes from a time string
-    private static func calculateTimeInMinutes(input: String) -> Int  {
+    static func calculateTimeInMinutes(input: String) -> Int  {
         let cleanedString = input.replacingOccurrences(of: " ", with: "")
         
         var numberArr = [Int]()

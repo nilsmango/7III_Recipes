@@ -56,7 +56,14 @@ struct RecipesListView: View {
                     Menu {
                         Picker("Sorting", selection: $sortingSelection) {
                             ForEach(Sorting.allCases) { sortCase in
-                                Text(sortCase.rawValue.capitalized)
+                                if sortCase == .cooked {
+                                    Text("Times Cooked")
+                                } else if sortCase == .time {
+                                    Text("Total Time")
+                                } else {
+                                    Text(sortCase.rawValue.capitalized)
+                                }
+                                
                             }
                         }
                     }
@@ -76,13 +83,16 @@ struct RecipesListView: View {
                 
                 Button(action: {
                     // TODO: change that to an edit view / see qrCoder
-                    fileManager.createMarkdownFile(name: "New Recipe", content: "# Curry\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: 1/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: 1h40min\nServings:\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after 10 seconds.\n\nEnjoy!")
+                    fileManager.createMarkdownFile(name: "New Recipe", content: "# Curry\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
                 }) { Label("New Recipe", systemImage: "plus.circle")}
             }
             .environment(\.editMode, $editMode)
             
             .onChange(of: sortingSelection) { newSortingSelection in
                 fileManager.sortRecipes(selection: newSortingSelection)
+            }
+            .onAppear {
+                fileManager.sortRecipes(selection: sortingSelection)
             }
         }
     }

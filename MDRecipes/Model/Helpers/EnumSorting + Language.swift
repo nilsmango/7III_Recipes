@@ -9,7 +9,7 @@ import Foundation
 
 
 enum Sorting: String, CaseIterable, Identifiable, Codable {
-    case standard, name, time, rating
+    case standard, name, time, rating, cooked
     var id: Self { self }
 }
 
