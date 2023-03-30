@@ -81,7 +81,6 @@ class MarkdownFileManager: ObservableObject {
         var recipeTitles = [String]()
         
         for id in idsToDelete {
-            manuallySortedRecipes.removeAll(where: { $0.id == id })
             let title = recipes.first(where: { $0.id == id })?.title
             recipeTitles.append(title ?? "")
         }
@@ -104,7 +103,6 @@ class MarkdownFileManager: ObservableObject {
     
     func move(from offset: IndexSet, to newPlace: Int) {
         recipes.move(fromOffsets: offset, toOffset: newPlace)
-        updateManualList()
     }
     
     
@@ -119,6 +117,13 @@ class MarkdownFileManager: ObservableObject {
     func updateNoteSection(of recipe: Recipe, to string: String) {
         var updatedRecipe = recipe
         updatedRecipe.notes = string
+        updateRecipe(updatedRecipe: updatedRecipe)
+    }
+    
+    /// update the rating of a recipe, update the Markdown file too
+    func updateRating(of recipe: Recipe, to rating: Int) {
+        var updatedRecipe = recipe
+        updatedRecipe.rating = "\(rating)/5"
         updateRecipe(updatedRecipe: updatedRecipe)
     }
     
@@ -209,7 +214,7 @@ class MarkdownFileManager: ObservableObject {
                 }
             }
         }
-        return categories
+        return categories.sorted()
     }
     
     /// get a list of tags from the recipes
@@ -224,7 +229,7 @@ class MarkdownFileManager: ObservableObject {
                 }
             }
         }
-        return tags
+        return tags.sorted()
     }
     
     
@@ -245,29 +250,19 @@ class MarkdownFileManager: ObservableObject {
                 }
             }
         }
-        return ingredients
+        return ingredients.sorted()
     }
+    
     
     
     
     // Sorting
     
-    var manuallySortedRecipes = [Recipe]()
-    
-    private func updateManualList() {
-        manuallySortedRecipes = recipes
-        }
-        
-        
     func sortRecipes(selection: Sorting) {
         
-        if manuallySortedRecipes.isEmpty {
-            updateManualList()
-        }
-
         switch selection {
         case .standard:
-            recipes = manuallySortedRecipes
+            recipes.sort(by: { $0.updated < $1.updated})
         case .name:
             recipes.sort(by: { $0.title < $1.title })
         case .time:

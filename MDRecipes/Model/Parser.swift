@@ -155,7 +155,6 @@ struct Parser {
                     }
                 } else if stringElement.lowercased() == "m" {
                     if numberArr.count > 1 {
-                        print(numberArr)
                         var count = numberArr.count
                         for number in numberArr {
                             minutes += number * Int(pow(10, Double(count - 1)))
@@ -414,27 +413,7 @@ struct Parser {
     }
     
     // find the Directions or Zubereitung in the markdown file
-    private static func findDirections2(in lines: [String]) -> [Direction] {
-        var directions: [Direction] = []
-        if let directionIndex = lines.firstIndex(where: { $0 == "## Directions" || $0 == "## Zubereitung"}) {
-            for i in directionIndex+1..<lines.count {
-                let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
-                if line.hasPrefix("\(directions.count+1).") {
-                    let text = line
-                    let timerInMinutes = extractTimerInMinutes(from: line)
-                    let hasTimer = timerInMinutes > 0 ? true : false
-                    let direction = Direction(step: directions.count+1, text: text, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                    directions.append(direction)
-                } else {
-                    break
-                }
-            }
-        }
-        return directions
-    }
-    
-    
-    private static func findDirections(in lines: [String]) -> [Direction] {
+    static func findDirections(in lines: [String]) -> [Direction] {
         var directions: [Direction] = []
         if let directionIndex = lines.firstIndex(where: { $0 == "## Directions" || $0 == "## Zubereitung"}) {
             let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
@@ -459,6 +438,7 @@ struct Parser {
                     currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
             }
+            
             let timerInMinutes = extractTimerInMinutes(from: currentString)
             let hasTimer = timerInMinutes > 0 ? true : false
             currentString = currentString.trimmingCharacters(in: .newlines)
@@ -468,7 +448,27 @@ struct Parser {
         return directions
     }
     
-   
+    /// function to create a direction from a string
+    static func createDirection(from string: String, directionsCount: Int) -> Direction {
+        let timerInMinutes = extractTimerInMinutes(from: string)
+        let hasTimer = timerInMinutes > 0 ? true : false
+        let step = directionsCount + 1
+        let newString = String(step) + ". " + string.trimmingCharacters(in: .newlines)
+        let direction = Direction(step: step, text: newString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+        
+        return direction
+    }
+    
+    /// create a string from directions
+    static func createString(from directions: [Direction]) -> String {
+        var output = ""
+        for direction in directions {
+            output.append(direction.text)
+        }
+        return output
+    }
+    
+    
     // find a certain section in the markdown file
     private static func findSection(in lines: [String], for string: String, and string2: String) -> String {
         if let sectionIndex = lines.firstIndex(where: { $0 == string || $0 == string2}) {
@@ -498,8 +498,23 @@ struct Parser {
         return ""
     }
     
+    // find a date in the markdown file
+    private static func findDate(for key: String, in lines: [String]) -> Date? {
+        let dateString = findValue(for: key, in: lines) ?? "Unknown"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.date(from: dateString)
+    }
+    
+    // format a date back for the yaml header
+    private static func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.string(from: date)
+    }
+    
     // find out what language the markdown file is in
-    private static func findLanguage(in lines: [String]) -> Language {
+    private static func findLanguage(in lines: [String]) -> RecipeLanguage {
         if lines.firstIndex(where: { $0 == "## Zutaten" }) != nil {
             return .german
         } else {
@@ -507,7 +522,6 @@ struct Parser {
         }
         
     }
-    
     
     
     
@@ -534,14 +548,21 @@ struct Parser {
         let nutrition = findSection(in: lines, for: "## Nutrition", and: "## Nährwertangaben")
         let notes = findSection(in: lines, for: "## Notes", and: "## Notizen")
         let images = findImages(in: lines)
+        let date = findDate(for: "date: ", in: lines) ?? Date.now
+        let updated = findDate(for: "updated: ", in: lines) ?? Date.now
         let language = findLanguage(in: lines)
         
-        return Recipe(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, language: language)
+        return Recipe(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language)
     }
     
     
     static func makeMarkdownFromRecipe(recipe: Recipe) -> MarkdownFile {
         var lines: [String] = []
+        // yaml header
+        lines.append("---")
+        lines.append("date: \(formatDate(recipe.date))")
+        lines.append("updated: \(formatDate(recipe.updated))")
+        lines.append("---")
         
         // Recipe title
         lines.append("# \(recipe.title)")
@@ -613,9 +634,8 @@ struct Parser {
         let directionsTitle = recipe.language == .german ? "## Zubereitung" : "## Directions"
         lines.append(directionsTitle)
         for direction in recipe.directions {
-            let step = direction.step
             let text = direction.text
-            lines.append("\(step). \(text)")
+            lines.append("\(text)")
         }
         
         // Nutrition

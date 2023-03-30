@@ -10,13 +10,13 @@ import SwiftUI
 struct RecipeView: View {
     @ObservedObject var fileManager: MarkdownFileManager
     
-//    @StateObject private var timerManager = TimerManager()
+    //    @StateObject private var timerManager = TimerManager()
     
     
     var recipe: Recipe
     
     @AppStorage("Servings") var selectedServings = 4
-
+    
     // ingredient selection
     @State private var selectedIngredientsSet = Set<String>()
     private func selectedIngredient(ingredientName: String) -> Bool {
@@ -36,34 +36,46 @@ struct RecipeView: View {
     @State private var note = ""
     @State private var saveNotes = false
     
+    @State private var rating = 1
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 List {
                     Section {
-                        HStack {
-                            Image(systemName: "clock")
-                            Text("\(recipe.totalTime)")
-                            if recipe.rating != "" {
-                                Image(systemName: "star")
-                                Text(recipe.rating)
+                        HeadSectionView(recipe: recipe, fileManager: fileManager, rating: $rating)
+                            .onAppear {
+                                rating = Int(String(recipe.rating.first ?? Character("1"))) ?? 1
                             }
-                            Spacer()
-                            Image(systemName: "menucard")
-                            Text(recipe.categories.first!)
-                        }
-                        
                     }
                     
                     Section("Servings") {
-                        Stepper("\(selectedServings)", value: $selectedServings, in: 1...1000)
+                        HStack {
+                            Text("\(selectedServings)")
+                            Spacer()
+                            Button(action: {
+                                if selectedServings > 1 {
+                                    selectedServings -= 1
+                                }
+                                
+                            }) {
+                                Image(systemName: "minus.circle")
+                            }
+                            .buttonStyle(.bordered)
+                            Button(action: {
+                                selectedServings += 1
+                            }) {
+                                Image(systemName: "plus.circle")
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
                     
                     Section("Ingredients") {
                         ForEach(recipe.ingredients, id: \.self) { ingredient in
                             
                             IngredientView(ingredientString: ingredient, recipeServings: recipe.servings, chosenServings: selectedServings, selected: selectedIngredient(ingredientName: ingredient))
-                                // mark ingredient as checked.
+                            // mark ingredient as checked.
                                 .onTapGesture {
                                     if selectedIngredient(ingredientName: ingredient) {
                                         selectedIngredientsSet.remove(ingredient)
@@ -73,14 +85,14 @@ struct RecipeView: View {
                                 }
                         }
                     }
-                                    
+                    
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
                             DirectionView(direction: direction)
                         }
                     }
                     
-                    Section("Achievements") {
+                    Section("Statistics") {
                         Button(confettiStopper ? "Well done!" : "I have finished this recipe!") {
                             fileManager.setTimesCooked(of: recipe, to: recipe.timesCooked + 1)
                             counter += 1
@@ -89,6 +101,11 @@ struct RecipeView: View {
                         .disabled(confettiStopper)
                         
                         Text(recipe.timesCooked == 1 ? "You have cooked this meal 1 time." : "You have cooked this meal \(recipe.timesCooked) times.")
+                        HStack {
+                            Text("Update Rating:")
+                            RecipeRatingView(rating: $rating, recipe: recipe, fileManager: fileManager)
+                                
+                        }
                         
                     }
                     
@@ -100,16 +117,11 @@ struct RecipeView: View {
                     
                     
                     Section("Notes") {
-                    
-//                            TextEditor(text: $note)
-//                                .scrollDisabled(true)
-
                         ZStack {
-                                        TextEditor(text: $note)
-                                        Text(note).opacity(0).padding(.all, 8)
-                                    }
+                            TextEditor(text: $note)
+                            Text(note).opacity(0).padding(.all, 8)
+                        }
                         
-                            
                     }
                     .onAppear {
                         note = recipe.notes
@@ -129,13 +141,17 @@ struct RecipeView: View {
                         }
                     }
                     
-                    Section("Source") {
-                        Text(recipe.source)
+                    Section("Info") {
+                        Text("Source: \(recipe.source)")
+                        Text("Created: \(recipe.date, style: .date)")
+                        Text("Add tags and categories Views here, with navigationlinks to tap them")
+                        
                     }
                     
                 }
                 .listStyle(.insetGrouped)
                 
+                // ZStack Layer
                 ConfettiCannon(counter: $counter, num: numberArray, colors: [.blue, .red, .yellow, .purple, .green, .black])
             }
             .navigationTitle(recipe.title)

@@ -26,11 +26,14 @@ struct Recipe: Identifiable, Codable {
     var notes: String
     var images: String
     
-    var language: Language
+    var language: RecipeLanguage
+    
+    var date: Date
+    var updated: Date
 
     let id: UUID
 
-    init(title: String, source: String, categories: [String], tags: [String], rating: String, prepTime: String, cookTime: String, additionalTime: String, totalTime: String, servings: Int, timesCooked: Int, ingredients: [String], directions: [Direction], nutrition: String, notes: String, images: String, language: Language, id: UUID = UUID()) {
+    init(title: String, source: String, categories: [String], tags: [String], rating: String, prepTime: String, cookTime: String, additionalTime: String, totalTime: String, servings: Int, timesCooked: Int, ingredients: [String], directions: [Direction], nutrition: String, notes: String, images: String, date: Date, updated: Date, language: RecipeLanguage, id: UUID = UUID()) {
         self.title = title
         self.source = source
         self.categories = categories
@@ -47,6 +50,8 @@ struct Recipe: Identifiable, Codable {
         self.notes = notes
         self.nutrition = nutrition
         self.images = images
+        self.date = date
+        self.updated = updated
         self.language = language
         self.id = id
     }
@@ -55,7 +60,7 @@ struct Recipe: Identifiable, Codable {
 
 extension Recipe {
     static var sampleData: [Recipe] {
-        [ Recipe(title: "Essen", source: "http://nilsmango.ch", categories: ["Dinner", "Rice", "Chicken"], tags: ["#meat", "#quick"], rating: "4/5", prepTime: "10 min", cookTime: "20 min", additionalTime: "2 min", totalTime: "32 min", servings: 4, timesCooked: 0, ingredients: ["1 chicken breast", "2 cups of water", "20 g cheddar"], directions: [Direction(step: 1, text: "1. Take 5 minutes to breath\nThen relax", hasTimer: true, timerInMinutes: 5), Direction(step: 2, text: "2. Cook it all up", hasTimer: false, timerInMinutes: 0), Direction(step: 3, text: "3. Let it cool before you eat", hasTimer: false, timerInMinutes: 0)], nutrition: "100% love", notes: "Don't cook this!", images: "", language: .english)
+        [ Recipe(title: "Essen", source: "http://nilsmango.ch", categories: ["Dinner", "Rice", "Chicken"], tags: ["#meat", "#quick"], rating: "4/5", prepTime: "10 min", cookTime: "20 min", additionalTime: "2 min", totalTime: "32 min", servings: 4, timesCooked: 0, ingredients: ["1 chicken breast", "2 cups of water", "20 g cheddar"], directions: [Direction(step: 1, text: "1. Take 5 minutes to breath\nThen relax", hasTimer: true, timerInMinutes: 5), Direction(step: 2, text: "2. Cook it all up", hasTimer: false, timerInMinutes: 0), Direction(step: 3, text: "3. Let it cool before you eat", hasTimer: false, timerInMinutes: 0)], nutrition: "100% love", notes: "Don't cook this!", images: "", date: Date(timeIntervalSince1970: 12323), updated: Date(timeIntervalSinceNow: -2342), language: .english)
         ]
     }
 }
@@ -81,13 +86,15 @@ extension Recipe {
         var nutrition: String = ""
         var notes: String = ""
         var images: String = ""
+        var date: Date = Date.now
+        var updated: Date = Date.now
         
-        var language: Language = .english
+        var language: RecipeLanguage = .english
         
     }
     
     var data: Data {
-        return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, language: language)
+        return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language)
     }
     
     mutating func update(from data: Data) {
@@ -107,6 +114,8 @@ extension Recipe {
         nutrition = data.nutrition
         notes = data.notes
         images = data.images
+        date = data.date
+        updated = data.updated
         language = data.language
     }
 }

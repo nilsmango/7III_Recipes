@@ -79,7 +79,7 @@ struct HomeView: View {
                     }
                     
                 }
-                .listStyle(.inset)
+                
             }
             
                 

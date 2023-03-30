@@ -13,6 +13,7 @@ enum Sorting: String, CaseIterable, Identifiable, Codable {
     var id: Self { self }
 }
 
-enum Language: Codable {
+enum RecipeLanguage: String, CaseIterable, Identifiable, Codable {
     case english, german
+    var id: Self { self }
 }
