@@ -14,14 +14,12 @@ struct IngredientsEditView: View {
     
     @FocusState private var isFieldFocused: Bool
     
+    @State private var selected = false
     
     var body: some View {
         
         ForEach(ingredients, id: \.self) { ingredient in
-            HStack {
-                Image(systemName: "circle")
-                TextField("Amount Unit Ingredient", text: binding(ingredient: ingredient))
-                }
+            IngredientEditView(ingredient: binding(ingredient: ingredient))
         }
         .onDelete { indices in
             ingredients.remove(atOffsets: indices)
@@ -31,7 +29,11 @@ struct IngredientsEditView: View {
         }
         
             HStack {
-                Image(systemName: "circle")
+                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(selected ? .blue : .primary)
+                    .onTapGesture {
+                        selected.toggle()
+                    }
                 TextField("10 kg carrots", text: $newIngredient)
                     .focused($isFieldFocused)
                     .onSubmit {

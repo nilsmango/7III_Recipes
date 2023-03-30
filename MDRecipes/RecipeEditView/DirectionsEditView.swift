@@ -14,12 +14,24 @@ struct DirectionsEditView: View {
     
     var body: some View {
         ForEach(directions) { direction in
-            Text(direction.text)
+            ZStack(alignment: .leading) {
+                TextEditor(text: binding(direction: direction).text)
+                
+                Text(direction.text)
+                    .padding(.all, 8)
+                    .opacity(0)
+            }
+            .padding(.top)
         }
         HStack{
-            TextEditor(text: $newDirection)
+            ZStack(alignment: .leading) {
+                TextEditor(text: $newDirection)
+                Text(newDirection)
+                    .padding(.all, 8)
+                    .opacity(0)
+            }
+            .padding(.top)
             Button {
-                let count = directions.count
                 if newDirection.range(of: #"^\d+\."#, options: .regularExpression) != nil {
                     newDirection = String(newDirection.dropFirst(3))
                 }
@@ -33,10 +45,15 @@ struct DirectionsEditView: View {
             .disabled(newDirection.isEmpty)
             .buttonStyle(.bordered)
         }
-        
-        
-                    
     }
+    
+    private func binding(direction: Direction) -> Binding<Direction> {
+        guard let ingredientIndex = directions.firstIndex(where: { $0.id == direction.id }) else {
+            fatalError("Can't find the stupid ingredient in array")
+        }
+        return $directions[ingredientIndex]
+    }
+    
 }
 
 struct DirectionsEditView_Previews: PreviewProvider {

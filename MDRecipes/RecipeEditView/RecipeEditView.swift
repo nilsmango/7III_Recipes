@@ -43,10 +43,10 @@ struct RecipeEditView: View {
                 
                 }
                 }
-                Section("Tags") {
+                Section("Select Tags") {
                     TagsEditView(tags: $recipeData.tags, fileManager: fileManager)
                 }
-                Section("Categories") {
+                Section("Select Categories") {
                     CategoriesEditView(categories: $recipeData.categories, fileManager: fileManager)
                 }
                 Section("Time") {
@@ -96,6 +96,7 @@ struct RecipeEditView: View {
                         .opacity(0)
                         .padding(.vertical, 8)
                 }
+
             }
             
           
