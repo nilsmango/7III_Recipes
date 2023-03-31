@@ -139,8 +139,17 @@ struct RecipesListView: View {
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
                                     editViewPresented = false
-                                    let newRecipe = Recipe(title: newRecipeData.title, source: newRecipeData.source, categories: newRecipeData.categories, tags: newRecipeData.tags, rating: newRecipeData.rating, prepTime: newRecipeData.prepTime, cookTime: newRecipeData.cookTime, additionalTime: newRecipeData.additionalTime, totalTime: newRecipeData.totalTime, servings: newRecipeData.servings, timesCooked: newRecipeData.timesCooked, ingredients: newRecipeData.ingredients, directions: newRecipeData.directions, nutrition: newRecipeData.nutrition, notes: newRecipeData.notes, images: newRecipeData.images, date: Date.now, updated: Date.now, language: newRecipeData.language)
+                                    let newRecipe = Recipe(title: newRecipeData.title, source: newRecipeData.source, categories: newRecipeData.categories, tags: newRecipeData.tags, rating: newRecipeData.rating, prepTime: newRecipeData.prepTime, cookTime: newRecipeData.cookTime, additionalTime: newRecipeData.additionalTime, totalTime: newRecipeData.totalTime, servings: newRecipeData.servings, timesCooked: newRecipeData.timesCooked, ingredients: newRecipeData.ingredients,
+                                        // re-parsing directions to find all the new timer from edits in the list.
+                                                           directions: Parser.reParsingDirections(directions: newRecipeData.directions), nutrition: newRecipeData.nutrition, notes: newRecipeData.notes, images: newRecipeData.images, date: newRecipeData.date, updated: Date.now, language: newRecipeData.language)
+                                    
+                                    // save the new recipe in the recipes Array
                                     fileManager.recipes.append(newRecipe)
+                                    
+                                    // save the recipe as a Markdown File on disk
+                                    fileManager.saveRecipeAsMarkdownFile(recipe: newRecipe)
+                                    
+                                    // reset the newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         newRecipeData.timesCooked = 0
                                         newRecipeData.title = ""

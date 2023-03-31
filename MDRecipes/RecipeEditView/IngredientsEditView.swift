@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct IngredientsEditView: View {
-    @Binding var ingredients: [String]
+    @Binding var ingredients: [Ingredient]
     
     @State private var newIngredient = ""
     
@@ -18,8 +18,8 @@ struct IngredientsEditView: View {
     
     var body: some View {
         
-        ForEach(ingredients, id: \.self) { ingredient in
-            IngredientEditView(ingredient: binding(ingredient: ingredient))
+        ForEach(ingredients) { ingredient in
+            IngredientEditView(ingredient: binding(ingredient: ingredient).text)
         }
         .onDelete { indices in
             ingredients.remove(atOffsets: indices)
@@ -38,7 +38,7 @@ struct IngredientsEditView: View {
                     .focused($isFieldFocused)
                     .onSubmit {
                         withAnimation {
-                            ingredients.append(newIngredient)
+                            ingredients.append(Ingredient(text: newIngredient))
                             newIngredient = ""
                             isFieldFocused = true
                         }
@@ -58,8 +58,8 @@ struct IngredientsEditView: View {
         }
     }
     
-    private func binding(ingredient: String) -> Binding<String> {
-        guard let ingredientIndex = ingredients.firstIndex(where: { $0 == ingredient }) else {
+    private func binding(ingredient: Ingredient) -> Binding<Ingredient> {
+        guard let ingredientIndex = ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
             fatalError("Can't find the stupid ingredient in array")
         }
         return $ingredients[ingredientIndex]

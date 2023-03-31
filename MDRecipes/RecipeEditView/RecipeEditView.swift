@@ -86,12 +86,24 @@ struct RecipeEditView: View {
             Section("Ingredients") {
                 IngredientsEditView(ingredients: $recipeData.ingredients)
             }
-            Section(header: Text("Directions")) {
+            Section("Directions") {
                 DirectionsEditView(directions: $recipeData.directions)
             }
+            
+            Section("Nutrition") {
+                ZStack {
+                    TextEditor(text: $recipeData.nutrition)
+                    // this text is to disable the scrolling
+                    Text(recipeData.nutrition)
+                        .opacity(0)
+                        .padding(.vertical, 8)
+                }
+            }
+            
             Section("Notes") {
                 ZStack {
                     TextEditor(text: $recipeData.notes)
+                    // this text is to disable the scrolling
                     Text(recipeData.notes)
                         .opacity(0)
                         .padding(.vertical, 8)

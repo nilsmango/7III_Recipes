@@ -16,7 +16,7 @@ struct DirectionsEditView: View {
         ForEach(directions) { direction in
             ZStack(alignment: .leading) {
                 TextEditor(text: binding(direction: direction).text)
-                
+                // this text is to disable the scrolling of the textEditor
                 Text(direction.text)
                     .padding(.all, 8)
                     .opacity(0)
@@ -26,6 +26,7 @@ struct DirectionsEditView: View {
         HStack{
             ZStack(alignment: .leading) {
                 TextEditor(text: $newDirection)
+                // this text is to disable the scrolling
                 Text(newDirection)
                     .padding(.all, 8)
                     .opacity(0)

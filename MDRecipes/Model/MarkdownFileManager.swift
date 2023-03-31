@@ -53,15 +53,21 @@ class MarkdownFileManager: ObservableObject {
             // Update the recipe in the array
             recipes[index] = updatedRecipe
             
-            // Save the updated recipe to the Markdown file
-            let markdownFile = Parser.makeMarkdownFromRecipe(recipe: updatedRecipe)
+            // Save the updated recipe to Markdown files
+            saveRecipeAsMarkdownFile(recipe: updatedRecipe)
             
-            let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
-            do {
-                try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
-            } catch {
-                print("Error saving updated Markdown file for recipe \(updatedRecipe.title): \(error.localizedDescription)")
-            }
+        }
+    }
+    
+    
+    func saveRecipeAsMarkdownFile(recipe: Recipe) {
+        let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
+        
+        let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+        do {
+            try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
+        } catch {
+            print("Error saving updated Markdown file for recipe \(recipe.title): \(error.localizedDescription)")
         }
     }
     
@@ -159,7 +165,7 @@ class MarkdownFileManager: ObservableObject {
                             let singularForm = String(word.dropLast())
                             var ingredientsString = ""
                             for ingredient in recipe.ingredients {
-                                ingredientsString.append(ingredient.lowercased())
+                                ingredientsString.append(ingredient.text.lowercased())
                             }
                             
                             return ingredientsString.contains(word.lowercased()) || ingredientsString.contains(singularForm.lowercased())
@@ -239,7 +245,7 @@ class MarkdownFileManager: ObservableObject {
         
         for recipe in recipes {
             for ingredient in recipe.ingredients {
-                let cleanIngredient = ingredient.capitalized
+                let cleanIngredient = ingredient.text.capitalized
                 let oneIngredient = String(cleanIngredient.dropLast())
                 let pluralIngredient = cleanIngredient + "s"
                 

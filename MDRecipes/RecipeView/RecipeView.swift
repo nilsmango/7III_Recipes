@@ -12,7 +12,6 @@ struct RecipeView: View {
     
     //    @StateObject private var timerManager = TimerManager()
     
-    
     var recipe: Recipe
     
     @AppStorage("Servings") var selectedServings = 4
@@ -36,7 +35,13 @@ struct RecipeView: View {
     @State private var note = ""
     @State private var saveNotes = false
     
+    // rating
     @State private var rating = 1
+    
+    // edit view
+    @State private var editViewIsPresented = false
+    
+    @State private var data: Recipe.Data = Recipe.Data()
     
     var body: some View {
         NavigationStack {
@@ -72,15 +77,15 @@ struct RecipeView: View {
                     }
                     
                     Section("Ingredients") {
-                        ForEach(recipe.ingredients, id: \.self) { ingredient in
+                        ForEach(recipe.ingredients) { ingredient in
                             
-                            IngredientView(ingredientString: ingredient, recipeServings: recipe.servings, chosenServings: selectedServings, selected: selectedIngredient(ingredientName: ingredient))
+                            IngredientView(ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings, selected: selectedIngredient(ingredientName: ingredient.text))
                             // mark ingredient as checked.
                                 .onTapGesture {
-                                    if selectedIngredient(ingredientName: ingredient) {
-                                        selectedIngredientsSet.remove(ingredient)
+                                    if selectedIngredient(ingredientName: ingredient.text) {
+                                        selectedIngredientsSet.remove(ingredient.text)
                                     } else {
-                                        selectedIngredientsSet.insert(ingredient)
+                                        selectedIngredientsSet.insert(ingredient.text)
                                     }
                                 }
                         }
@@ -155,6 +160,41 @@ struct RecipeView: View {
                 ConfettiCannon(counter: $counter, num: numberArray, colors: [.blue, .red, .yellow, .purple, .green, .black])
             }
             .navigationTitle(recipe.title)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Edit") {
+                        editViewIsPresented = true
+                        data = recipe.data
+                    }
+                }
+            }
+            .sheet(isPresented: $editViewIsPresented) {
+                NavigationView {
+                    RecipeEditView(recipeData: $data, fileManager: fileManager)
+                        .navigationTitle("Edit Recipe")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Cancel") {
+                                    editViewIsPresented = false
+                                }
+                            }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Save") {
+                                    editViewIsPresented = false
+                                    guard let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
+                                        fatalError("Couldn't find recipe index in array")
+                                    }
+                                    // update recipe in the recipes array
+                                    fileManager.recipes[index].update(from: data)
+                                    // update the Markdown File on disk
+                                    fileManager.saveRecipeAsMarkdownFile(recipe: recipe)
+                                    
+                                }
+                            }
+                        }
+                }
+            }
         }
         
         

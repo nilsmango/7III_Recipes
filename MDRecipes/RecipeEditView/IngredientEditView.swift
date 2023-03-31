@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+
+
 struct IngredientEditView: View {
-    
+
     @Binding var ingredient: String
-    
+
     @State private var selected = false
     
     var body: some View {

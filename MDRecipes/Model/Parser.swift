@@ -306,10 +306,15 @@ struct Parser {
         
         if numbersRange != nil || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "one" ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "two" ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "a"  ||  cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "an" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "ein" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "eine" || cleanIngredient.components(separatedBy: .whitespaces).first?.lowercased() == "zwei"  {
             
+            if let firstCharacter = cleanIngredient.first, firstCharacter.isLetter {
+                return cleanIngredient
+            }
+                
+            
             let input = cleanIngredient.components(separatedBy: .whitespaces).map { String($0) }
             
             var rawAmount = 1.0
-            // hier auch checken ob "one" oder "two" ist
+            // check if a number word
             if input.first!.lowercased() == "two" || input.first!.lowercased() == "zwei" {
                 rawAmount = 2.0
             } else {
@@ -362,6 +367,25 @@ struct Parser {
     }
     
     
+    /// re-parsing the instructions to render the timers again.
+    static func reParsingDirections(directions: [Direction]) -> [Direction] {
+        var lines = [String]()
+        for direction in directions {
+            let text = direction.text
+            lines.append("\(text)")
+        }
+        var newDirections: [Direction] = []
+        for line in lines {
+            let timerInMinutes = extractTimerInMinutes(from: line)
+            let hasTimer = timerInMinutes > 0 ? true : false
+            let cleanString = line.trimmingCharacters(in: .newlines)
+            let direction = Direction(step: newDirections.count+1, text: cleanString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+            newDirections.append(direction)
+        }
+        
+        return newDirections
+    }
+    
     
     
     // RECIPE to MARKDOWN and vice versa
@@ -393,8 +417,8 @@ struct Parser {
     }
     
     // find the Ingredients or Zutaten list in the markdown file
-    private static func findIngredients(in lines: [String]) -> [String] {
-        var ingredients: [String] = []
+    private static func findIngredients(in lines: [String]) -> [Ingredient] {
+        var ingredients: [Ingredient] = []
         if let ingredientIndex = lines.firstIndex(where: { $0 == "## Ingredients" || $0 == "## Zutaten" }) {
             let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
             for i in ingredientIndex+1..<nextTitleIndex {
@@ -404,7 +428,7 @@ struct Parser {
                     let ingredientString = cleanUpIngredientString(string: rawString)
                     
                     
-                    ingredients.append(ingredientString)
+                    ingredients.append(Ingredient(text: ingredientString))
                 }
                 
             }
@@ -525,6 +549,7 @@ struct Parser {
     
     
     
+    
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     ///
@@ -625,7 +650,7 @@ struct Parser {
         let ingredientsTitle = recipe.language == .german ? "## Zutaten" : "## Ingredients"
         lines.append(ingredientsTitle)
         for ingredient in recipe.ingredients {
-            let name = " \(ingredient)"
+            let name = " \(ingredient.text)"
             lines.append("- [ ]\(name)")
         }
         
@@ -668,6 +693,6 @@ struct Parser {
         
         // Return the markdown string
         let markdownContent = lines.joined(separator: "\n")
-        return MarkdownFile(name: "# \(recipe.title)", content: markdownContent)
+        return MarkdownFile(name: "\(recipe.title)", content: markdownContent)
     }
 }

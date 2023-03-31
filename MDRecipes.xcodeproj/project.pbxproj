@@ -15,6 +15,7 @@
 		782C65D029D5762600A95C18 /* HeadSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65CF29D5762600A95C18 /* HeadSectionView.swift */; };
 		782C65D229D58B0A00A95C18 /* ServingsCookedEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65D129D58B0A00A95C18 /* ServingsCookedEditView.swift */; };
 		782C65D729D6003200A95C18 /* IngredientEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65D629D6003200A95C18 /* IngredientEditView.swift */; };
+		782C65DB29D6D58000A95C18 /* Ingredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65DA29D6D58000A95C18 /* Ingredient.swift */; };
 		782EB6AD29C3A3A20086D2E7 /* MDRecipesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */; };
 		782EB6B129C3A3A30086D2E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 782EB6B029C3A3A30086D2E7 /* Assets.xcassets */; };
 		782EB6B529C3A3A30086D2E7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 782EB6B429C3A3A30086D2E7 /* Preview Assets.xcassets */; };
@@ -68,6 +69,7 @@
 		782C65CF29D5762600A95C18 /* HeadSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadSectionView.swift; sourceTree = "<group>"; };
 		782C65D129D58B0A00A95C18 /* ServingsCookedEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServingsCookedEditView.swift; sourceTree = "<group>"; };
 		782C65D629D6003200A95C18 /* IngredientEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientEditView.swift; sourceTree = "<group>"; };
+		782C65DA29D6D58000A95C18 /* Ingredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredient.swift; sourceTree = "<group>"; };
 		782EB6A929C3A3A20086D2E7 /* MDRecipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDRecipes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDRecipesApp.swift; sourceTree = "<group>"; };
 		782EB6B029C3A3A30086D2E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 				782EB6BE29C3A4650086D2E7 /* MarkdownFileManager.swift */,
 				786F9A1729CAE74D00CAA48B /* Parser.swift */,
 				782AB9EC29CE39C800EC23FC /* Direction.swift */,
+				782C65DA29D6D58000A95C18 /* Ingredient.swift */,
 				786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */,
 				78676B0B29D2EE4C002205B5 /* TimerManager.swift */,
 				786F9A1929CAF2D800CAA48B /* ConfettiSwiftUI */,
@@ -403,6 +406,7 @@
 				786F9A0A29C86D9D00CAA48B /* EnumSorting + Language.swift in Sources */,
 				78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */,
 				78F553DA29D4B545001C9F56 /* DirectionsEditView.swift in Sources */,
+				782C65DB29D6D58000A95C18 /* Ingredient.swift in Sources */,
 				78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */,
 				782EB6C329C460800086D2E7 /* RecipeViewTryOne.swift in Sources */,
 				782C65CE29D5746100A95C18 /* RecipeRatingView.swift in Sources */,
