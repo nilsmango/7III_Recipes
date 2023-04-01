@@ -12,7 +12,7 @@ struct CategoriesEditView: View {
     
     @State private var newCategory = ""
     
-    var fileManager: MarkdownFileManager
+    var fileManager: RecipesManager
     
     private var recipesCategories: [String] {
         fileManager.getAllCategories()
@@ -91,7 +91,7 @@ struct CategoriesEditView: View {
 struct CategoriesEditView_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            CategoriesEditView(categories: .constant(Recipe.sampleData[0].data.categories), fileManager: MarkdownFileManager())
+            CategoriesEditView(categories: .constant(Recipe.sampleData[0].data.categories), fileManager: RecipesManager())
         }
         
     }

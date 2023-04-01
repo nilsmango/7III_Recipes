@@ -9,23 +9,21 @@ import SwiftUI
 
 @main
 struct MDRecipesApp: App {
-    @StateObject private var fileManager = MarkdownFileManager()
-    
-    @StateObject private var timerManager = TimerManager()
-    
+    @StateObject private var fileManager = RecipesManager()
+        
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
-            HomeView(fileManager: fileManager, timerManager: timerManager)
+            HomeView(fileManager: fileManager)
                 .onAppear {
                     // loading all the timers into our timer manager
-                    timerManager.loadTimersFromDisk()
+                    fileManager.loadTimersFromDisk()
                 }
                 .onChange(of: scenePhase) { phase in
                     if phase == .inactive {
                         // saving our timer status to disk
-                        timerManager.saveTimersToDisk()
+                        fileManager.saveTimersToDisk()
                     }
                 }
         }

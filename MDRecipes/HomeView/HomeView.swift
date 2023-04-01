@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {    
-    @ObservedObject var fileManager: MarkdownFileManager
-    @ObservedObject var timerManager: TimerManager
+    @ObservedObject var fileManager: RecipesManager
     
     @State var searchText = ""
     
@@ -23,12 +22,12 @@ struct HomeView: View {
                 ScrollView {
                     VStack {
                         LazyVGrid(columns: columns) {
-                            NavigationLink(destination: RecipesListView(fileManager: fileManager, timerManager: timerManager, category: "")) {
+                            NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
                                 FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
                             }
                             
                             ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                                NavigationLink(destination: RecipesListView(fileManager: fileManager, timerManager: timerManager, category: category)) {
+                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
                                     FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                         
                                 }
@@ -67,7 +66,7 @@ struct HomeView: View {
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, timerManager: timerManager)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                                             ListItemView(recipe: recipe)
                                         }
                                         
@@ -105,10 +104,10 @@ struct HomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-            let fileManager = MarkdownFileManager()
+            let fileManager = RecipesManager()
             fileManager.recipes = Recipe.sampleData
             
-        return HomeView(fileManager: fileManager, timerManager: TimerManager())
+        return HomeView(fileManager: fileManager)
         }
     }
 

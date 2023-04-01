@@ -10,7 +10,7 @@ import SwiftUI
 struct HeadSectionView: View {
     var recipe: Recipe
     
-    @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var fileManager: RecipesManager
     
     @Binding var rating: Int
     
@@ -66,6 +66,6 @@ struct HeadSectionView: View {
 
 struct HeadSectionView_Previews: PreviewProvider {
     static var previews: some View {
-        HeadSectionView(recipe: Recipe.sampleData[0], fileManager: MarkdownFileManager(), rating: .constant(3))
+        HeadSectionView(recipe: Recipe.sampleData[0], fileManager: RecipesManager(), rating: .constant(3))
     }
 }

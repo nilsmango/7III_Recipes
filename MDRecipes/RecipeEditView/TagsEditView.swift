@@ -10,7 +10,7 @@ import SwiftUI
 struct TagsEditView: View {
     @Binding var tags: [String]
     
-    var fileManager: MarkdownFileManager
+    var fileManager: RecipesManager
     
     private var recipesTags: [String] {
         fileManager.getAllTags()
@@ -125,7 +125,7 @@ struct TagsEditView: View {
 struct TagsEditView_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            TagsEditView(tags: .constant(Recipe.sampleData[0].data.tags), fileManager: MarkdownFileManager())
+            TagsEditView(tags: .constant(Recipe.sampleData[0].data.tags), fileManager: RecipesManager())
         }
         
     }

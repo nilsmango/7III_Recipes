@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecipeView: View {
-    @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var fileManager: RecipesManager
     
     var recipe: Recipe
     
@@ -31,8 +31,6 @@ struct RecipeView: View {
     // edit view data
     @State private var data: Recipe.Data = Recipe.Data()
     
-    // timer manager
-    @ObservedObject var timerManager: TimerManager
     
     var body: some View {
         NavigationStack {
@@ -68,8 +66,8 @@ struct RecipeView: View {
                     
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
-                            if let timerManagerIndex = timerManager.timers.firstIndex(where: { $0.id == direction.id }) {
-                                DirectionTimerView(timerManager: timerManager, direction: direction, timer: $timerManager.timers[timerManagerIndex])
+                            if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.id == direction.id }) {
+                                DirectionTimerView(direction: direction, timer: $fileManager.timers[timerManagerIndex])
                             } else {
                                 DirectionView(direction: direction)
                             }
@@ -165,7 +163,7 @@ struct RecipeView: View {
                                     // update the Markdown File on disk
                                     fileManager.saveRecipeAsMarkdownFile(recipe: recipe)
                                     // update our timers
-                                    timerManager.loadTimers(for: fileManager.recipes[index].directions)
+                                    fileManager.loadTimers(for: fileManager.recipes[index].directions)
                                 }
                             }
                         }
@@ -180,6 +178,6 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(fileManager: MarkdownFileManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!), timerManager: TimerManager())
+        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!))
     }
 }

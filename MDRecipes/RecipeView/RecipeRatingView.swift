@@ -10,7 +10,7 @@ import SwiftUI
 struct RecipeRatingView: View {
     @Binding var rating: Int
     let recipe: Recipe
-    @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var fileManager: RecipesManager
 
         var body: some View {
             ForEach(1...5, id: \.self) { selectedRating in
@@ -29,7 +29,7 @@ struct RecipeRatingView: View {
 struct RecipeRatingView_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
-            RecipeRatingView(rating: .constant(3), recipe: Recipe.sampleData[0], fileManager: MarkdownFileManager())
+            RecipeRatingView(rating: .constant(3), recipe: Recipe.sampleData[0], fileManager: RecipesManager())
         }
         
     }

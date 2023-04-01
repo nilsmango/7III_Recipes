@@ -10,7 +10,7 @@ import SwiftUI
 struct RecipeEditView: View {
     @Binding var recipeData: Recipe.Data
     
-    @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var fileManager: RecipesManager
     
     @State private var newIngredient = ""
     
@@ -127,7 +127,7 @@ struct RecipeEditView: View {
 
 struct RecipeEditView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: MarkdownFileManager())
+        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager())
     }
 }
 

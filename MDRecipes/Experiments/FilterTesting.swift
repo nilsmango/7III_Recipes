@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FilterTesting: View {
-    @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var fileManager: RecipesManager
     
     @State private var searchText = ""
    
@@ -191,7 +191,7 @@ struct FilterTesting: View {
 
 struct FilterTesting_Previews: PreviewProvider {
     static var previews: some View {
-        let fileManager = MarkdownFileManager()
+        let fileManager = RecipesManager()
         fileManager.recipes = Recipe.sampleData
         
         return FilterTesting(fileManager: fileManager)
