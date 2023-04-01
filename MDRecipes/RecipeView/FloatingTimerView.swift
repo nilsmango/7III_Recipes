@@ -27,8 +27,6 @@ struct FloatingTimerView: View {
                         .clipShape(Capsule())
                 
             }
-            
-        
     }
 }
 

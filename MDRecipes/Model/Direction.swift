@@ -13,7 +13,13 @@ struct Direction: Identifiable, Codable {
     var hasTimer: Bool
     var timerInMinutes: Double
     
-    var id: Int {
-        step
+    let id: UUID
+    
+    init(step: Int, text: String, hasTimer: Bool, timerInMinutes: Double, id: UUID = UUID()) {
+        self.step = step
+        self.text = text
+        self.hasTimer = hasTimer
+        self.timerInMinutes = timerInMinutes
+        self.id = id
     }
 }

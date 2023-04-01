@@ -9,8 +9,9 @@ import SwiftUI
 
 struct HomeView: View {    
     @ObservedObject var fileManager: MarkdownFileManager
+    @ObservedObject var timerManager: TimerManager
     
-    @State private var searchText = ""
+    @State var searchText = ""
     
     
     
@@ -22,12 +23,12 @@ struct HomeView: View {
                 ScrollView {
                     VStack {
                         LazyVGrid(columns: columns) {
-                            NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
+                            NavigationLink(destination: RecipesListView(fileManager: fileManager, timerManager: timerManager, category: "")) {
                                 FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
                             }
                             
                             ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
+                                NavigationLink(destination: RecipesListView(fileManager: fileManager, timerManager: timerManager, category: category)) {
                                     FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                         
                                 }
@@ -41,8 +42,15 @@ struct HomeView: View {
                       
                     // TODO: make this great
                         
-                        Text("Irgndwie Tags und ingredients here, wenn clickt dann zu einer liste mit ausgewählten tags etc.")
+                        Text("Tags")
+                        FlexiStringsView(strings: fileManager.getAllTags())
+                        Text("Ingredients")
+                        
+                        
+                        Text("Irgndwie Tags und ingredients here, wenn clickt dann zu einer speziellen liste mit ausgewählten tags oder eben ingredients, wo man einzelne tags oder ingredients dazuklicken kann wie TagsEditView - die neue liste hier unten hinzufügen bei else")
+                        
                         Text("New Recipe Button auch irgendwo hier unten, als erstes!(?)")
+                        Text("Alles wie in erinnerungen app")
                     }
                 }
                 
@@ -55,13 +63,11 @@ struct HomeView: View {
             } else {
                 List {
   
-                    
-                    
                         ForEach(fileManager.getAllCategories(), id: \.self) { category in
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, timerManager: timerManager)) {
                                             ListItemView(recipe: recipe)
                                         }
                                         
@@ -102,7 +108,7 @@ struct HomeView_Previews: PreviewProvider {
             let fileManager = MarkdownFileManager()
             fileManager.recipes = Recipe.sampleData
             
-            return HomeView(fileManager: fileManager)
+        return HomeView(fileManager: fileManager, timerManager: TimerManager())
         }
     }
 

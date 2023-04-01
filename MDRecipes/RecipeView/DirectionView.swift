@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct DirectionView: View {
+   
     var direction: Direction
-    
-//    @Binding var timer: DirectionTimer
     
     // Step done indicator.
     @State private var done = false
@@ -30,19 +29,7 @@ struct DirectionView: View {
                             done.toggle()
                         
                     }
-                if direction.hasTimer {
-                    if done == false {
-                        Button(action: {
-                            //
-                        }) {
-                            Image(systemName: "timer")
-                            Text("\(Int(direction.timerInMinutes)) min")
-                        }
-                        .foregroundColor(.white) // fontcolor
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue) // color background
-                    }
-                }
+                
             }
             
         }
@@ -52,6 +39,6 @@ struct DirectionView: View {
 
 struct DirectionView_Previews: PreviewProvider {
     static var previews: some View {
-        DirectionView(direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2))
+        DirectionView(direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: false, timerInMinutes: 2))
     }
 }

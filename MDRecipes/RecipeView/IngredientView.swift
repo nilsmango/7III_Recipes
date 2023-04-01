@@ -11,17 +11,18 @@ struct IngredientView: View {
     var ingredientString: String
     var recipeServings: Int
     var chosenServings: Int
-    var selected: Bool
+    @State private var selected = false
     
     var body: some View {
         HStack {
-            if selected {
-                Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.blue)
-            } else {
-                Image(systemName: "circle")
-            }
+            
+                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(selected ? .blue : .primary)
+            
             Text(Parser.stringMaker(of: ingredientString, selectedServings: chosenServings, recipeServings: recipeServings))
+        }
+        .onTapGesture {
+            selected.toggle()
         }
         
     }
@@ -30,6 +31,6 @@ struct IngredientView: View {
 
 struct IngredientView_Previews: PreviewProvider {
     static var previews: some View {
-        IngredientView(ingredientString: "1 egg", recipeServings: 4, chosenServings: 6, selected: true)
+        IngredientView(ingredientString: "1 egg", recipeServings: 4, chosenServings: 6)
     }
 }

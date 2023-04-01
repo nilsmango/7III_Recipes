@@ -39,6 +39,10 @@ struct TagsEditView: View {
         }
     }
     
+    private func updateAllTags() {
+        allTags = Array(Set(recipesTags + tags)).sorted()
+    }
+    
     var body: some View {
         Section {
             FlexibleView(
@@ -52,74 +56,69 @@ struct TagsEditView: View {
                     .fontDesign(.rounded)
                     .padding(8)
                     .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(tags.contains(tag) ? .blue : .gray)
-                                .opacity(tags.contains(tag) ? 1 : 0.2)
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(tags.contains(tag) ? .blue : .gray)
+                            .opacity(tags.contains(tag) ? 1 : 0.2)
                         
                     )
                     .onTapGesture {
                         withAnimation {
                             if tags.contains(tag) {
                                 tags.removeAll(where: { $0 == tag })
-                                allTags = Array(Set(recipesTags + tags)).sorted()
+                                updateAllTags()
                             } else {
                                 tags.append(tag)
-                                allTags = Array(Set(recipesTags + tags)).sorted()
+                                updateAllTags()
                             }
                         }
-                        
-                        
                     }
-                
             }
-            }
+        }
         .onAppear {
             allTags = Array(Set(recipesTags + tags)).sorted()
         }
         Section {
             
             HStack {
-            TextField("Add a new tag ...", text: $newTag)
+                TextField("Add a new tag ...", text: $newTag)
                     .focused($isFieldFocused)
                     .onSubmit {
                         isFieldFocused = true
-                            withAnimation {
-                                tags.append(makeWordTag(newTag))
-                                newTag = ""
-                                allTags = Array(Set(recipesTags + tags)).sorted()
-                            }
-                            
-                        
-                    }
-            .disableAutocorrection(true)
-            .autocapitalization(.none)
-                .onChange(of: newTag) { newValue in
-                    if canMakeTag(from: newTag) {
                         withAnimation {
                             tags.append(makeWordTag(newTag))
                             newTag = ""
-                            allTags = Array(Set(recipesTags + tags)).sorted()
+                            updateAllTags()
                         }
-                        
                     }
-                }
+                    .disableAutocorrection(true)
+                    .autocapitalization(.none)
+                    .onChange(of: newTag) { newValue in
+                        if canMakeTag(from: newTag) {
+                            withAnimation {
+                                tags.append(makeWordTag(newTag))
+                                newTag = ""
+                                updateAllTags()
+                            }
+                            
+                        }
+                    }
                 
                 if !newTag.isEmpty {
                     Button {
-                            newTag = ""
+                        newTag = ""
                         
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .accessibilityLabel(Text("Delete"))
                             .foregroundColor(.secondary)
-
+                        
                     }
                 }
-                 
+                
+            }
+            
         }
- 
-    }
-                   
+        
     }
 }
 

@@ -8,14 +8,13 @@
 import Foundation
 import SwiftUI
 
-struct DirectionTimer: Identifiable {
+/// a direction timer struct, available with random colors and custom colors
+struct DirectionTimer: Identifiable, Codable {
     var targetDate: Date
+    var timerInMinutes: Double
     var step: Int
     var running: Bool
-    var backgroundColor: UIColor
-    var fontColor: UIColor
+    let id: UUID
     
-    var id: Int {
-        step
-    }
+
 }

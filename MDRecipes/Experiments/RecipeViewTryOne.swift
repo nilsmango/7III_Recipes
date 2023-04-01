@@ -113,7 +113,7 @@ struct RecipeViewTryOne: View {
                     
                     Section(header: Text("Ingredients")) {
                         ForEach(Parser.extractIngredients(from: recipe.content), id: \.self) { ingredient in
-                            IngredientView(ingredientString: ingredient, recipeServings: Parser.extractServings(from: recipe.content), chosenServings: chosenServings, selected: selectionChecker(ingredient))
+                            IngredientView(ingredientString: ingredient, recipeServings: Parser.extractServings(from: recipe.content), chosenServings: chosenServings)
                                 .monospacedDigit()
                                 .onTapGesture {
                                     if selectionChecker(ingredient) {
@@ -327,12 +327,8 @@ struct RecipeViewTryOne: View {
                 } else {
                     
                     Button(action: {
-                        let newTimer = DirectionTimer(targetDate: targetDateArray[makeIndex(of: direction)],
-                                                      step: makeIndex(of: direction),
-                                                      running: true,
-                                                      backgroundColor: .blue,
-                                                      fontColor: .white)
-                        floatingTimers.append(newTimer)
+//                        let newTimer = DirectionTimer(targetDate: targetDateArray[makeIndex(of: direction)], timerInMinutes: 14, step: makeIndex(of: direction), running: true, id: direction.id)
+//                        floatingTimers.append(newTimer)
                     }) {
                         Image(systemName: "arrow.down.right.circle")
                     }

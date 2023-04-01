@@ -679,6 +679,7 @@ struct Parser {
         lines.append("")
         let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
         lines.append(imagesTitle)
+        
         // From this: ("\(title): \(imagePath)") - back to a markdown image link
         let imageLines = recipe.images.components(separatedBy: "\n")
         for line in imageLines {
@@ -689,7 +690,6 @@ struct Parser {
                 }
         }
         lines.append("")
-        
         
         // Return the markdown string
         let markdownContent = lines.joined(separator: "\n")

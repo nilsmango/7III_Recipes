@@ -10,21 +10,9 @@ import SwiftUI
 struct RecipeView: View {
     @ObservedObject var fileManager: MarkdownFileManager
     
-    //    @StateObject private var timerManager = TimerManager()
-    
     var recipe: Recipe
     
     @AppStorage("Servings") var selectedServings = 4
-    
-    // ingredient selection
-    @State private var selectedIngredientsSet = Set<String>()
-    private func selectedIngredient(ingredientName: String) -> Bool {
-        if selectedIngredientsSet.contains(ingredientName) {
-            return true
-        } else {
-            return false
-        }
-    }
     
     // confetti
     @State private var confettiStopper = false
@@ -40,8 +28,11 @@ struct RecipeView: View {
     
     // edit view
     @State private var editViewIsPresented = false
-    
+    // edit view data
     @State private var data: Recipe.Data = Recipe.Data()
+    
+    // timer manager
+    @ObservedObject var timerManager: TimerManager
     
     var body: some View {
         NavigationStack {
@@ -50,50 +41,38 @@ struct RecipeView: View {
                     Section {
                         HeadSectionView(recipe: recipe, fileManager: fileManager, rating: $rating)
                             .onAppear {
+                                
+                                // loading the rating
                                 rating = Int(String(recipe.rating.first ?? Character("1"))) ?? 1
+                                // loading the notes
+                                note = recipe.notes
+                            }
+                            .onDisappear {
+                                
+                                if saveNotes {
+                                    fileManager.updateNoteSection(of: recipe, to: note)
+                                }
                             }
                     }
                     
                     Section("Servings") {
-                        HStack {
-                            Text("\(selectedServings)")
-                            Spacer()
-                            Button(action: {
-                                if selectedServings > 1 {
-                                    selectedServings -= 1
-                                }
-                                
-                            }) {
-                                Image(systemName: "minus.circle")
-                            }
-                            .buttonStyle(.bordered)
-                            Button(action: {
-                                selectedServings += 1
-                            }) {
-                                Image(systemName: "plus.circle")
-                            }
-                            .buttonStyle(.bordered)
-                        }
+                        ServingsView(selectedServings: $selectedServings)
                     }
                     
                     Section("Ingredients") {
                         ForEach(recipe.ingredients) { ingredient in
+                            IngredientView(ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings)
                             
-                            IngredientView(ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings, selected: selectedIngredient(ingredientName: ingredient.text))
-                            // mark ingredient as checked.
-                                .onTapGesture {
-                                    if selectedIngredient(ingredientName: ingredient.text) {
-                                        selectedIngredientsSet.remove(ingredient.text)
-                                    } else {
-                                        selectedIngredientsSet.insert(ingredient.text)
-                                    }
-                                }
                         }
                     }
                     
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
-                            DirectionView(direction: direction)
+                            if let timerManagerIndex = timerManager.timers.firstIndex(where: { $0.id == direction.id }) {
+                                DirectionTimerView(timerManager: timerManager, direction: direction, timer: $timerManager.timers[timerManagerIndex])
+                            } else {
+                                DirectionView(direction: direction)
+                            }
                         }
                     }
                     
@@ -111,7 +90,6 @@ struct RecipeView: View {
                             RecipeRatingView(rating: $rating, recipe: recipe, fileManager: fileManager)
                                 
                         }
-                        
                     }
                     
                     if recipe.nutrition != "" {
@@ -128,17 +106,11 @@ struct RecipeView: View {
                         }
                         
                     }
-                    .onAppear {
-                        note = recipe.notes
-                    }
+                    
                     .onChange(of: note) { _ in
                         saveNotes = true
                     }
-                    .onDisappear {
-                        if saveNotes {
-                            fileManager.updateNoteSection(of: recipe, to: note)
-                        }
-                    }
+                    
                     
                     if recipe.images != "" {
                         Section("Images") {
@@ -149,8 +121,10 @@ struct RecipeView: View {
                     Section("Info") {
                         Text("Source: \(recipe.source)")
                         Text("Created: \(recipe.date, style: .date)")
-                        Text("Add tags and categories Views here, with navigationlinks to tap them")
                         
+                        FlexiStringsView(strings: recipe.tags)
+                        
+                        FlexiStringsView(strings: recipe.categories)
                     }
                     
                 }
@@ -185,11 +159,13 @@ struct RecipeView: View {
                                     guard let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
                                         fatalError("Couldn't find recipe index in array")
                                     }
+                                    
                                     // update recipe in the recipes array
                                     fileManager.recipes[index].update(from: data)
                                     // update the Markdown File on disk
                                     fileManager.saveRecipeAsMarkdownFile(recipe: recipe)
-                                    
+                                    // update our timers
+                                    timerManager.loadTimers(for: fileManager.recipes[index].directions)
                                 }
                             }
                         }
@@ -204,6 +180,6 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(fileManager: MarkdownFileManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!))
+        RecipeView(fileManager: MarkdownFileManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!), timerManager: TimerManager())
     }
 }

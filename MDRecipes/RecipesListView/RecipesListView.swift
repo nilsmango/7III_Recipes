@@ -10,6 +10,8 @@ import SwiftUI
 struct RecipesListView: View {
     @ObservedObject var fileManager: MarkdownFileManager
     
+    @ObservedObject var timerManager: TimerManager
+    
     @State private var editMode: EditMode = .inactive
     
     @State private var sortingSelection: Sorting = .standard
@@ -24,7 +26,7 @@ struct RecipesListView: View {
         NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, timerManager: timerManager)) {
                             // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }.listStyle(.insetGrouped)
@@ -90,6 +92,7 @@ struct RecipesListView: View {
                     Button(action: {
                         // TODO: change that to an edit view / see qrCoder
                         fileManager.createMarkdownFile(name: "New Fake Recipe", content: "# Curry\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
+                        
                     }) { Label("New Fake Recipe", systemImage: "hammer.circle")}
                     
                     
@@ -149,6 +152,9 @@ struct RecipesListView: View {
                                     // save the recipe as a Markdown File on disk
                                     fileManager.saveRecipeAsMarkdownFile(recipe: newRecipe)
                                     
+                                    // update the timers
+                                    timerManager.loadTimers(for: newRecipe.directions)
+                                    
                                     // reset the newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         newRecipeData.timesCooked = 0
@@ -187,6 +193,6 @@ struct RecipesListView_Previews: PreviewProvider {
         let fileManager = MarkdownFileManager()
         fileManager.recipes = Recipe.sampleData
         
-        return RecipesListView(fileManager: fileManager, category: "Main Course")
+        return RecipesListView(fileManager: fileManager, timerManager: TimerManager(), category: "Main Course")
     }
 }
