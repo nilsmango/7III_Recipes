@@ -510,11 +510,13 @@ struct Parser {
             let imageLines = lines[imagesIndex+1..<lines.count]
             var imagesString = ""
             for imageLine in imageLines {
-                let startIndex = imageLine.index(imageLine.startIndex, offsetBy: 2) // skip "!["
-                let endIndex = imageLine.firstIndex(of: "]")!
-                let title = String(imageLine[startIndex..<endIndex]).trimmingCharacters(in: .whitespaces)
-                let imagePath = imageLine.components(separatedBy: "(")[1].replacingOccurrences(of: ")", with: "")
-                imagesString.append("\(title): \(imagePath)\n")
+                if imageLine != "" {
+                    let startIndex = imageLine.index(imageLine.startIndex, offsetBy: 2) // skip "!["
+                    let endIndex = imageLine.firstIndex(of: "]")!
+                    let title = String(imageLine[startIndex..<endIndex]).trimmingCharacters(in: .whitespaces)
+                    let imagePath = imageLine.components(separatedBy: "(")[1].replacingOccurrences(of: ")", with: "")
+                    imagesString.append("\(title): \(imagePath)\n")
+                }
             }
             imagesString = imagesString.trimmingCharacters(in: .newlines)
             return imagesString
@@ -559,8 +561,8 @@ struct Parser {
         
         let title = findValue(for: "# ", in: lines) ?? "No Title Found"
         let source = findValue(for: "Source: ", or: "Quelle: ", in: lines) ?? "Unknown"
-        let categories = findValue(for: "Categories: ", or: "Kategorien: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? [""]
-        let tags = findValue(for: "Tags: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? [""]
+        let categories = findValue(for: "Categories: ", or: "Kategorien: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? []
+        let tags = findValue(for: "Tags: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
         let rating = findValue(for: "Rating: ", or: "Bewertung: ", in: lines) ?? ""
         let prepTime = parsingTimes(for: "Prep time: ", or: "Vorbereitungszeit: ", in: lines)
         let cookTime = parsingTimes(for: "Cook time: ", or: "Kochzeit: ", in: lines)

@@ -10,22 +10,24 @@ import UIKit
 
 class RecipesManager: ObservableObject {
     
-    // TIMERS
+    // MARK: TIMERS
     
     @Published var timers = [DirectionTimer]()
     
-    func loadTimers(for directions: [Direction]) {
+    /// to load and reload timers for new or edited recipes
+    func loadTimers(for recipe: Recipe) {
+        let directions = recipe.directions
         for direction in directions {
-            if let index = timers.firstIndex(where: { $0.id == direction.id }) {
+            if let index = timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
                 timers.remove(at: index)
             }
             if direction.hasTimer {
-                timers.append(DirectionTimer(targetDate: Date.now, timerInMinutes: direction.timerInMinutes, step: direction.step, running: false, id: direction.id))
+                timers.append(DirectionTimer(targetDate: Date.now, timerInMinutes: direction.timerInMinutes, recipeTitle: recipe.title, step: direction.step, running: false, id: direction.id))
             }
         }
     }
     
-    // Idea how to keep the timers up when view gets destroyed
+    // Saving and loading of the timers in the documents folder to keep the timers up when view gets destroyed
     
     private static var documentsFolder: URL {
         let appIdentifier = "group.qrcoder.codes"
@@ -65,7 +67,13 @@ class RecipesManager: ObservableObject {
             }
             DispatchQueue.main.async {
                 self?.timers = jsonTimers
-                
+                for timer in self!.timers {
+                    if timer.targetDate < Date.now {
+                        if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
+                            self!.timers[index].running = false
+                        }
+                    }
+                }
             }
         }
         }
@@ -75,7 +83,7 @@ class RecipesManager: ObservableObject {
     
     
     
-    // RECIPES
+    // MARK: RECIPES
     
     @Published var recipes = [Recipe]()
     
@@ -147,10 +155,13 @@ class RecipesManager: ObservableObject {
     
     
     func delete(at indexSet: IndexSet) {
+        // find the id for later removing the markdown
+        let idsToDelete = indexSet.map { recipes[$0].id }
+        
         // Remove the Recipe from the Recipes Arrays
         recipes.remove(atOffsets: indexSet)
-        // we have to keep our manuallySorted array up to date
-        let idsToDelete = indexSet.map { recipes[$0].id }
+        
+        
         
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
@@ -291,6 +302,7 @@ class RecipesManager: ObservableObject {
         }
         return categories.sorted()
     }
+    
     
     /// get a list of tags from the recipes
     func getAllTags() -> [String] {

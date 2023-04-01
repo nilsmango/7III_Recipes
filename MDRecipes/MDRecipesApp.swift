@@ -17,7 +17,8 @@ struct MDRecipesApp: App {
         WindowGroup {
             HomeView(fileManager: fileManager)
                 .onAppear {
-                    // loading all the timers into our timer manager
+                    fileManager.loadMarkdownFiles()
+                    // loading all the timers afresh
                     fileManager.loadTimersFromDisk()
                 }
                 .onChange(of: scenePhase) { phase in

@@ -18,14 +18,60 @@ struct RecipeEditView: View {
         Int(String(recipeData.rating.first ?? Character("1"))) ?? 1
     }
     
+    // Title validation
+    @State private var badTitle = false
+    
+    private var titles: [String] {
+        fileManager.recipes.map { $0.title }
+    }
+    
+    @FocusState private var titleIsFocused: Bool
+    
+    @State private var oldTitle = "Some title you would never think of"
+    
     var body: some View {
         List {
             Section("Name & Co.") {
-                
+                VStack(alignment: .leading) {
                     HStack {
                         Text("Title:")
                         TextField("Carrot Cake", text: $recipeData.title)
+                        .focused($titleIsFocused)
+                        
+                        .onChange(of: recipeData.title) { newValue in
+                            if titles.contains(recipeData.title) && recipeData.title != oldTitle {
+                               badTitle = true
+                           } else {
+                               badTitle = false
+                           }
+                       }
+                        .onChange(of: titleIsFocused) { newValue in
+                            if titles.contains(recipeData.title) && recipeData.title != oldTitle  {
+                                recipeData.title += " 2"
+                            }
+                        }
+                       .onSubmit {
+                           if titles.contains(recipeData.title) && recipeData.title != oldTitle  {
+                               recipeData.title += " 2"
+                           }
+                        }
+                        
+                       .onAppear {
+                           if recipeData.title != "" {
+                               oldTitle = recipeData.title
+                           }
+                           
+                       }
+                                            
+                            
+                        }
+                    if badTitle {
+                        Text("Title already taken, choose another one or add a number")
+                            .font(.caption)
                     }
+                    
+                }
+                    
                     HStack {
                         Text("Source:")
                         TextField("Source of the Recipe", text: $recipeData.source)

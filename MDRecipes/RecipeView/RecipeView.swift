@@ -66,7 +66,7 @@ struct RecipeView: View {
                     
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
-                            if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.id == direction.id }) {
+                            if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
                                 DirectionTimerView(direction: direction, timer: $fileManager.timers[timerManagerIndex])
                             } else {
                                 DirectionView(direction: direction)
@@ -163,7 +163,7 @@ struct RecipeView: View {
                                     // update the Markdown File on disk
                                     fileManager.saveRecipeAsMarkdownFile(recipe: recipe)
                                     // update our timers
-                                    fileManager.loadTimers(for: fileManager.recipes[index].directions)
+                                    fileManager.loadTimers(for: fileManager.recipes[index])
                                 }
                             }
                         }

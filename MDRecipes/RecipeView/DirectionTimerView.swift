@@ -60,7 +60,7 @@ struct DirectionTimerView: View {
 
 struct DirectionTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        DirectionTimerView(direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), timer: .constant(DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, step: 2, running: true, id: UUID())))
+        DirectionTimerView(direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), timer: .constant(DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: true, id: UUID())))
     }
 }
 

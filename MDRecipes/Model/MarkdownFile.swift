@@ -17,12 +17,6 @@ struct MarkdownFile: Identifiable, Equatable, Hashable {
         self.name = name
         self.content = content
     }
-    
-//    mutating func iCookedIt() {
-//        var timesCooked = Parser.extractTimesCooked(from: content)
-//        timesCooked += 1
-//
-//    }
 }
 
 extension MarkdownFile {

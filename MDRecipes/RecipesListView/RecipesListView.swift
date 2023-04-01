@@ -88,11 +88,13 @@ struct RecipesListView: View {
                         Label("Import from Text", systemImage: "square.and.arrow.down")
                     }
                     Button(action: {
-                        fileManager.createMarkdownFile(name: "New Fake Recipe", content: "# Curry\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
+                        fileManager.createMarkdownFile(name: "New Fake Recipe", content: "# Curry No. \(Int.random(in: 0...1000))\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
                         // add the timers to our timer manager also
-                        if let directions = fileManager.recipes.last?.directions {
-                            fileManager.loadTimers(for: directions)
+                        if let recipe = fileManager.recipes.last {
+                            fileManager.loadTimers(for: recipe)
                         }
+                        // save the fake recipe to markdown folder
+                        fileManager.saveRecipeAsMarkdownFile(recipe: fileManager.recipes.last!)
                         
                     }) { Label("New Fake Recipe", systemImage: "hammer.circle")}
                     
@@ -147,6 +149,7 @@ struct RecipesListView: View {
                                         // re-parsing directions to find all the new timer from edits in the list.
                                                            directions: Parser.reParsingDirections(directions: newRecipeData.directions), nutrition: newRecipeData.nutrition, notes: newRecipeData.notes, images: newRecipeData.images, date: newRecipeData.date, updated: Date.now, language: newRecipeData.language)
                                     
+                                    
                                     // save the new recipe in the recipes Array
                                     fileManager.recipes.append(newRecipe)
                                     
@@ -154,7 +157,7 @@ struct RecipesListView: View {
                                     fileManager.saveRecipeAsMarkdownFile(recipe: newRecipe)
                                     
                                     // update the timers
-                                    fileManager.loadTimers(for: newRecipe.directions)
+                                    fileManager.loadTimers(for: newRecipe)
                                     
                                     // reset the newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
