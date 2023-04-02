@@ -12,13 +12,16 @@ struct RecipesListView: View {
     
     @State private var editMode: EditMode = .inactive
     
-    @State private var sortingSelection: Sorting = .standard
+    @AppStorage("sorting") private var sortingSelection: Sorting = .standard
     
     var category: String
     
     @State private var editViewPresented = false
     
     @State private var newRecipeData = Recipe.Data()
+    
+    // going back to this view programmatically
+//    @State private var viewActive = [Array(repeating: false, count: 10000)]
     
     var body: some View {
         NavigationStack {
@@ -27,7 +30,8 @@ struct RecipesListView: View {
                     NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
                         // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
-                    }.listStyle(.insetGrouped)
+                    }
+                    .listStyle(.insetGrouped)
                     
                 }
                 .onDelete { indexSet in

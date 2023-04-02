@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RecipeView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @ObservedObject var fileManager: RecipesManager
     
     var recipe: Recipe
@@ -125,6 +127,8 @@ struct RecipeView: View {
                         FlexiStringsView(strings: recipe.categories)
                     }
                     
+                    
+                    
                 }
                 .listStyle(.insetGrouped)
                 
@@ -134,10 +138,27 @@ struct RecipeView: View {
             .navigationTitle(recipe.title)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Edit") {
-                        editViewIsPresented = true
-                        data = recipe.data
+                    Menu {
+                        Button {
+                            editViewIsPresented = true
+                            data = recipe.data
+                        } label: {
+                            Label("Edit Recipe", systemImage: "square.and.pencil")
+                        }
+                        Button {
+                            if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+                                let indexSet = IndexSet(integer: index)
+                                fileManager.delete(at: indexSet)
+                                dismiss()
+                            }
+                        } label: {
+                            Label("Delete Recipe", systemImage: "trash")
+                        }
+                    } label: {
+                        Label("Edit", systemImage: "ellipsis.circle")
                     }
+
+                    
                 }
             }
             .sheet(isPresented: $editViewIsPresented) {

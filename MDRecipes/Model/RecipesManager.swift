@@ -87,8 +87,6 @@ class RecipesManager: ObservableObject {
     
     @Published var recipes = [Recipe]()
     
-    
-    
     /// The document directory
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 
@@ -109,20 +107,6 @@ class RecipesManager: ObservableObject {
         }
     }
     
-    /// Save a new recipe as a Markdown file in the chosen directory and add it to the recipes array
-    func saveMarkdownFile(recipe: Recipe) {
-        recipes.append(recipe)
-        
-        let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
-        
-        let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
-        do {
-            try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
-            
-        } catch {
-            print("Error saving Markdown file for recipe \(recipe.title): \(error.localizedDescription)")
-        }
-    }
     
     /// Update a recipe in the Markdown file as well the recipes array
     func updateRecipe(updatedRecipe: Recipe) {
@@ -136,7 +120,7 @@ class RecipesManager: ObservableObject {
         }
     }
     
-    
+    // TODO: make this private once I don't use fake recipes any more
     func saveRecipeAsMarkdownFile(recipe: Recipe) {
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
         
@@ -148,13 +132,13 @@ class RecipesManager: ObservableObject {
         }
     }
     
-    
+    // TODO: delete this once we don't use fake recipes any more
     func createMarkdownFile(name: String, content: String) {
         recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
     }
     
     /// deleting only the markdown file of a recipe
-    func deleteMarkdownFile(recipeTitle: String) {
+    private func deleteMarkdownFile(recipeTitle: String) {
         let sanitizedTitle = Parser.sanitizeFileName(recipeTitle)
         let fileName = "\(sanitizedTitle).md"
         let fileURL = documentsDirectory.appendingPathComponent(fileName)
@@ -214,8 +198,8 @@ class RecipesManager: ObservableObject {
     }
     
     /// save a new recipe
-    
     func saveNewRecipe(newRecipeData: Recipe.Data) {
+        
         let newRecipe = Recipe(title: newRecipeData.title,
                                source: newRecipeData.source,
                                categories: newRecipeData.categories,
@@ -248,7 +232,7 @@ class RecipesManager: ObservableObject {
     }
     
     
-    
+    /// move a recipe in the list
     func move(from offset: IndexSet, to newPlace: Int) {
         recipes.move(fromOffsets: offset, toOffset: newPlace)
     }
@@ -274,9 +258,6 @@ class RecipesManager: ObservableObject {
         updatedRecipe.rating = "\(rating)/5"
         updateRecipe(updatedRecipe: updatedRecipe)
     }
-    
-    
-    
     
     
     /// Search and filter the recipes
