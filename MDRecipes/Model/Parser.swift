@@ -549,6 +549,15 @@ struct Parser {
         
     }
     
+    // sanitize any filename
+    static func sanitizeFileName(_ fileName: String) -> String {
+        var sanitizedFileName = fileName
+        let disallowedChars = CharacterSet(charactersIn: ":/?*\"<>|")
+        sanitizedFileName = sanitizedFileName.replacingOccurrences(of: ".", with: "")
+        sanitizedFileName = sanitizedFileName.components(separatedBy: disallowedChars).joined(separator: "")
+        sanitizedFileName = sanitizedFileName.replacingOccurrences(of: "/", with: "-")
+        return sanitizedFileName
+    }
     
     
     
@@ -695,6 +704,7 @@ struct Parser {
         
         // Return the markdown string
         let markdownContent = lines.joined(separator: "\n")
-        return MarkdownFile(name: "\(recipe.title)", content: markdownContent)
+        let filename = sanitizeFileName(recipe.title)
+        return MarkdownFile(name: filename, content: markdownContent)
     }
 }

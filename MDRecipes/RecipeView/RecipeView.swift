@@ -154,16 +154,9 @@ struct RecipeView: View {
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
                                     editViewIsPresented = false
-                                    guard let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
-                                        fatalError("Couldn't find recipe index in array")
-                                    }
                                     
-                                    // update recipe in the recipes array
-                                    fileManager.recipes[index].update(from: data)
-                                    // update the Markdown File on disk
-                                    fileManager.saveRecipeAsMarkdownFile(recipe: recipe)
-                                    // update our timers
-                                    fileManager.loadTimers(for: fileManager.recipes[index])
+                                    fileManager.updateEditedRecipe(recipe: recipe, data: data)
+                                    
                                 }
                             }
                         }

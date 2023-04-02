@@ -21,13 +21,33 @@ struct RecipeEditView: View {
     // Title validation
     @State private var badTitle = false
     
+    // all titles of all the recipes
     private var titles: [String] {
         fileManager.recipes.map { $0.title }
+    }
+    
+    // checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
+    private var invalidTitle: Bool {
+        ( titles.contains(recipeData.title) || titles.contains(Parser.sanitizeFileName(recipeData.title)) ) && recipeData.title != oldTitle
     }
     
     @FocusState private var titleIsFocused: Bool
     
     @State private var oldTitle = "Some title you would never think of"
+    
+    private func createUniqueTitle() {
+        if invalidTitle  {
+            // save the committed title so we can reuse it for version numbering
+            let chosenTitle = recipeData.title
+            for versionNumber in (2...20) {
+                // adding a funny version number to the committed title
+                recipeData.title = chosenTitle + " No. \(versionNumber)"
+                if !invalidTitle {
+                    return
+                }
+            }
+        }
+    }
     
     var body: some View {
         List {
@@ -39,21 +59,17 @@ struct RecipeEditView: View {
                         .focused($titleIsFocused)
                         
                         .onChange(of: recipeData.title) { newValue in
-                            if titles.contains(recipeData.title) && recipeData.title != oldTitle {
+                            if invalidTitle {
                                badTitle = true
                            } else {
                                badTitle = false
                            }
                        }
                         .onChange(of: titleIsFocused) { newValue in
-                            if titles.contains(recipeData.title) && recipeData.title != oldTitle  {
-                                recipeData.title += " 2"
-                            }
+                            createUniqueTitle()
                         }
                        .onSubmit {
-                           if titles.contains(recipeData.title) && recipeData.title != oldTitle  {
-                               recipeData.title += " 2"
-                           }
+                           createUniqueTitle()
                         }
                         
                        .onAppear {
@@ -66,7 +82,7 @@ struct RecipeEditView: View {
                             
                         }
                     if badTitle {
-                        Text("Title already taken, choose another one or add a number")
+                        Text("Title already taken, choose another one or I will.")
                             .font(.caption)
                     }
                     

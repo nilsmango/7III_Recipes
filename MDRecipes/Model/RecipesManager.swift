@@ -153,34 +153,61 @@ class RecipesManager: ObservableObject {
         recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
     }
     
+    /// deleting only the markdown file of a recipe
+    func deleteMarkdownFile(recipeTitle: String) {
+        let sanitizedTitle = Parser.sanitizeFileName(recipeTitle)
+        let fileName = "\(sanitizedTitle).md"
+        let fileURL = documentsDirectory.appendingPathComponent(fileName)
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+        } catch {
+            print("Error deleting Markdown file for recipe with name \(recipeTitle): \(error.localizedDescription)")
+        }
+    }
     
+    /// deleting both Recipe and the corresponding Markdown File
     func delete(at indexSet: IndexSet) {
         // find the id for later removing the markdown
         let idsToDelete = indexSet.map { recipes[$0].id }
-        
-        // Remove the Recipe from the Recipes Arrays
-        recipes.remove(atOffsets: indexSet)
-        
         
         
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
         
         for id in idsToDelete {
-            let title = recipes.first(where: { $0.id == id })?.title
-            recipeTitles.append(title ?? "")
+            // adding the titles to the recipe titles
+            if let title = recipes.first(where: { $0.id == id })?.title {
+                recipeTitles.append(title)
+            }
         }
         
         // Delete the Markdown files
         for title in recipeTitles {
-            let fileName = "\(title).md"
-            let fileURL = documentsDirectory.appendingPathComponent(fileName)
-            do {
-                try FileManager.default.removeItem(at: fileURL)
-            } catch {
-                print("Error deleting Markdown file for recipe with title \(title): \(error.localizedDescription)")
-            }
+            deleteMarkdownFile(recipeTitle: title)
         }
+        
+        // Remove the Recipe from the Recipes Arrays
+        recipes.remove(atOffsets: indexSet)
+        
+    }
+    
+    
+    /// update a recipe
+    func updateEditedRecipe(recipe: Recipe, data: Recipe.Data) {
+        guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
+            fatalError("Couldn't find recipe index in array")
+        }
+        
+        // check if title was changed, delete markdown file if it was
+        if recipe.title != data.title {
+            deleteMarkdownFile(recipeTitle: recipe.title)
+        }
+        // update recipe in the recipes array
+        recipes[index].update(from: data)
+        // update the Markdown File on disk
+        saveRecipeAsMarkdownFile(recipe: recipe)
+        // update our timers
+        loadTimers(for: recipes[index])
     }
     
     
