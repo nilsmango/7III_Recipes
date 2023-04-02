@@ -194,6 +194,7 @@ class RecipesManager: ObservableObject {
     
     /// update a recipe
     func updateEditedRecipe(recipe: Recipe, data: Recipe.Data) {
+        
         guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
             fatalError("Couldn't find recipe index in array")
         }
@@ -204,8 +205,10 @@ class RecipesManager: ObservableObject {
         }
         // update recipe in the recipes array
         recipes[index].update(from: data)
-        // update the Markdown File on disk
-        saveRecipeAsMarkdownFile(recipe: recipe)
+        
+        // update the Markdown File on disk from updated recipe
+        saveRecipeAsMarkdownFile(recipe: recipes[index])
+        
         // update our timers
         loadTimers(for: recipes[index])
     }
