@@ -19,12 +19,12 @@ struct MDRecipesApp: App {
                 .onAppear {
                     fileManager.loadMarkdownFiles()
                     // loading all the timers afresh
-                    fileManager.loadTimersFromDisk()
+                    fileManager.loadTimersAndTrashFromDisk()
                 }
                 .onChange(of: scenePhase) { phase in
                     if phase == .inactive {
                         // saving our timer status to disk
-                        fileManager.saveTimersToDisk()
+                        fileManager.saveTimersAndTrashToDisk()
                     }
                 }
         }

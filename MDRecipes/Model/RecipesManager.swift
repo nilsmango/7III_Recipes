@@ -27,60 +27,109 @@ class RecipesManager: ObservableObject {
         }
     }
     
-    // Saving and loading of the timers in the documents folder to keep the timers up when view gets destroyed
-    
-    private static var documentsFolder: URL {
-        let appIdentifier = "group.qrcoder.codes"
-        return FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: appIdentifier)!
-    }
-    private static var fileURL: URL {
-        return documentsFolder.appendingPathComponent("recipes.data")
-    }
-    
-    
-    
-    func saveTimersToDisk() {
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let timers = self?.timers else { fatalError("Self out of scope!") }
-            guard let data = try? JSONEncoder().encode(timers) else { fatalError("Error encoding data") }
-            
-            do {
-                let outFile = Self.fileURL
-                try data.write(to: outFile)
-    //            WidgetCenter.shared.reloadAllTimelines()
-                
-            } catch {
-                fatalError("Couldn't write to file")
+    /// remove timers of deleted recipe from timer array
+    private func removeTimers(of recipe: Recipe) {
+        let directions = recipe.directions
+        for direction in directions {
+            if let index = timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
+                timers.remove(at: index)
             }
         }
-        }
+    }
+    
+    
+    
+    // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
+      
+      private static var documentsFolder: URL {
+          let appIdentifier = "group.qrcoder.codes"
+          return FileManager.default.containerURL(
+              forSecurityApplicationGroupIdentifier: appIdentifier)!
+      }
+      
+      private static var timersFileURL: URL {
+          return documentsFolder.appendingPathComponent("timers.data")
+      }
+      
+      private static var trashFileURL: URL {
+          return documentsFolder.appendingPathComponent("trash.data")
+      }
+      
+      
+      
+      func saveTimersAndTrashToDisk() {
+          DispatchQueue.global(qos: .background).async { [weak self] in
+              guard let timers = self?.timers else { fatalError("Self out of scope!") }
+              guard let data = try? JSONEncoder().encode(timers) else { fatalError("Error encoding timers data") }
+              
+              do {
+                  let outFile = Self.timersFileURL
+                  try data.write(to: outFile)
+              } catch {
+                  fatalError("Couldn't write to file")
+              }
+              
+              guard let trash = self?.trash else { fatalError("Self out of scope!") }
+              guard let trashData = try? JSONEncoder().encode(trash) else { fatalError("Error encoding trash data") }
+              
+              do {
+                  let outFile = Self.trashFileURL
+                  try trashData.write(to: outFile)
+              } catch {
+                  fatalError("Couldn't write to file")
+              }
+          }
+      }
+          
+      func loadTimersAndTrashFromDisk() {
+          DispatchQueue.global(qos: .background).async { [weak self] in
+              guard let timersData = try? Data(contentsOf: Self.timersFileURL) else {
+                  return
+              }
+              guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: timersData) else {
+                  fatalError("Couldn't decode saved timers data")
+              }
+              
+              DispatchQueue.main.async {
+                  self?.timers = jsonTimers
+                  for timer in self!.timers {
+                      if timer.targetDate < Date.now {
+                          if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
+                              self!.timers[index].running = false
+                          }
+                      }
+                  }
+              }
+              
+              guard let trashData = try? Data(contentsOf: Self.trashFileURL) else {
+                  return
+              }
+              guard let jsonTrash = try? JSONDecoder().decode([Recipe].self, from: trashData) else {
+                  fatalError("Couldn't decode saved timers data")
+              }
+              
+              DispatchQueue.main.async {
+                         self?.trash = jsonTrash
+                     }
+              // update the trash
+              self?.updateTrash()
+                 }
+            }
+    
+    // MARK: TRASH
+    
+    @Published var trash = [Recipe]()
+    
+    /// remove all recipes from the trash that have been in here more than 60 days
+    private func updateTrash() {
+        let calendar = Calendar.current
+        let currentDate = Date.now
+        let daysAgo = -60
+        let cutOffDate = calendar.date(byAdding: .day, value: daysAgo, to: currentDate)!
         
-    func loadTimersFromDisk() {
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let data = try? Data(contentsOf: Self.fileURL) else {
-                return
-                
-            }
-            guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: data) else {
-                fatalError("Couldn't decode saved codes data")
-            }
-            DispatchQueue.main.async {
-                self?.timers = jsonTimers
-                for timer in self!.timers {
-                    if timer.targetDate < Date.now {
-                        if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
-                            self!.timers[index].running = false
-                        }
-                    }
-                }
-            }
-        }
-        }
-    
-    
-    
-    
+        trash = trash.filter { $0.updated >= cutOffDate }
+        
+    }
     
     
     // MARK: RECIPES
@@ -166,9 +215,20 @@ class RecipesManager: ObservableObject {
         }
         
         // Delete the Markdown files
-        for title in recipeTitles {
-            deleteMarkdownFile(recipeTitle: title)
+        recipeTitles.forEach(deleteMarkdownFile)
+        
+        
+        // Remove the timer of the recipes
+        var recipesToDelete = indexSet.map { recipes[$0] }
+        recipesToDelete.forEach(removeTimers)
+        
+        // Update the updated date in the deleted recipes to the trash array
+        let currentDate = Date.now
+        for (index, _) in recipesToDelete.enumerated() {
+            recipesToDelete[index].updated = currentDate
         }
+        trash.append(contentsOf: recipesToDelete)
+        
         
         // Remove the Recipe from the Recipes Arrays
         recipes.remove(atOffsets: indexSet)
@@ -229,6 +289,23 @@ class RecipesManager: ObservableObject {
         
         // update the timers
         loadTimers(for: newRecipe)
+    }
+    
+    /// restore recipe from trash
+    func restoreRecipe(recipe: Recipe) {
+        // save the new recipe in the recipes Array
+        recipes.append(recipe)
+        
+        // save the recipe as a Markdown File on disk
+        saveRecipeAsMarkdownFile(recipe: recipe)
+        
+        // update the timers
+        loadTimers(for: recipe)
+        
+        // remove recipe from trash
+        if let index = trash.firstIndex(where: { $0.id == recipe.id }) {
+                trash.remove(at: index)
+            }
     }
     
     

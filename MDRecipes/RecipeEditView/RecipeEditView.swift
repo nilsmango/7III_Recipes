@@ -23,6 +23,8 @@ struct RecipeEditView: View {
         fileManager.recipes.map { $0.title }
     }
     
+    // undo manager
+    
     
     var body: some View {
 //        ScrollView {

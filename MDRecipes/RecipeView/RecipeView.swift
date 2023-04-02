@@ -145,15 +145,16 @@ struct RecipeView: View {
                         } label: {
                             Label("Edit Recipe", systemImage: "square.and.pencil")
                         }
-                        Button {
+                        Button(role: .destructive, action: {
                             if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
                                 let indexSet = IndexSet(integer: index)
                                 fileManager.delete(at: indexSet)
+                                // dismissing the view
                                 dismiss()
                             }
-                        } label: {
+                        }, label: {
                             Label("Delete Recipe", systemImage: "trash")
-                        }
+                        })
                     } label: {
                         Label("Edit", systemImage: "ellipsis.circle")
                     }
@@ -161,6 +162,7 @@ struct RecipeView: View {
                     
                 }
             }
+            
             .sheet(isPresented: $editViewIsPresented) {
                 NavigationView {
                     RecipeEditView(recipeData: $data, fileManager: fileManager)

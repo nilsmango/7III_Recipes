@@ -8,6 +8,17 @@
 import Foundation
 
 struct Parser {
+    
+    static func daysUntilDeletion(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let futureDate = calendar.date(byAdding: .day, value: 60, to: date)!
+        let targetDate = calendar.startOfDay(for: futureDate)
+        let components = calendar.dateComponents([.day], from: today, to: targetDate)
+        return String(components.day ?? 0)
+    }
+    
+    
     static let decimalCharacters = CharacterSet.decimalDigits
     
     static let units = ["g", "kg", "ml", "l", "dl", "hl", "cups", "cup", "tsp.", "Tbsp.", "EL", "TL", "packet", "some", "Packet", "Dose", "Kiste", "Teelöffel", "Esslöffel", "pinch", "pinches", "Eine", "Prise", "Prisen", "mg", "L", "Liter", "Ltr.", "ounce", "ounces", "approx.", "approximately", "etwa", "tablespoons", "tablespoon", "teaspoon", "teaspoons", "heaped", "clove", "cloves", "Zehe", "Zehen", "whole", "ganze", "ganz", "zum Anbraten", "wenig", "Messerspitze"]

@@ -33,9 +33,10 @@ struct CategoriesEditView: View {
                     .foregroundColor(categories.contains(category) ? .white : .gray)
                     .fontWeight(.bold)
                     .fontDesign(.rounded)
-                    .padding(8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
                     .background(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: 10)
                                 .fill(categories.contains(category) ? .blue : .gray)
                                 .opacity(categories.contains(category) ? 1 : 0.2)
                         
@@ -53,6 +54,7 @@ struct CategoriesEditView: View {
                         
                         
                     }
+                    .padding(.vertical, 6)
                 
             }
             }

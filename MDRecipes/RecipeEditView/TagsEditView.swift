@@ -54,9 +54,10 @@ struct TagsEditView: View {
                     .foregroundColor(tags.contains(tag) ? .white : .gray)
                     .fontWeight(.bold)
                     .fontDesign(.rounded)
-                    .padding(8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: 10)
                             .fill(tags.contains(tag) ? .blue : .gray)
                             .opacity(tags.contains(tag) ? 1 : 0.2)
                         
@@ -72,6 +73,7 @@ struct TagsEditView: View {
                             }
                         }
                     }
+                    .padding(.vertical, 6)
             }
         }
         .onAppear {
