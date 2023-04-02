@@ -72,6 +72,8 @@ struct Parser {
             if let range = Range(match.range, in: string) {
                 let almostIngredient = String(string[range])
                 let ingredient = almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")
+                // get rid of any strange fractions
+                let cleanIngredient = convertFractionToDouble(ingredient)
                 ingredients.append(ingredient)
             }
         }
@@ -244,11 +246,6 @@ struct Parser {
         }
         return Double(times.reduce(0, +))
     }
-    
-    
-    
-    
-    
     
     
     /// Extract the cooking counter from a recipe

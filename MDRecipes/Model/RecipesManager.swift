@@ -111,9 +111,10 @@ class RecipesManager: ObservableObject {
               DispatchQueue.main.async {
                          self?.trash = jsonTrash
                      }
-              // update the trash
-              self?.updateTrash()
+              
                  }
+                // update the trash
+                updateTrash()
             }
     
     // MARK: TRASH
