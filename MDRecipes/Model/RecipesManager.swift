@@ -192,7 +192,7 @@ class RecipesManager: ObservableObject {
     }
     
     
-    /// update a recipe
+    /// update an edited recipe
     func updateEditedRecipe(recipe: Recipe, data: Recipe.Data) {
         
         guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
@@ -213,7 +213,39 @@ class RecipesManager: ObservableObject {
         loadTimers(for: recipes[index])
     }
     
+    /// save a new recipe
     
+    func saveNewRecipe(newRecipeData: Recipe.Data) {
+        let newRecipe = Recipe(title: newRecipeData.title,
+                               source: newRecipeData.source,
+                               categories: newRecipeData.categories,
+                               tags: newRecipeData.tags,
+                               rating: newRecipeData.rating,
+                               prepTime: newRecipeData.prepTime,
+                               cookTime: newRecipeData.cookTime,
+                               additionalTime: newRecipeData.additionalTime,
+                               totalTime: newRecipeData.totalTime,
+                               servings: newRecipeData.servings,
+                               timesCooked: newRecipeData.timesCooked,
+                               ingredients: newRecipeData.ingredients,
+                               directions: Parser.reParsingDirections(directions: newRecipeData.directions), // re-parsing directions to find all the new timer from edits in the list.
+                               nutrition: newRecipeData.nutrition,
+                               notes: newRecipeData.notes,
+                               images: newRecipeData.images,
+                               date: newRecipeData.date,
+                               updated: Date.now,
+                               language: newRecipeData.language)
+        
+        
+        // save the new recipe in the recipes Array
+        recipes.append(newRecipe)
+        
+        // save the recipe as a Markdown File on disk
+        saveRecipeAsMarkdownFile(recipe: newRecipe)
+        
+        // update the timers
+        loadTimers(for: newRecipe)
+    }
     
     
     

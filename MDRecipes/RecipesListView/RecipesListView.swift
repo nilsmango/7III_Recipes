@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RecipesListView: View {
     @ObservedObject var fileManager: RecipesManager
-        
+    
     @State private var editMode: EditMode = .inactive
     
     @State private var sortingSelection: Sorting = .standard
@@ -25,7 +25,7 @@ struct RecipesListView: View {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
                     NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
-                            // TODO: show tags, how long it takes etc.
+                        // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }.listStyle(.insetGrouped)
                     
@@ -43,7 +43,7 @@ struct RecipesListView: View {
             
             .toolbar {
                 // TODO: check if I don't need the editButton to move things
-//                EditButton()
+                //                EditButton()
                 Menu {
                     
                     Button(action: {  } ) {
@@ -69,7 +69,7 @@ struct RecipesListView: View {
                             }
                         }
                     }
-                     label: { Label("Sort by", systemImage: "arrow.up.arrow.down") }
+                label: { Label("Sort by", systemImage: "arrow.up.arrow.down") }
                     
                 } label: {
                     Label("Options", systemImage: "ellipsis.circle")
@@ -109,7 +109,6 @@ struct RecipesListView: View {
             }
             .environment(\.editMode, $editMode)
             
-            
             .onChange(of: sortingSelection) { newSortingSelection in
                 fileManager.sortRecipes(selection: newSortingSelection)
             }
@@ -124,6 +123,8 @@ struct RecipesListView: View {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Dismiss") {
                                     editViewPresented = false
+                                    
+                                    // reseting newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         newRecipeData.timesCooked = 0
                                         newRecipeData.title = ""
@@ -147,21 +148,11 @@ struct RecipesListView: View {
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
                                     editViewPresented = false
-                                    let newRecipe = Recipe(title: newRecipeData.title, source: newRecipeData.source, categories: newRecipeData.categories, tags: newRecipeData.tags, rating: newRecipeData.rating, prepTime: newRecipeData.prepTime, cookTime: newRecipeData.cookTime, additionalTime: newRecipeData.additionalTime, totalTime: newRecipeData.totalTime, servings: newRecipeData.servings, timesCooked: newRecipeData.timesCooked, ingredients: newRecipeData.ingredients,
-                                        // re-parsing directions to find all the new timer from edits in the list.
-                                                           directions: Parser.reParsingDirections(directions: newRecipeData.directions), nutrition: newRecipeData.nutrition, notes: newRecipeData.notes, images: newRecipeData.images, date: newRecipeData.date, updated: Date.now, language: newRecipeData.language)
                                     
+                                    // saving the new recipe
+                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
                                     
-                                    // save the new recipe in the recipes Array
-                                    fileManager.recipes.append(newRecipe)
-                                    
-                                    // save the recipe as a Markdown File on disk
-                                    fileManager.saveRecipeAsMarkdownFile(recipe: newRecipe)
-                                    
-                                    // update the timers
-                                    fileManager.loadTimers(for: newRecipe)
-                                    
-                                    // reset the newRecipeData
+                                    // reseting newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         newRecipeData.timesCooked = 0
                                         newRecipeData.title = ""
@@ -186,8 +177,6 @@ struct RecipesListView: View {
                             }
                         }
                 }
-                
-                
             })
         }
     }
