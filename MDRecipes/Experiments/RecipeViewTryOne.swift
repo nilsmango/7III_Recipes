@@ -112,18 +112,7 @@ struct RecipeViewTryOne: View {
                     }
                     
                     Section(header: Text("Ingredients")) {
-                        ForEach(Parser.extractIngredients(from: recipe.content), id: \.self) { ingredient in
-                            IngredientView(ingredientString: ingredient, recipeServings: Parser.extractServings(from: recipe.content), chosenServings: chosenServings)
-                                .monospacedDigit()
-                                .onTapGesture {
-                                    if selectionChecker(ingredient) {
-                                        selection.removeAll(where: { $0 == ingredient })
-                                    } else {
-                                        selection.append(ingredient)
-                                    }
-                                    
-                                }
-                        }
+                        
                     }
                     
                     Section("Directions") {

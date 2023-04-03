@@ -15,9 +15,14 @@ struct TitleEditView: View {
     // all titles of all the recipes
     var titles: [String]
     
+    // sanitized version of all titles
+    private var saneTitles: [String] {
+        titles.map({ Parser.sanitizeFileName($0) })
+    }
+    
     // checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
     private var invalidTitle: Bool {
-        ( titles.contains(title) || titles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
+        ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
     }
     
     @FocusState private var titleIsFocused: Bool

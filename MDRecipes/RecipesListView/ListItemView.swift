@@ -21,9 +21,6 @@ struct ListItemView: View {
                     Image(systemName: "star")
                     Text(recipe.rating)
                 }
-                
-                
-                    
             }
             .font(.caption)
             

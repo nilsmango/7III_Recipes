@@ -46,9 +46,11 @@ Cooking can be dangerous
             }
             
             Section {
-                Button(counter > 0 ? "Update" : "Decode") {
+                Button {
                     counter += 1
                     //                                        recipeData = getRecipeFromText(text: newRecipe)
+                } label: {
+                    Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
                 }
             }
             

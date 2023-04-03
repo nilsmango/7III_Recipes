@@ -9,6 +9,7 @@ import Foundation
 
 struct Parser {
     
+    /// using the update date of a recipe to determine when it was 60 days in the trash and will get deleted.
     static func daysUntilDeletion(_ date: Date) -> String {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -62,23 +63,7 @@ struct Parser {
         return ingredient
     }
     
-    /// extract ingredients list with amounts from recipe
-    static func extractIngredients(from string: String) -> [String] {
-        let regex = try? NSRegularExpression(pattern: "- \\[ \\] ([^\\n]+)", options: .anchorsMatchLines)
-        var ingredients = [String]()
-        
-        let matches = regex?.matches(in: string, options: [], range: NSRange(string.startIndex..<string.endIndex, in: string))
-        for match in matches ?? [] {
-            if let range = Range(match.range, in: string) {
-                let almostIngredient = String(string[range])
-                let ingredient = almostIngredient.replacingOccurrences(of: "- [ ] ", with: "")
-                // get rid of any strange fractions
-                let cleanIngredient = convertFractionToDouble(ingredient)
-                ingredients.append(ingredient)
-            }
-        }
-        return ingredients
-    }
+    
     
     /// cleaning up the ingredient string
     private static func cleanUpIngredientString(string: String) -> String {
@@ -434,9 +419,9 @@ struct Parser {
                 let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                 if rawString != "" {
                     let ingredientString = cleanUpIngredientString(string: rawString)
+                    let cleanIngredient = convertFractionToDouble(ingredientString)
                     
-                    
-                    ingredients.append(Ingredient(text: ingredientString))
+                    ingredients.append(Ingredient(text: cleanIngredient))
                 }
                 
             }
@@ -557,7 +542,7 @@ struct Parser {
         
     }
     
-    // sanitize any filename
+    /// sanitize any filename by removing ":/?*\"<>|."
     static func sanitizeFileName(_ fileName: String) -> String {
         var sanitizedFileName = fileName
         let disallowedChars = CharacterSet(charactersIn: ":/?*\"<>|")
@@ -566,6 +551,9 @@ struct Parser {
         sanitizedFileName = sanitizedFileName.replacingOccurrences(of: "/", with: "-")
         return sanitizedFileName
     }
+    
+    // find a title if it's not prefixed by '# '
+    
     
     
     

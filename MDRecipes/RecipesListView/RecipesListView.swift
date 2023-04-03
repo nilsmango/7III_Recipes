@@ -190,7 +190,7 @@ struct RecipesListView: View {
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Dismiss") {
-                                    editViewPresented = false
+                                    importViewPresented = false
                                     
                                     // reseting newRecipeData
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -215,7 +215,7 @@ struct RecipesListView: View {
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
-                                    editViewPresented = false
+                                    importViewPresented = false
                                     
                                     // saving the new recipe
                                     fileManager.saveNewRecipe(newRecipeData: newRecipeData)
