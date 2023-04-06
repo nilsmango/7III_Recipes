@@ -511,7 +511,19 @@ class RecipesManager: ObservableObject {
         
     }
     
+    // MARK: Editing Ingredients
     
+    /// Updating the ingredients of a recipe after editing them
+    func updatingIngredientsOfRecipe(ingredients: [Ingredient], of recipe: Recipe) {
+        guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
+            fatalError("Couldn't find recipe index in array")
+        }
+        recipes[index].ingredients = ingredients
+        
+        // update the Markdown File on disk from updated recipe
+        saveRecipeAsMarkdownFile(recipe: recipes[index])
+        
+    }
     
 }
 

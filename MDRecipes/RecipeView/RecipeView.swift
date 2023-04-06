@@ -61,7 +61,7 @@ struct RecipeView: View {
                     
                     Section("Ingredients") {
                         ForEach(recipe.ingredients) { ingredient in
-                            IngredientView(ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings)
+                            IngredientView(fileManager: fileManager, ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
                             
                         }
                     }
