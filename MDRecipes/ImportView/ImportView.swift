@@ -8,8 +8,14 @@
 import SwiftUI
 
 struct ImportView: View {
+    @ObservedObject var fileManager: RecipesManager
+    
+    // edit view data
     @Binding var recipeData: Recipe.Data
     
+    
+    // indexes parsed
+    @State private var indexes = [Int]()
     
     @State private var counter = 0
     
@@ -35,34 +41,42 @@ Cooking can be dangerous
 
 """
     
-    
     var body: some View {
         
-        List {
-            Section(header: Text("Paste Recipe here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
-                TextEditor(text: $newRecipe)
-                    .frame(minHeight: 370)
-                
-            }
-            
-            Section {
-                Button {
-                    counter += 1
-                    //                                        recipeData = getRecipeFromText(text: newRecipe)
-                } label: {
-                    Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
+            VStack {
+                List {
+                    Section(header: Text("Paste Recipe here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
+                        TextEditor(text: $newRecipe)
+                            .frame(minHeight: 370)
+                        
+                    }
+                    
+                    Section {
+                        Button {
+                            counter += 1
+                            let parseComponents = Parser.makeRecipeFromString(string: newRecipe)
+                            recipeData = parseComponents.recipe.data
+                            indexes = Array(parseComponents.indexes)
+                            
+                        } label: {
+                            Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
+                        }
+                    }
+                }
+                if counter > 0 {
+                    RecipeEditView(recipeData: $recipeData, fileManager: fileManager)
                 }
             }
             
-            if counter > 0 {
-                
-            }
-        }
+        
+        
+            
+        
     }
 }
 
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
-        ImportView(recipeData: .constant(Recipe.sampleData[0].data))
+        ImportView(fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data))
     }
 }

@@ -13,7 +13,7 @@ struct Parser {
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     ///
-    static func makeRecipeFromMarkdown(markdown: MarkdownFile) -> (recipe: Recipe, indexes: Set<Int>)  {
+    static func makeRecipeFromString(string: String) -> (recipe: Recipe, indexes: Set<Int>)  {
         
         // Helper to add the parsed indexes
         func checkAndAppendIndex(input: Int?) {
@@ -23,7 +23,7 @@ struct Parser {
         }
         
         // Input lines
-        let lines = markdown.content.components(separatedBy: "\n")
+        let lines = string.components(separatedBy: "\n")
         
         // Output indexes of the found recipe components
         var indexesFound = Set<Int>()
@@ -74,12 +74,15 @@ struct Parser {
             checkAndAppendIndex(input: timeValues.index)
             if cookingTime == "" {
                 // check next line has numbers in it
-                let nextLine = lines[timeValues.index!+1]
-                if (nextLine.rangeOfCharacter(from: decimalCharacters) != nil) {
-                    let minuteValue = Double(calculateTimeInMinutes(input: nextLine))
-                    cookingTime = formatTime(minuteValue)
-                    checkAndAppendIndex(input: timeValues.index!+1)
+                if timeValues.index != nil {
+                    let nextLine = lines[timeValues.index!+1]
+                    if (nextLine.rangeOfCharacter(from: decimalCharacters) != nil) {
+                        let minuteValue = Double(calculateTimeInMinutes(input: nextLine))
+                        cookingTime = formatTime(minuteValue)
+                        checkAndAppendIndex(input: timeValues.index!+1)
+                    }
                 }
+                
             }
             if cookingTime == "0 s" {
                 return ""
@@ -92,10 +95,10 @@ struct Parser {
         let prepTime = calculateTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"])
         let cookTime = calculateTimes(for: ["Cook time:", "Active Time", "Active Time", "Active time:", "Kochzeit", "Kochzeit:", "Koch-/Backzeit:", "Koch-/Backzeit"])
         let additionalTime = calculateTimes(for: ["Additional time:", "Zusätzliche Zeit:", "Zusätzliche Zeit"])
-        let totalTime = calculateTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit"])
+        let totalTime = calculateTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit", "Zubereitungszeit:", "Zubereitungszeit"])
         
         // Servings
-        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für"], in: lines)
+        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: lines)
         checkAndAppendIndex(input: servingsVariables.index)
         let servings: Int
         if servingsVariables.value == "" {
@@ -118,13 +121,13 @@ struct Parser {
         checkAndAppendIndex(input: timesCookedVariables.index)
         
         // Ingredients
-        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving"], in: lines)
+        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: lines)
         let ingredients = ingredientsVariables.ingredients
         let indexes = ingredientsVariables.indexes
         indexes.forEach { checkAndAppendIndex(input: $0) }
         
         // Directions
-        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT"], in: lines)
+        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: lines)
         let directions = directionsVariables.directions
         let dirIndexes = directionsVariables.indexes
         dirIndexes.forEach { checkAndAppendIndex(input: $0) }
@@ -136,13 +139,18 @@ struct Parser {
         nutritionIndexes?.forEach { checkAndAppendIndex(input: $0)}
         
         // Notes
-        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips"], cutoffStrings: ["## "])
+        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
         let notes: String
         if notesValues == (nil, nil) {
-            let noteVariables = findValue(for: ["Tip:", "Tipps:"], in: lines)
-            if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 {
+            let noteVariables = findValue(for: ["Tip:", "Tipps:", "Notes:"], in: lines)
+            if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 && noteVariables.index! > nutritionIndexes?.last ?? 0 {
                 let additionalNotes = lines[noteVariables.index!+1..<lines.count].joined(separator: "\n")
-                notes = noteVariables.value! + "\n" + additionalNotes
+                if noteVariables.value == "" {
+                    notes = additionalNotes
+                } else {
+                    notes = noteVariables.value! + "\n" + additionalNotes
+                }
+                
                 Array(noteVariables.index!..<lines.count).forEach { checkAndAppendIndex(input: $0) }
             } else {
                 notes = noteVariables.value ?? ""

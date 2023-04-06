@@ -150,7 +150,7 @@ class RecipesManager: ObservableObject {
             for markdownFile in markdownFiles {
                 let name = markdownFile.lastPathComponent
                 let content = try String(contentsOf: markdownFile)
-                self.recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)).recipe)
+                self.recipes.append(Parser.makeRecipeFromString(string: content).recipe)
             }
         } catch {
             print("Error loading Markdown files: \(error.localizedDescription)")
@@ -184,7 +184,7 @@ class RecipesManager: ObservableObject {
     
     // TODO: delete this once we don't use fake recipes any more
     func createMarkdownFile(name: String, content: String) {
-        recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)).recipe)
+        recipes.append(Parser.makeRecipeFromString(string: content).recipe)
     }
     
     /// deleting only the markdown file of a recipe
