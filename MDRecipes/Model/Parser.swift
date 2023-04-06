@@ -81,7 +81,12 @@ struct Parser {
                     checkAndAppendIndex(input: timeValues.index!+1)
                 }
             }
-            return cookingTime
+            if cookingTime == "0 s" {
+                return ""
+            } else {
+                return cookingTime
+            }
+            
         }
         
         let prepTime = calculateTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"])
@@ -425,15 +430,16 @@ struct Parser {
         var numberArr = [Int]()
         var hours = 0
         var minutes = 0
+    var seconds: Double = 0
         
-        for element in cleanedString {
+    for (index, element) in cleanedString.enumerated() {
             let stringElement = String(element)
             //check if number or character
             if element.isNumber {
                 numberArr.append(Int(stringElement)!)
             } else if element.isLetter {
-                
-                if stringElement.lowercased() == "h" || stringElement.lowercased() == "s" {
+                // looking for s as well because of the german Stunden.
+                if stringElement.lowercased() == "h" || stringElement.lowercased() == "s" && cleanedString.last != element && cleanedString[cleanedString.index(cleanedString.startIndex, offsetBy: index+1)] != "e" {
                     if numberArr.count > 1 {
                         var count = numberArr.count
                         for number in numberArr {
@@ -441,8 +447,9 @@ struct Parser {
                             count = count - 1
                         }
                         numberArr.removeAll()
+                        
 
-                    } else {
+                    } else if numberArr.count == 1 {
                         hours = numberArr.first ?? 0
                         numberArr.removeAll()
                     }
@@ -453,14 +460,28 @@ struct Parser {
                             minutes += number * Int(pow(10, Double(count - 1)))
                             count = count - 1
                         }
+                        numberArr.removeAll()
                     } else {
                         minutes = numberArr.first ?? 0
+                        numberArr.removeAll()
                     }
+                } else if stringElement.lowercased() == "s" {
+                    if numberArr.count > 1 {
+                                            var count = numberArr.count
+                                            for number in numberArr {
+                                                seconds += Double(number) * pow(10, Double(count - 1))
+                                                count = count - 1
+                                            }
+                                            numberArr.removeAll()
+                                        } else {
+                                            seconds = Double(numberArr.first ?? 0)
+                                            numberArr.removeAll()
+                                        }
                 }
             }
         }
         
-        return hours * 60 + minutes
+    return hours * 60 + minutes + Int((seconds / 60).rounded())
     }
     
     
