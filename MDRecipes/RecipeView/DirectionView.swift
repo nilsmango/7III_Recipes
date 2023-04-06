@@ -47,6 +47,11 @@ struct DirectionView: View {
         }
         .padding(.vertical)
         
+        .onLongPressGesture {
+            directionsString = recipe.directions.map({ $0.text }).joined(separator: "\n")
+            showDirectionsEdit = true
+        }
+        
         .sheet(isPresented: $showDirectionsEdit) {
             NavigationView {
                 DirectionsEditTextView(directionsData: $directionsString)

@@ -14,24 +14,33 @@ struct DirectionsEditView: View {
     
     @FocusState private var isFieldFocused: Bool
     
+    // Directions Edit
+    @State private var showDirectionsEdit = false
+    @State private var directionsString = ""
+    
     var body: some View {
         ForEach(directions) { direction in
-            ZStack(alignment: .leading) {
-                TextEditor(text: binding(direction: direction).text)
-                // this text is to disable the scrolling of the textEditor
+            
+                
                 Text(direction.text)
-                    .padding(.all, 8)
-                    .opacity(0)
-            }
-            .padding(.top)
+
+            
+            .padding(.vertical)
         }
+        .onTapGesture {
+            directionsString = directions.map( { $0.text }).joined(separator: "\n")
+            
+            showDirectionsEdit = true
+        }
+        
         HStack{
             ZStack(alignment: .leading) {
                 TextEditor(text: $newDirection)
+                    .focused($isFieldFocused)
                    
                 // this text is to disable the scrolling
                 Text(newDirection)
-                    .padding(.all, 8)
+                    .padding(.all, 9)
                     .opacity(0)
             }
             .padding(.top)
@@ -41,6 +50,8 @@ struct DirectionsEditView: View {
                 }
                 directions.append(Parser.createDirection(from: newDirection, directionsCount: directions.count))
                 newDirection = ""
+                isFieldFocused = true
+                
             } label: {
                 Image(systemName: "plus.circle")
                     .accessibilityLabel(Text("Add Step"))
@@ -49,14 +60,35 @@ struct DirectionsEditView: View {
             .disabled(newDirection.isEmpty)
             .buttonStyle(.bordered)
         }
+        
+        .sheet(isPresented: $showDirectionsEdit) {
+            NavigationView {
+                DirectionsEditTextView(directionsData: $directionsString)
+                    .navigationTitle("Edit Directions")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancel") {
+                                showDirectionsEdit = false
+                            }
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Update") {
+                                showDirectionsEdit = false
+                                
+                                // update the directions of this recipe.data
+                                let newDirections = Parser.makingDirectionsFromString(directionsString: directionsString)
+                                
+                                directions = newDirections
+                                
+                            }
+                        }
+                    }
+            }
+        }
     }
     
-    private func binding(direction: Direction) -> Binding<Direction> {
-        guard let ingredientIndex = directions.firstIndex(where: { $0.id == direction.id }) else {
-            fatalError("Can't find the stupid ingredient in array")
-        }
-        return $directions[ingredientIndex]
-    }
+    
     
 }
 
