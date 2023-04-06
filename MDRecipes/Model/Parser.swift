@@ -9,6 +9,301 @@ import Foundation
 
 struct Parser {
     
+    
+    /// Creating a Recipe struct from a Markdown Recipe.
+    /// With German and English parsing
+    ///
+    static func makeRecipeFromMarkdown(markdown: MarkdownFile) -> (recipe: Recipe, indexes: Set<Int>)  {
+        
+        // Helper to add the parsed indexes
+        func checkAndAppendIndex(input: Int?) {
+            if let index = input {
+                indexesFound.insert(index)
+            }
+        }
+        
+        // Input lines
+        let lines = markdown.content.components(separatedBy: "\n")
+        
+        // Output indexes of the found recipe components
+        var indexesFound = Set<Int>()
+        
+        // Title
+        let title: String
+        let titleVariable = findValue(for: ["# "], in: lines)
+        if titleVariable != (nil, nil) {
+            title = titleVariable.value!
+            indexesFound.insert(titleVariable.index!)
+        } else  {
+            let alternativeTitle = findTitleAlternative(in: lines)
+            title = alternativeTitle.value
+            checkAndAppendIndex(input: alternativeTitle.index)
+        }
+        
+        // Source
+        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: lines)
+        let source = sourceVariables.value ?? "Unknown"
+        checkAndAppendIndex(input: sourceVariables.index)
+        
+        // Categories
+        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
+        let categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? []
+        checkAndAppendIndex(input: categoriesVariables.index)
+        
+        // Tags
+        let tagsVariables = findValue(for: ["Tags:"], in: lines)
+        let tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
+        checkAndAppendIndex(input: tagsVariables.index)
+        
+        // Rating
+        let rating: String
+        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: lines)
+        if ratingVariables != (nil, nil) {
+            rating = ratingVariables.value!
+            checkAndAppendIndex(input: ratingVariables.index)
+        } else {
+            let ratingAlternatives = findRatingAlternative(in: lines)
+            rating = ratingAlternatives.value
+            checkAndAppendIndex(input: ratingAlternatives.index)
+        }
+        
+        // Times
+        func calculateTimes(for keys: [String]) -> String {
+            let timeValues = parsingTimes(for: keys, in: lines)
+            var cookingTime = timeValues.value
+            checkAndAppendIndex(input: timeValues.index)
+            if cookingTime == "" {
+                // check next line has numbers in it
+                let nextLine = lines[timeValues.index!+1]
+                if (nextLine.rangeOfCharacter(from: decimalCharacters) != nil) {
+                    let minuteValue = Double(calculateTimeInMinutes(input: nextLine))
+                    cookingTime = formatTime(minuteValue)
+                    checkAndAppendIndex(input: timeValues.index!+1)
+                }
+            }
+            return cookingTime
+        }
+        
+        let prepTime = calculateTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"])
+        let cookTime = calculateTimes(for: ["Cook time:", "Active Time", "Active Time", "Active time:", "Kochzeit", "Kochzeit:", "Koch-/Backzeit:", "Koch-/Backzeit"])
+        let additionalTime = calculateTimes(for: ["Additional time:", "Zusätzliche Zeit:", "Zusätzliche Zeit"])
+        let totalTime = calculateTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit"])
+        
+        // Servings
+        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für"], in: lines)
+        checkAndAppendIndex(input: servingsVariables.index)
+        let servings: Int
+        if servingsVariables.value == "" {
+            // check next line has a number in it
+            let nextLine = lines[servingsVariables.index!+1]
+            if let number = nextLine.first(where: { $0.isNumber }) {
+                servings = Int(String(number)) ?? 4
+                checkAndAppendIndex(input: servingsVariables.index!+1)
+            } else {
+                servings = 4
+            }
+        } else {
+            servings = servingsVariables.value.flatMap { Int($0) } ?? 4
+        }
+        
+        
+        // Times cooked
+        let timesCookedVariables = findValue(for: ["Times cooked:", "Zubereitungen:"], in: lines)
+        let timesCooked = timesCookedVariables.value.flatMap { Int($0) } ?? 0
+        checkAndAppendIndex(input: timesCookedVariables.index)
+        
+        // Ingredients
+        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving"], in: lines)
+        let ingredients = ingredientsVariables.ingredients
+        let indexes = ingredientsVariables.indexes
+        indexes.forEach { checkAndAppendIndex(input: $0) }
+        
+        // Directions
+        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT"], in: lines)
+        let directions = directionsVariables.directions
+        let dirIndexes = directionsVariables.indexes
+        dirIndexes.forEach { checkAndAppendIndex(input: $0) }
+        
+        // Nutrition
+        let nutritionVariables = findSection(in: lines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        let nutrition = nutritionVariables.value ?? ""
+        let nutritionIndexes = nutritionVariables.indexes
+        nutritionIndexes?.forEach { checkAndAppendIndex(input: $0)}
+        
+        // Notes
+        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips"], cutoffStrings: ["## "])
+        let notes: String
+        if notesValues == (nil, nil) {
+            let noteVariables = findValue(for: ["Tip:", "Tipps:"], in: lines)
+            if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 {
+                let additionalNotes = lines[noteVariables.index!+1..<lines.count].joined(separator: "\n")
+                notes = noteVariables.value! + "\n" + additionalNotes
+                Array(noteVariables.index!..<lines.count).forEach { checkAndAppendIndex(input: $0) }
+            } else {
+                notes = noteVariables.value ?? ""
+                checkAndAppendIndex(input: noteVariables.index)
+            }
+        } else {
+            notes = notesValues.value ?? ""
+            let notesIndexes = notesValues.indexes
+            notesIndexes?.forEach { checkAndAppendIndex(input: $0) }
+        }
+        
+        // Images TODO: Implement images
+        let images = ""
+//        let imageValues = findImages(in: lines)
+//        let images = imageValues.string
+//        let imageIndexes = imageValues.indexes
+//        imageIndexes?.forEach { checkAndAppendIndex(input: $0) }
+        
+        // Date of Creation
+        var dateVariables = findDate(for: "date:", in: lines)
+        if dateVariables == (nil, nil) {
+            dateVariables = findFirstDateIndexAndDate(in: lines)
+            if dateVariables == (nil, nil) {
+                dateVariables = (Date.now, nil)
+            }
+        }
+        let date = dateVariables.date ?? Date.now
+        let dateIndex = dateVariables.index
+        checkAndAppendIndex(input: dateIndex)
+        
+        // Date of Update
+        let updatedVariables = findDate(for: "updated:", in: lines)
+        let updated = updatedVariables.date ?? Date.now
+        let updatedIndex = updatedVariables.index
+        checkAndAppendIndex(input: updatedIndex)
+        
+        // Language
+        let language = findLanguage(in: lines)
+        
+        return (Recipe(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language), indexesFound)
+    }
+    
+    /// Creating a Markdown Recipe froma a Recipe struct.
+    /// With German and English parsing
+    static func makeMarkdownFromRecipe(recipe: Recipe) -> MarkdownFile {
+        var lines: [String] = []
+        // yaml header
+        lines.append("---")
+        lines.append("date: \(formatDate(recipe.date))")
+        lines.append("updated: \(formatDate(recipe.updated))")
+        lines.append("---")
+        
+        // Recipe title
+        lines.append("# \(recipe.title)")
+        
+        // Source
+        let sourceKey = recipe.language == .german ? "Quelle" : "Source"
+        lines.append("\(sourceKey): \(recipe.source)")
+        
+        
+        // Categories
+        let categoriesKey = recipe.language == .german ? "Kategorien" : "Categories"
+        let categoriesValue = recipe.categories.joined(separator: ", ")
+        lines.append("\(categoriesKey): \(categoriesValue)")
+        
+        
+        // Tags
+        let tagsKey = "Tags"
+        let tagsValue = recipe.tags.joined(separator: ", ")
+        lines.append("\(tagsKey): \(tagsValue)")
+        
+        
+        // Rating
+        let ratingKey = recipe.language == .german ? "Bewertung" : "Rating"
+        let ratingValue = String(recipe.rating)
+        lines.append("\(ratingKey): \(ratingValue)")
+        
+        // Prep time
+        let prepTimeKey = recipe.language == .german ? "Vorbereitungszeit" : "Prep time"
+        let prepTimeValue = "\(recipe.prepTime) min"
+        lines.append("\(prepTimeKey): \(prepTimeValue)")
+        
+        // Cook time
+        let cookTimeKey = recipe.language == .german ? "Kochzeit" : "Cook time"
+        let cookTimeValue = "\(recipe.cookTime) min"
+        lines.append("\(cookTimeKey): \(cookTimeValue)")
+        
+        // Additional time
+        let addTimeKey = recipe.language == .german ? "Zusätzliche Zeit" : "Additional time"
+        let addTimeValue = "\(recipe.additionalTime) min"
+        lines.append("\(addTimeKey): \(addTimeValue)")
+        
+        // Total time
+        let totalTimeKey = recipe.language == .german ? "Gesamtzeit" : "Total time"
+        let totalTimeValue = "\(recipe.totalTime) min"
+        lines.append("\(totalTimeKey): \(totalTimeValue)")
+        
+        // Servings
+        let servingsKey = recipe.language == .german ? "Portionen" : "Servings"
+        let servingsValue = String(recipe.servings)
+        lines.append("\(servingsKey): \(servingsValue)")
+        
+        // Times cooked
+        let cookedKey = recipe.language == .german ? "Zubereitungen" : "Times cooked"
+        let cookedValue = String(recipe.timesCooked)
+        lines.append("\(cookedKey): \(cookedValue)")
+        
+        
+        // Ingredients
+        lines.append("")
+        let ingredientsTitle = recipe.language == .german ? "## Zutaten" : "## Ingredients"
+        lines.append(ingredientsTitle)
+        for ingredient in recipe.ingredients {
+            let name = " \(ingredient.text)"
+            lines.append("- [ ]\(name)")
+        }
+        
+        // Directions
+        lines.append("")
+        let directionsTitle = recipe.language == .german ? "## Zubereitung" : "## Directions"
+        lines.append(directionsTitle)
+        for direction in recipe.directions {
+            let text = direction.text
+            lines.append("\(text)")
+        }
+        
+        // Nutrition
+        lines.append("")
+        let nutritionTitle = recipe.language == .german ? "## Nährwertangaben" : "## Nutrition"
+        lines.append(nutritionTitle)
+        lines.append(recipe.nutrition)
+        
+        // Notes
+        lines.append("")
+        let notesTitle = recipe.language == .german ? "## Notizen" : "## Notes"
+        lines.append(notesTitle)
+        lines.append(recipe.notes)
+        
+        // Images TODO: implement images
+        lines.append("")
+        let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
+        lines.append(imagesTitle)
+        
+//        // From this: ("\(title): \(imagePath)") - back to a markdown image link
+//        let imageLines = recipe.images.components(separatedBy: "\n")
+//        for line in imageLines {
+//            if let colonIndex = recipe.images.firstIndex(of: ":"){
+//                let title = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
+//                let imagePath = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
+//                lines.append("![\(title)](\(imagePath))")
+//                }
+//        }
+//        lines.append("")
+        
+        // Return the markdown string
+        let markdownContent = lines.joined(separator: "\n")
+        let filename = sanitizeFileName(recipe.title)
+        return MarkdownFile(name: filename, content: markdownContent)
+    }
+    
+    
+    
+    // MARK: Parser functions
+    
+    
+    
     /// using the update date of a recipe to determine when it was 60 days in the trash and will get deleted.
     static func daysUntilDeletion(_ date: Date) -> String {
         let calendar = Calendar.current
@@ -381,88 +676,219 @@ struct Parser {
     
     
     
-    // RECIPE to MARKDOWN and vice versa
+    // MARK: RECIPE to MARKDOWN and vice versa
     
     
-    // find a value for a given key or alternative key (second language) in the markdown file
-    private static func findValue(for key: String, or key2: String? = nil, in lines: [String]) -> String? {
-        
-        if let value = lines.first(where: { $0.hasPrefix("\(key)") }) {
-            return value.replacingOccurrences(of: "\(key)", with: "")
+    // Find a value for given keys in an array of strings. Case insensitive.
+    private static func findValue(for keys: [String], in lines: [String]) -> (value: String?, index: Int?) {
+        for key in keys {
+            // search case insensitive
+            if let index = lines.firstIndex(where: { $0.range(of: key, options: [.caseInsensitive, .anchored]) != nil }) {
+                // drop the key
+                let value = String(lines[index].dropFirst(key.count).trimmingCharacters(in: .whitespaces))
+                return (value, index)
+            }
         }
-        if key2 != nil {
-            let value = lines.first(where: { $0.hasPrefix("\(key2!)") })
-            return value?.replacingOccurrences(of: "\(key2!)", with: "")
-        }
-        return nil
+        return (nil, nil)
     }
     
     // extracting, cleaning and calculating prep, cook, etc. times
-    private static func parsingTimes(for english: String, or german: String, in lines: [String]) -> String {
-        if let rawValue = findValue(for: english, or: german, in: lines) {
-            let minuteValue = Double(calculateTimeInMinutes(input: rawValue))
+    private static func parsingTimes(for keys: [String], in lines: [String]) -> (value: String, index: Int?) {
+        let rawValue = findValue(for: keys, in: lines)
+        if rawValue != (nil, nil) {
+            let string = rawValue.value
+            let index = rawValue.index
+            let minuteValue = Double(calculateTimeInMinutes(input: string!))
             let outputString = formatTime(minuteValue)
             
-            return outputString
+            return (outputString, index)
         }
-        return ""
+        return ("", nil)
         
     }
     
     // find the Ingredients or Zutaten list in the markdown file
-    private static func findIngredients(in lines: [String]) -> [Ingredient] {
+    private static func findIngredients(searchStrings: [String], cutoff: [String], in lines: [String]) -> (ingredients: [Ingredient], indexes: [Int]) {
         var ingredients: [Ingredient] = []
-        if let ingredientIndex = lines.firstIndex(where: { $0 == "## Ingredients" || $0 == "## Zutaten" }) {
-            let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
+        var indexes = [Int]()
+        if let ingredientIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+            indexes.append(ingredientIndex)
+            let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex { line in
+                cutoff.contains { prefix in
+                    line.hasPrefix(prefix)
+                }
+            } ?? lines.count
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
                 let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                if rawString != "" {
+                
                     let ingredientString = cleanUpIngredientString(string: rawString)
                     let cleanIngredient = convertFractionToDouble(ingredientString)
-                    
+                    indexes.append(i)
+                
+                if rawString != "" && rawString != "Portionen" && rawString != "Anzahl Personen" {
                     ingredients.append(Ingredient(text: cleanIngredient))
+                    
                 }
                 
             }
         }
-        return ingredients
+        return (ingredients, indexes)
     }
     
     // find the Directions or Zubereitung in the markdown file
-    static func findDirections(in lines: [String]) -> [Direction] {
+    static func findDirections(searchStrings: [String], cutoff: [String], in lines: [String]) -> (directions: [Direction], indexes: [Int]) {
         var directions: [Direction] = []
-        if let directionIndex = lines.firstIndex(where: { $0 == "## Directions" || $0 == "## Zubereitung"}) {
-            let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ") }) ?? lines.count
-            let directionArray = lines[directionIndex+1..<directionEndIndex]
-            var currentString = ""
+        var indexes = [Int]()
+        if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+            let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
+                cutoff.contains { prefix in
+                    line.hasPrefix(prefix)
+                }
+            } ?? lines.count
             
-            for line in directionArray {
-                // use regular expression to match the first string that begins with a number
-                if line.range(of: #"^\d+\."#, options: .regularExpression) != nil {
-                    // append the current string to the result array if it's not empty
-                    if !currentString.isEmpty {
-                        let timerInMinutes = extractTimerInMinutes(from: currentString)
-                        let hasTimer = timerInMinutes > 0 ? true : false
-                        currentString = currentString.trimmingCharacters(in: .newlines)
-                        let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                        directions.append(direction)
+            let directionArray = Array(lines[directionIndex+1..<directionEndIndex])
+            
+            // add the indexes
+            let indexRange = (directionIndex..<directionEndIndex)
+            indexes += indexRange
+            
+            directions = directionsFromStrings(strings: directionArray)
+            
+        }
+        return (directions, indexes)
+    }
+    
+    /// make Directions from an Array of Strings
+    static func directionsFromStrings(strings: [String]) -> [Direction] {
+        var directions: [Direction] = []
+        var currentString = ""
+        
+        // determine which kind of directions pattern we have.
+        let startsWithNumber = "^\\d+.*"
+        let startsWithStepNumber = "^Step\\s+\\d+.*"
+        
+        let testString = strings.first!
+        
+        // "Starts with a number"
+            if testString.range(of: startsWithNumber, options: .regularExpression) != nil {
+                for line in strings {
+                    // clean it up
+                    let cleanLine = addPeriodToNumberedString(line)
+                    // use regular expression to match the first string that begins with a number
+                    if cleanLine.range(of: #"^\d+\."#, options: .regularExpression) != nil {
+                        
+                        // append the current string to the directions array if it's not empty
+                        if currentString.isEmpty == false {
+                            let timerInMinutes = extractTimerInMinutes(from: currentString)
+                            let hasTimer = timerInMinutes > 0.2 ? true : false
+                            currentString = currentString.trimmingCharacters(in: .newlines)
+                            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                            directions.append(direction)
+                        }
+                        // start a new string with the matched string
+                        currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
+                    } else {
+                        // append the current string to the current string with a newline character
+                        currentString += "\n" + cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                    // start a new string with the matched string
-                    currentString = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                } else {
-                    // append the current string to the current string with a newline character
+                }
+                // append the last current string to the directions array
+                let timerInMinutes = extractTimerInMinutes(from: currentString)
+                let hasTimer = timerInMinutes > 0 ? true : false
+                currentString = currentString.trimmingCharacters(in: .whitespacesAndNewlines)
+                let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                directions.append(direction)
+                
+            
+          // "Starts with 'Step' and a number"
+            } else if testString.range(of: startsWithStepNumber, options: .regularExpression) != nil {
+                var currentString = ""
+                for line in strings {
+                    if line.hasPrefix("Step") {
+                        // append the current string to the directions array if it's not empty
+                        if currentString != "" {
+                            let timerInMinutes = extractTimerInMinutes(from: currentString)
+                            let hasTimer = timerInMinutes > 0 ? true : false
+                            currentString = currentString.trimmingCharacters(in: .newlines)
+                            let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                            directions.append(direction)
+                        }
+                        // start a new current string
+                        currentString = "\(directions.count + 1). "
+                        
+                    }
                     currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
+                // append the last current string to the directions array
+                let timerInMinutes = extractTimerInMinutes(from: currentString)
+                let hasTimer = timerInMinutes > 0 ? true : false
+                currentString = currentString.trimmingCharacters(in: .newlines)
+                let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                directions.append(direction)
+                
+        // No numbers and no steps
+            } else {
+                let linesCount = strings.count
+                
+                if linesCount <= 2 {
+                    for line in strings {
+                        let splitLines = line.split(separator: ". ")
+                        for line in splitLines {
+                            let currentString = String(line + ".")
+                            let timerInMinutes = extractTimerInMinutes(from: currentString)
+                            let hasTimer = timerInMinutes > 0 ? true : false
+                            let directionString = "\(directions.count+1). " + currentString
+                            let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                            directions.append(direction)
+                        }
+                    }
+                } else {
+                    for line in strings {
+                        let timerInMinutes = extractTimerInMinutes(from: line)
+                        let hasTimer = timerInMinutes > 0 ? true : false
+                        let directionString = "\(directions.count+1). " + line
+                        let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                        directions.append(direction)
+                    }
+                }
+                // check how many lines - if less than 2? also count each line.
             }
-            
-            let timerInMinutes = extractTimerInMinutes(from: currentString)
-            let hasTimer = timerInMinutes > 0 ? true : false
-            currentString = currentString.trimmingCharacters(in: .newlines)
-            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-            directions.append(direction)
-        }
         return directions
+    }
+    
+    /// Turning a String of Directions into an array of Directions
+    static func makingDirectionsFromString(directionsString: String) -> [Direction] {
+        let strings = directionsString.components(separatedBy: .newlines)
+        let updatedDirections = Parser.directionsFromStrings(strings: strings)
+        
+        return updatedDirections
+    }
+    
+    
+    
+    private static func addPeriodToNumberedString(_ inputString: String) -> String {
+        let startsWithNumberPattern = #"^\d{1,2}"#
+        let startsWithNumberAndDotPattern = #"^(\d+)\."#
+        
+        // starts with number and dot
+        if inputString.range(of: startsWithNumberAndDotPattern, options: .regularExpression) != nil {
+            let newString = inputString.split(separator: ".", maxSplits: 2)
+            let secondPart = newString.last!.trimmingCharacters(in: .whitespaces)
+            let outputString = String(newString.first! + ". " + secondPart)
+            return outputString
+        
+        // starts with only number
+        } else if let range = inputString.range(of: startsWithNumberPattern, options: .regularExpression) {
+            let matchedSubstring = String(inputString[range])
+            let startIndex = matchedSubstring.count
+            let rest = inputString.dropFirst(startIndex)
+            
+            let outputString = matchedSubstring + ". " + rest
+            return outputString
+        } else {
+            return inputString
+        }
     }
     
     /// function to create a direction from a string
@@ -487,42 +913,52 @@ struct Parser {
     
     
     // find a certain section in the markdown file
-    private static func findSection(in lines: [String], for string: String, and string2: String) -> String {
-        if let sectionIndex = lines.firstIndex(where: { $0 == string || $0 == string2}) {
-            let nextTitleIndex = lines[sectionIndex+1..<lines.count].firstIndex(where: { $0.hasPrefix("## ")}) ?? lines.count - 1
+    private static func findSection(in lines: [String], for searchStrings: [String], cutoffStrings: [String]) -> (value: String?, indexes: [Int]?) {
+        if let sectionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+            let nextTitleIndex = lines[sectionIndex+1..<lines.count].firstIndex { line in
+                cutoffStrings.contains { prefix in
+                    line.hasPrefix(prefix)
+                }
+            } ?? lines.count
+            
             let sectionLines = lines[sectionIndex+1..<nextTitleIndex].map { $0.trimmingCharacters(in: .whitespaces) }
             let sectionText = sectionLines.joined(separator: "\n").trimmingCharacters(in: .newlines)
-            return sectionText
+            let indexes = Array(sectionIndex..<nextTitleIndex)
+            return (sectionText, indexes)
         }
-        return ""
+        return (nil, nil)
     }
     
     // find the images section in the markdown file
-    private static func findImages(in lines: [String]) -> String {
+    private static func findImages(in lines: [String]) -> (string: String, indexes: [Int]?) {
         if let imagesIndex = lines.firstIndex(where: { $0 == "## Images" || $0 == "## Bilder"}) {
             let imageLines = lines[imagesIndex+1..<lines.count]
             var imagesString = ""
             for imageLine in imageLines {
                 if imageLine != "" {
                     let startIndex = imageLine.index(imageLine.startIndex, offsetBy: 2) // skip "!["
-                    let endIndex = imageLine.firstIndex(of: "]")!
+                    let endIndex = imageLine.endIndex
                     let title = String(imageLine[startIndex..<endIndex]).trimmingCharacters(in: .whitespaces)
-                    let imagePath = imageLine.components(separatedBy: "(")[1].replacingOccurrences(of: ")", with: "")
+                    let imagePath = imageLine.components(separatedBy: "(").last?.replacingOccurrences(of: ")", with: "") ?? ""
                     imagesString.append("\(title): \(imagePath)\n")
                 }
             }
             imagesString = imagesString.trimmingCharacters(in: .newlines)
-            return imagesString
+            return (imagesString, Array(imagesIndex+1..<lines.count))
         }
-        return ""
+        return ("", nil)
     }
     
-    // find a date in the markdown file
-    private static func findDate(for key: String, in lines: [String]) -> Date? {
-        let dateString = findValue(for: key, in: lines) ?? "Unknown"
+    // find a date in the markdown file with a key
+    private static func findDate(for key: String, in lines: [String]) -> (date: Date?, index: Int?) {
+        let dateString = findValue(for: [key], in: lines)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        return dateFormatter.date(from: dateString)
+        if let dateStringString = dateString.value {
+            return (dateFormatter.date(from: dateStringString), dateString.index)
+        } else {
+            return (nil, nil)
+        }
     }
     
     // format a date back for the yaml header
@@ -553,154 +989,49 @@ struct Parser {
     }
     
     // find a title if it's not prefixed by '# '
-    
-    
-    
-    
-    /// Creating a Recipe struct from a Markdown Recipe.
-    /// With German and English parsing
-    ///
-    static func makeRecipeFromMarkdown(markdown: MarkdownFile) -> Recipe {
-        
-        let lines = markdown.content.components(separatedBy: "\n")
-        
-        let title = findValue(for: "# ", in: lines) ?? "No Title Found"
-        let source = findValue(for: "Source: ", or: "Quelle: ", in: lines) ?? "Unknown"
-        let categories = findValue(for: "Categories: ", or: "Kategorien: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? []
-        let tags = findValue(for: "Tags: ", in: lines)?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
-        let rating = findValue(for: "Rating: ", or: "Bewertung: ", in: lines) ?? ""
-        let prepTime = parsingTimes(for: "Prep time: ", or: "Vorbereitungszeit: ", in: lines)
-        let cookTime = parsingTimes(for: "Cook time: ", or: "Kochzeit: ", in: lines)
-        let additionalTime = parsingTimes(for: "Additional time: ", or: "Zusätzliche Zeit: ", in: lines)
-        let totalTime = parsingTimes(for: "Total time: ", or: "Gesamtzeit: ", in: lines)
-        let servings = findValue(for: "Servings:", or: "Portionen: ", in: lines).flatMap { Int($0) } ?? 4
-        let timesCooked = findValue(for: "Times cooked:", or: "Zubereitungen:", in: lines).flatMap { Int($0) } ?? 0
-        let ingredients = findIngredients(in: lines)
-        let directions = findDirections(in: lines)
-        let nutrition = findSection(in: lines, for: "## Nutrition", and: "## Nährwertangaben")
-        let notes = findSection(in: lines, for: "## Notes", and: "## Notizen")
-        let images = findImages(in: lines)
-        let date = findDate(for: "date: ", in: lines) ?? Date.now
-        let updated = findDate(for: "updated: ", in: lines) ?? Date.now
-        let language = findLanguage(in: lines)
-        
-        return Recipe(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language)
+    private static func findTitleAlternative(in lines: [String]) -> (value: String, index: Int?) {
+        // the first index we start to search for the title in
+        var startIndex = 0
+        if let index = lines.firstIndex(where: { $0 == "---" }) {
+            let searchIndex = index + 1
+            if let secondIndex = lines[searchIndex...10].firstIndex(where: { $0 == "---" }) {
+                startIndex = secondIndex + 1
+            }
+        }
+        if let titleIndex = lines[startIndex...].firstIndex(where: { $0 != "" }) {
+            let title = lines[titleIndex]
+            return (title, titleIndex)
+        }
+        return ("No Title Found", nil)
     }
     
+    // find a rating that is not labeled, finds any number up to 5 that is on a separate line without anything else
+    private static func findRatingAlternative(in lines: [String]) -> (value: String, index: Int?) {
+        let numberFormatter = NumberFormatter()
+        for (index, string) in lines.enumerated() {
+                if let doubleValue = numberFormatter.number(from: String(string)), doubleValue.doubleValue <= 5.0 {
+                    let intValue = Int(doubleValue.doubleValue.rounded(.toNearestOrAwayFromZero))
+                    return (value: String(intValue), index: index)
+            }
+        }
+        return ("", nil)
+    }
     
-    static func makeMarkdownFromRecipe(recipe: Recipe) -> MarkdownFile {
-        var lines: [String] = []
-        // yaml header
-        lines.append("---")
-        lines.append("date: \(formatDate(recipe.date))")
-        lines.append("updated: \(formatDate(recipe.updated))")
-        lines.append("---")
-        
-        // Recipe title
-        lines.append("# \(recipe.title)")
-        
-        // Source
-        let sourceKey = recipe.language == .german ? "Quelle" : "Source"
-        lines.append("\(sourceKey): \(recipe.source)")
-        
-        
-        // Categories
-        let categoriesKey = recipe.language == .german ? "Kategorien" : "Categories"
-        let categoriesValue = recipe.categories.joined(separator: ", ")
-        lines.append("\(categoriesKey): \(categoriesValue)")
-        
-        
-        // Tags
-        let tagsKey = "Tags"
-        let tagsValue = recipe.tags.joined(separator: ", ")
-        lines.append("\(tagsKey): \(tagsValue)")
-        
-        
-        // Rating
-        let ratingKey = recipe.language == .german ? "Bewertung" : "Rating"
-        let ratingValue = String(recipe.rating)
-        lines.append("\(ratingKey): \(ratingValue)")
-        
-        // Prep time
-        let prepTimeKey = recipe.language == .german ? "Vorbereitungszeit" : "Prep time"
-        let prepTimeValue = "\(recipe.prepTime) min"
-        lines.append("\(prepTimeKey): \(prepTimeValue)")
-        
-        // Cook time
-        let cookTimeKey = recipe.language == .german ? "Kochzeit" : "Cook time"
-        let cookTimeValue = "\(recipe.cookTime) min"
-        lines.append("\(cookTimeKey): \(cookTimeValue)")
-        
-        // Additional time
-        let addTimeKey = recipe.language == .german ? "Zusätzliche Zeit" : "Additional time"
-        let addTimeValue = "\(recipe.additionalTime) min"
-        lines.append("\(addTimeKey): \(addTimeValue)")
-        
-        // Total time
-        let totalTimeKey = recipe.language == .german ? "Gesamtzeit" : "Total time"
-        let totalTimeValue = "\(recipe.totalTime) min"
-        lines.append("\(totalTimeKey): \(totalTimeValue)")
-        
-        // Servings
-        let servingsKey = recipe.language == .german ? "Portionen" : "Servings"
-        let servingsValue = String(recipe.servings)
-        lines.append("\(servingsKey): \(servingsValue)")
-        
-        // Times cooked
-        let cookedKey = recipe.language == .german ? "Zubereitungen" : "Times cooked"
-        let cookedValue = String(recipe.timesCooked)
-        lines.append("\(cookedKey): \(cookedValue)")
-        
-        
-        // Ingredients
-        lines.append("")
-        let ingredientsTitle = recipe.language == .german ? "## Zutaten" : "## Ingredients"
-        lines.append(ingredientsTitle)
-        for ingredient in recipe.ingredients {
-            let name = " \(ingredient.text)"
-            lines.append("- [ ]\(name)")
-        }
-        
-        // Directions
-        lines.append("")
-        let directionsTitle = recipe.language == .german ? "## Zubereitung" : "## Directions"
-        lines.append(directionsTitle)
-        for direction in recipe.directions {
-            let text = direction.text
-            lines.append("\(text)")
-        }
-        
-        // Nutrition
-        lines.append("")
-        let nutritionTitle = recipe.language == .german ? "## Nährwertangaben" : "## Nutrition"
-        lines.append(nutritionTitle)
-        lines.append(recipe.nutrition)
-        
-        // Notes
-        lines.append("")
-        let notesTitle = recipe.language == .german ? "## Notizen" : "## Notes"
-        lines.append(notesTitle)
-        lines.append(recipe.notes)
-        
-        // Images
-        lines.append("")
-        let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
-        lines.append(imagesTitle)
-        
-        // From this: ("\(title): \(imagePath)") - back to a markdown image link
-        let imageLines = recipe.images.components(separatedBy: "\n")
-        for line in imageLines {
-            if let colonIndex = recipe.images.firstIndex(of: ":"){
-                let title = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
-                let imagePath = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
-                lines.append("![\(title)](\(imagePath))")
+    // find any date if it's not prefixed correctly
+    private static func findFirstDateIndexAndDate(in lines: [String]) -> (date: Date?, index: Int?) {
+            let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.date.rawValue)
+            
+            for (index, string) in lines.enumerated() {
+                let matches = detector?.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
+                
+                if let match = matches?.first {
+                    return (match.date, index)
                 }
+            }
+            
+            return (nil, nil)
         }
-        lines.append("")
-        
-        // Return the markdown string
-        let markdownContent = lines.joined(separator: "\n")
-        let filename = sanitizeFileName(recipe.title)
-        return MarkdownFile(name: filename, content: markdownContent)
-    }
+    
+  
+    
 }

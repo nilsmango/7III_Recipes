@@ -12,6 +12,8 @@ struct DirectionsEditView: View {
     
     @State private var newDirection = ""
     
+    @FocusState private var isFieldFocused: Bool
+    
     var body: some View {
         ForEach(directions) { direction in
             ZStack(alignment: .leading) {
@@ -26,6 +28,7 @@ struct DirectionsEditView: View {
         HStack{
             ZStack(alignment: .leading) {
                 TextEditor(text: $newDirection)
+                   
                 // this text is to disable the scrolling
                 Text(newDirection)
                     .padding(.all, 8)

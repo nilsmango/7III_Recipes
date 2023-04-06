@@ -69,9 +69,9 @@ struct RecipeView: View {
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
                             if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
-                                DirectionTimerView(direction: direction, timer: $fileManager.timers[timerManagerIndex])
+                                DirectionTimerView(fileManager: fileManager, direction: direction, recipe: recipe, timer: $fileManager.timers[timerManagerIndex])
                             } else {
-                                DirectionView(direction: direction)
+                                DirectionView(fileManager: fileManager, direction: direction, recipe: recipe)
                             }
                         }
                     }
@@ -100,9 +100,11 @@ struct RecipeView: View {
                     
                     
                     Section("Notes") {
-                        ZStack {
+                        ZStack(alignment: .leading) {
                             TextEditor(text: $note)
-                            Text(note).opacity(0).padding(.all, 8)
+                            Text(note)
+                                .opacity(0)
+                                .padding(.vertical, 8)
                         }
                         
                     }
@@ -194,6 +196,6 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!))
+        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromMarkdown(markdown: MarkdownFile.sampleData.last!).recipe)
     }
 }

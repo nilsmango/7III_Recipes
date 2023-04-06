@@ -23,8 +23,9 @@ struct RecipeEditView: View {
         fileManager.recipes.map { $0.title }
     }
     
-    // undo manager
-    
+    // Directions Edit
+    @State private var showDirectionsEdit = false
+    @State private var directionsString = ""
     
     var body: some View {
 //        ScrollView {
@@ -95,12 +96,21 @@ struct RecipeEditView: View {
                         IngredientsEditView(ingredients: $recipeData.ingredients)
                     }
                     Section("Directions") {
-                        DirectionsEditView(directions: $recipeData.directions)
+                        
+                            ForEach(recipeData.directions) { direction in
+                                Text(direction.text)
+                                    .padding(.vertical)
+                                        .onTapGesture {
+                                            directionsString = recipeData.directions.map( { $0.text }).joined(separator: "\n")
+                                            
+                                            showDirectionsEdit = true
+                                        }
+                                }
                     }
                     
                     Group {
                         Section("Nutrition") {
-                            ZStack {
+                            ZStack(alignment: .leading) {
                                 TextEditor(text: $recipeData.nutrition)
                                 // this text is to disable the scrolling
                                 Text(recipeData.nutrition)
@@ -110,7 +120,7 @@ struct RecipeEditView: View {
                         }
                         
                         Section("Notes") {
-                            ZStack {
+                            ZStack(alignment: .leading) {
                                 TextEditor(text: $recipeData.notes)
                                 // this text is to disable the scrolling
                                 Text(recipeData.notes)
@@ -129,10 +139,34 @@ struct RecipeEditView: View {
                     }
                     
                     
-                    
                 }
                 .listStyle(.insetGrouped)
                 
+                .sheet(isPresented: $showDirectionsEdit) {
+                    NavigationView {
+                        DirectionsEditTextView(directionsData: $directionsString)
+                            .navigationTitle("Edit Directions")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button("Cancel") {
+                                        showDirectionsEdit = false
+                                    }
+                                }
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button("Update") {
+                                        showDirectionsEdit = false
+                                        
+                                        // update the directions of this recipe.data
+                                        let newDirections = Parser.makingDirectionsFromString(directionsString: directionsString)
+                                        
+                                        recipeData.directions = newDirections
+                                        
+                                    }
+                                }
+                            }
+                    }
+                }
                 
                 
                 

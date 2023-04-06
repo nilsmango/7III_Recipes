@@ -150,7 +150,7 @@ class RecipesManager: ObservableObject {
             for markdownFile in markdownFiles {
                 let name = markdownFile.lastPathComponent
                 let content = try String(contentsOf: markdownFile)
-                self.recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
+                self.recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)).recipe)
             }
         } catch {
             print("Error loading Markdown files: \(error.localizedDescription)")
@@ -184,7 +184,7 @@ class RecipesManager: ObservableObject {
     
     // TODO: delete this once we don't use fake recipes any more
     func createMarkdownFile(name: String, content: String) {
-        recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)))
+        recipes.append(Parser.makeRecipeFromMarkdown(markdown: MarkdownFile(name: name, content: content)).recipe)
     }
     
     /// deleting only the markdown file of a recipe
@@ -257,6 +257,7 @@ class RecipesManager: ObservableObject {
         // update our timers
         loadTimers(for: recipes[index])
     }
+    
     
     /// save a new recipe
     func saveNewRecipe(newRecipeData: Recipe.Data) {
@@ -481,6 +482,36 @@ class RecipesManager: ObservableObject {
             recipes.sort(by: { $0.timesCooked > $1.timesCooked })
         }
     }
+    
+    // MARK: Editing Directions
+    
+    /// Mapping Directions to a string for convenient editing
+    func mapDirections(directions: [Direction]) -> String {
+        return directions.map( { $0.text }).joined(separator: "\n")
+    }
+    
+    /// Updating the Directions of a Recipe after editing them in a String
+    func updatingDirectionsOfRecipe(directionsString: String, of recipe: Recipe) {
+        // Parsing the Directions from the directions string
+        let strings = directionsString.components(separatedBy: .newlines)
+        let updatedDirections = Parser.directionsFromStrings(strings: strings)
+        
+        guard let index = recipes.firstIndex(where: { $0.id == recipe.id }) else {
+            fatalError("Couldn't find recipe index in array")
+        }
+        
+        // update the directions of the recipe in the recipes array
+        recipes[index].directions = updatedDirections
+        
+        // update the Markdown File on disk from updated recipe
+        saveRecipeAsMarkdownFile(recipe: recipes[index])
+        
+        // update our timers
+        loadTimers(for: recipes[index])
+        
+    }
+    
+    
     
 }
 
