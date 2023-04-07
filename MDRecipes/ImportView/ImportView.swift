@@ -29,7 +29,7 @@ Ingredients
 500 g sugar
 20 black peas
 
-Instructions / Steps / Directions
+Instructions
 1. Take the sugar and make it wet.
 2. Wait for 10 Min
 3. Take the peas and let soak. Wait another few hours, then you might be finished.

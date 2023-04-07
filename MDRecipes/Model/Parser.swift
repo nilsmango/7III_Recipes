@@ -1061,6 +1061,49 @@ struct Parser {
             return (nil, nil)
         }
     
+    /// get the pretty string for a recipe part enum
+    static func getRecipePartName(for recipePart: RecipeParts) -> String {
+            switch recipePart {
+            case .title:
+                return "Title"
+            case .source:
+                return "Source"
+            case .categories:
+                return "Categories"
+            case .tags:
+                return "Tags"
+            case .rating:
+                return "Rating"
+            case .prepTime:
+                return "Prep Time"
+            case .cookTime:
+                return "Cook Time"
+            case .additionalTime:
+                return "Additional Time"
+            case .totalTime:
+                return "Total Time"
+            case .servings:
+                return "Servings"
+            case .timesCooked:
+                return "Times Cooked"
+            case .ingredients:
+                return "Ingredients"
+            case .directions:
+                return "Directions"
+            case .nutrition:
+                return "Nutrition"
+            case .notes:
+                return "Notes"
+            case .images:
+                return "Images"
+            case .date:
+                return "Date"
+            case .updated:
+                return "Updated"
+            case .unknown:
+                return "???"
+            }
+        }
   
     
 }
