@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct SegmentStackView: View {
-    @State private var linePart: RecipeParts = .notes
+    @ObservedObject var importer: Importer
+    
+    @State private var newLinePart: RecipeParts = .notes
     var segmentPart: RecipeParts
     var line: String
     var isWiggling: Bool
@@ -19,10 +21,17 @@ struct SegmentStackView: View {
             if isWiggling {
                 Spacer()
                 HStack {
-                    Image(systemName: segmentPart == .unknown ? "xmark" : "checkmark")
-                        .padding(.leading, 5)
-                        .padding(.trailing, -10)
-                    Picker("Select a Recipe Part", selection: $linePart) {
+                    if newLinePart == .remove {
+                        Image(systemName: "trash")
+                            .padding(.leading, 5)
+                            .padding(.trailing, -10)
+                    } else {
+                        Image(systemName: newLinePart == .unknown ? "xmark" : "checkmark")
+                            .padding(.leading, 5)
+                            .padding(.trailing, -10)
+                    }
+                    
+                    Picker("Select a Recipe Part", selection: $newLinePart) {
                                     ForEach(RecipeParts.allCases, id: \.self) { recipePart in
                                         Text(Parser.getRecipePartName(for: recipePart))
                                     }
@@ -30,7 +39,12 @@ struct SegmentStackView: View {
                 }
                 .tint(.primary)
                 .onAppear {
-                    linePart = segmentPart
+                    newLinePart = segmentPart
+                }
+                .onDisappear {
+                    if newLinePart != segmentPart {
+                        importer.reAssignLine(segmentPart: segmentPart, newLinePart: newLinePart, line: line)
+                    }
                 }
             }
             
@@ -40,6 +54,6 @@ struct SegmentStackView: View {
 
 struct SegmentStackView_Previews: PreviewProvider {
     static var previews: some View {
-        SegmentStackView(segmentPart: .cookTime, line: "Cook Time: 2 h", isWiggling: true)
+        SegmentStackView(importer: Importer(), segmentPart: .cookTime, line: "Cook Time: 2 h", isWiggling: true)
     }
 }

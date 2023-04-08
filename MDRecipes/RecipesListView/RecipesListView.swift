@@ -213,36 +213,36 @@ struct RecipesListView: View {
                                     }
                                 }
                             }
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Save") {
-                                    importViewPresented = false
-                                    
-                                    // saving the new recipe
-                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-                                    
-                                    // reseting newRecipeData
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        newRecipeData.timesCooked = 0
-                                        newRecipeData.title = ""
-                                        newRecipeData.source = ""
-                                        newRecipeData.tags = []
-                                        newRecipeData.categories = []
-                                        newRecipeData.prepTime = ""
-                                        newRecipeData.cookTime = ""
-                                        newRecipeData.additionalTime = ""
-                                        newRecipeData.totalTime = ""
-                                        newRecipeData.notes = ""
-                                        newRecipeData.nutrition = ""
-                                        newRecipeData.directions = []
-                                        newRecipeData.servings = 4
-                                        newRecipeData.ingredients = []
-                                        newRecipeData.images = ""
-                                        newRecipeData.date = Date.now
-                                        
-                                    }
-                                    
-                                }
-                            }
+//                            ToolbarItem(placement: .navigationBarTrailing) {
+//                                Button("Save") {
+//                                    importViewPresented = false
+//
+//                                    // saving the new recipe
+//                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+//
+//                                    // reseting newRecipeData
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                                        newRecipeData.timesCooked = 0
+//                                        newRecipeData.title = ""
+//                                        newRecipeData.source = ""
+//                                        newRecipeData.tags = []
+//                                        newRecipeData.categories = []
+//                                        newRecipeData.prepTime = ""
+//                                        newRecipeData.cookTime = ""
+//                                        newRecipeData.additionalTime = ""
+//                                        newRecipeData.totalTime = ""
+//                                        newRecipeData.notes = ""
+//                                        newRecipeData.nutrition = ""
+//                                        newRecipeData.directions = []
+//                                        newRecipeData.servings = 4
+//                                        newRecipeData.ingredients = []
+//                                        newRecipeData.images = ""
+//                                        newRecipeData.date = Date.now
+//
+//                                    }
+//
+//                                }
+//                            }
                         }
                 }
             })

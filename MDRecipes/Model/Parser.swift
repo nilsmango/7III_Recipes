@@ -10,6 +10,190 @@ import Foundation
 struct Parser {
     
     
+    /// Creating an Array of RecipeSegments from a String
+    static func makeSegmentsFromString(string: String) -> [RecipeSegment]  {
+        
+        // Output Segments
+        var recipeSegments = [RecipeSegment]()
+        
+        // Input lines
+        let lines = string.components(separatedBy: "\n")
+        
+        // Indexes of the found recipe segments
+        var indexesFound = Set<Int>()
+        
+        // Helper for multiple lines
+        func checkAndAppendSegmentsAndIndexes(recipePart: RecipeParts, variablesIndex: Any?) {
+            if let index = variablesIndex {
+                switch index {
+                case let intIndex as Int:
+                    let line = lines[intIndex]
+                    indexesFound.insert(intIndex)
+                    recipeSegments.append(RecipeSegment(part: recipePart, lines: [line]))
+                case let intArrayIndex as [Int]:
+                    let linesArray = intArrayIndex.map { lines[$0] }
+                    let cleanedLinesArray = Array(linesArray.drop(while: { $0.isEmpty } ).reversed().drop(while: { $0.isEmpty }).reversed())
+                    indexesFound.formUnion(intArrayIndex)
+                    recipeSegments.append(RecipeSegment(part: recipePart, lines: cleanedLinesArray))
+                default:
+                    break
+                }
+            }
+        }
+        
+        
+        
+        // Title
+        let title: String
+        let titleVariable = findValue(for: ["# "], in: lines)
+        if titleVariable != (nil, nil) {
+            title = lines[titleVariable.index!]
+            indexesFound.insert(titleVariable.index!)
+            recipeSegments.append(RecipeSegment(part: .title, lines: [title]))
+        } else  {
+            let alternativeTitle = findTitleAlternative(in: lines)
+            checkAndAppendSegmentsAndIndexes(recipePart: .title, variablesIndex: alternativeTitle.index)
+        }
+        
+        // Source
+        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: lines)
+        checkAndAppendSegmentsAndIndexes(recipePart: .source, variablesIndex: sourceVariables.index)
+        
+        // Categories
+        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
+        checkAndAppendSegmentsAndIndexes(recipePart: .categories, variablesIndex: categoriesVariables.index)
+        
+        // Tags
+        let tagsVariables = findValue(for: ["Tags:"], in: lines)
+        checkAndAppendSegmentsAndIndexes(recipePart: .tags, variablesIndex: tagsVariables.index)
+        
+        // Rating
+        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: lines)
+        if ratingVariables != (nil, nil) {
+            checkAndAppendSegmentsAndIndexes(recipePart: .rating, variablesIndex: ratingVariables.index)
+        } else {
+            let ratingAlternatives = findRatingAlternative(in: lines)
+            checkAndAppendSegmentsAndIndexes(recipePart: .rating, variablesIndex: ratingAlternatives.index)
+        }
+        
+        // Times
+        func calculateIndexesForTimes(for keys: [String]) -> [Int?] {
+            let timeValues = parsingTimes(for: keys, in: lines)
+            var indexes = [timeValues.index]
+            let cookingTime = timeValues.value
+            if cookingTime == "" {
+                // check next line has numbers in it
+                if timeValues.index != nil {
+                    let nextLine = lines[timeValues.index!+1]
+                    if (nextLine.rangeOfCharacter(from: decimalCharacters) != nil) {
+                        indexes.append(timeValues.index!+1)
+                    }
+                }
+            }
+            return indexes
+        }
+        // Prep Time
+        checkAndAppendSegmentsAndIndexes(recipePart: .prepTime, variablesIndex: calculateIndexesForTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"]))
+        // Cook Time
+        checkAndAppendSegmentsAndIndexes(recipePart: .cookTime, variablesIndex: calculateIndexesForTimes(for: ["Cook time:", "Active Time", "Active Time", "Active time:", "Kochzeit", "Kochzeit:", "Koch-/Backzeit:", "Koch-/Backzeit"]))
+        // Additional Time
+        checkAndAppendSegmentsAndIndexes(recipePart: .additionalTime, variablesIndex: calculateIndexesForTimes(for: ["Additional time:", "Zusätzliche Zeit:", "Zusätzliche Zeit"]))
+        // Total Time
+        checkAndAppendSegmentsAndIndexes(recipePart: .totalTime, variablesIndex: calculateIndexesForTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit", "Zubereitungszeit:", "Zubereitungszeit"]))
+        
+        
+        // Servings
+        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: lines)
+        var servingsIndexes = [servingsVariables.index]
+        if servingsVariables.value == "" {
+            // check next line has a number in it
+            let nextLine = lines[servingsVariables.index!+1]
+            if nextLine.first(where: { $0.isNumber }) != nil {
+                servingsIndexes.append(servingsVariables.index!+1)
+            }
+        }
+        checkAndAppendSegmentsAndIndexes(recipePart: .servings, variablesIndex: servingsIndexes)
+        
+        
+        // Ingredients
+        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: lines)
+        checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes)
+        
+        
+        // Directions
+        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: lines)
+        checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes)
+        
+        // Nutrition
+        let nutritionVariables = findSection(in: lines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        checkAndAppendSegmentsAndIndexes(recipePart: .nutrition, variablesIndex: nutritionVariables.indexes)
+        
+        // Notes
+        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
+        let notesIndexes: [Int?]
+        if notesValues == (nil, nil) {
+            let noteVariables = findValue(for: ["Tip:", "Tipps:", "Notes:"], in: lines)
+            if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 && noteVariables.index! > nutritionVariables.indexes?.last ?? 0 {
+                notesIndexes = Array(noteVariables.index!..<lines.count)
+            } else {
+                notesIndexes = [noteVariables.index]
+            }
+        } else {
+            notesIndexes = notesValues.indexes!
+        }
+        checkAndAppendSegmentsAndIndexes(recipePart: .notes, variablesIndex: notesIndexes)
+        
+        
+        // Date of Creation
+        var dateVariables = findDate(for: "date:", in: lines)
+        if dateVariables == (nil, nil) {
+            dateVariables = findFirstDateIndexAndDate(in: lines)
+        }
+        let dateIndex = dateVariables.index
+        checkAndAppendSegmentsAndIndexes(recipePart: .date, variablesIndex: dateIndex)
+        
+        
+        // check what parts are not yet segmented
+        let totalSet = Set(0..<lines.count)
+        let unSegmentedArray = Array(totalSet.subtracting(indexesFound)).sorted()
+        
+        // Create an array with the continuous unknown lines
+        var unSegmentedParts = [[Int]]()
+        
+        for lineNumber in unSegmentedArray {
+            let lastIndex = unSegmentedParts.count - 1
+            if lastIndex == -1 || unSegmentedParts[lastIndex].last! + 1 != lineNumber {
+                    unSegmentedParts.append([lineNumber])
+            } else {
+                unSegmentedParts[lastIndex].append(lineNumber)
+            }
+           }
+        
+        // Map the continuous lines as a unknown segment, only if they are not just ""
+        for part in unSegmentedParts {
+            let lines = part.map { lines[$0] }
+            if lines.joined().trimmingCharacters(in: .whitespaces) != "" {
+                let cleanedLines = Array(lines.drop(while: { $0.isEmpty }).reversed().drop(while: { $0.isEmpty }).reversed())
+                recipeSegments.append(RecipeSegment(part: .unknown, lines: cleanedLines))
+            }
+        }
+        
+        
+        
+        // Sort the recipeSegments to represent the original lines
+        recipeSegments.sort { lhs, rhs in
+            guard let index1 = lines.firstIndex(where: { $0 == lhs.lines.first }),
+                  let index2 = lines.firstIndex(where: { $0 == rhs.lines.first }) else {
+                return false
+            }
+            return index1 < index2
+        }
+        
+        return recipeSegments
+    }
+
+    
+    
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     ///
@@ -1084,8 +1268,6 @@ struct Parser {
                 return "Total Time"
             case .servings:
                 return "Servings"
-            case .timesCooked:
-                return "Times Cooked"
             case .ingredients:
                 return "Ingredients"
             case .directions:
@@ -1094,16 +1276,15 @@ struct Parser {
                 return "Nutrition"
             case .notes:
                 return "Notes"
-            case .images:
-                return "Images"
             case .date:
-                return "Date"
-            case .updated:
-                return "Updated"
+                return "Creation Date"
+            case .remove:
+                return "Delete"
             case .unknown:
                 return "???"
             }
         }
   
+    
     
 }

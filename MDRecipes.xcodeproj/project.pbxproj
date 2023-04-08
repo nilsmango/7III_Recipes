@@ -32,6 +32,7 @@
 		783B4B8829E0073B00551888 /* SegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783B4B8729E0073B00551888 /* SegmentView.swift */; };
 		783B4B8A29E00DE000551888 /* RecipeSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783B4B8929E00DE000551888 /* RecipeSegment.swift */; };
 		783B4B8C29E04CD100551888 /* SegmentStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783B4B8B29E04CD100551888 /* SegmentStackView.swift */; };
+		783B4B8E29E148E600551888 /* Importer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783B4B8D29E148E600551888 /* Importer.swift */; };
 		78623AD129D982D300B9CF65 /* TitleEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78623AD029D982D300B9CF65 /* TitleEditView.swift */; };
 		78623AD429D9AFC700B9CF65 /* TrashList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78623AD329D9AFC700B9CF65 /* TrashList.swift */; };
 		78623AD729D9FB6700B9CF65 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78623AD629D9FB6700B9CF65 /* ImportView.swift */; };
@@ -100,6 +101,7 @@
 		783B4B8729E0073B00551888 /* SegmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentView.swift; sourceTree = "<group>"; };
 		783B4B8929E00DE000551888 /* RecipeSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeSegment.swift; sourceTree = "<group>"; };
 		783B4B8B29E04CD100551888 /* SegmentStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentStackView.swift; sourceTree = "<group>"; };
+		783B4B8D29E148E600551888 /* Importer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importer.swift; sourceTree = "<group>"; };
 		78623AD029D982D300B9CF65 /* TitleEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleEditView.swift; sourceTree = "<group>"; };
 		78623AD329D9AFC700B9CF65 /* TrashList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashList.swift; sourceTree = "<group>"; };
 		78623AD629D9FB6700B9CF65 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 				782EB6BC29C3A3F70086D2E7 /* MarkdownFile.swift */,
 				782AB9E629CE2F0E00EC23FC /* Recipe.swift */,
 				782EB6BE29C3A4650086D2E7 /* RecipesManager.swift */,
+				783B4B8D29E148E600551888 /* Importer.swift */,
 				786F9A1729CAE74D00CAA48B /* Parser.swift */,
 				782AB9EC29CE39C800EC23FC /* Direction.swift */,
 				783B4B8929E00DE000551888 /* RecipeSegment.swift */,
@@ -423,6 +426,7 @@
 				782C65D729D6003200A95C18 /* IngredientEditView.swift in Sources */,
 				78623AD729D9FB6700B9CF65 /* ImportView.swift in Sources */,
 				786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */,
+				783B4B8E29E148E600551888 /* Importer.swift in Sources */,
 				783B4B8029DDA7C700551888 /* DirectionsEditTextView.swift in Sources */,
 				782C65DF29D7501800A95C18 /* ServingsView.swift in Sources */,
 				78F0A95129D21DC500E59F56 /* DirectionView.swift in Sources */,
