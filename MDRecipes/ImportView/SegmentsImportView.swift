@@ -15,6 +15,7 @@ struct SegmentsImportView: View {
             
                 
             VStack() {
+                Text("Assign the Segments")
                 ForEach(importer.recipeSegments) { segment in
                         SegmentView(importer: importer, segment: segment)
                     }

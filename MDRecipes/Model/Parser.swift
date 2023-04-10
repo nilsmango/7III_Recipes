@@ -9,7 +9,6 @@ import Foundation
 
 struct Parser {
     
-    
     /// Creating an Array of RecipeSegments from a String
     static func makeSegmentsFromString(string: String) -> [RecipeSegment]  {
         
@@ -191,12 +190,187 @@ struct Parser {
         
         return recipeSegments
     }
+    
+    /// Creating a recipe.data from edited recipe segments
+    static func makeDataFromSegments(segments: [RecipeSegment]) -> Recipe.Data {
+        
+        // Helper that checks if the normal parsing for the Segment Lines does not give us the desired result and simply takes the Segment Lines as the value in that case
+        func makingSureWeGotValue(value: String?, lines: [String], separator: String) -> String {
+            if value == "" || value == nil {
+                return lines.joined(separator: separator).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                return value!
+            }
+        }
+        
+        
+        // Title
+        let titleLines = segments.first(where: { $0.part == .title })?.lines ?? ["Unknown"]
+        let title: String
+        let titleVariable = findValue(for: ["# "], in: titleLines)
+        if titleVariable != (nil, nil) {
+            title = titleVariable.value!
+        } else  {
+            let alternativeTitle = findTitleAlternative(in: titleLines)
+            title = alternativeTitle.value
+        }
+        
+        // Source
+        let sourceLines = segments.first(where: { $0.part == .source })?.lines ?? ["Source: Unknown"]
+        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: sourceLines)
+        let source = makingSureWeGotValue(value: sourceVariables.value, lines: sourceLines, separator: " ")
+
+        // Categories
+        let categorieLines = segments.first(where: { $0.part == .categories })?.lines ?? []
+        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: categorieLines)
+        let rawCategories = makingSureWeGotValue(value: categoriesVariables.value, lines: categorieLines, separator: " ")
+        let categories = rawCategories.components(separatedBy: " ")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        
+        
+        // Tags
+        let tagLines = segments.first(where: { $0.part == .tags })?.lines ?? []
+        let tagsVariables = findValue(for: ["Tags:"], in: tagLines)
+        var rawLine = tagsVariables.value
+        if tagsVariables.value == "" || tagsVariables.value == nil {
+            rawLine = tagLines.joined(separator: ", ").trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        let firstIteration = rawLine?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
+        var tags = [String]()
+        for part in firstIteration {
+            let partArray = part.components(separatedBy: " ")
+            tags += partArray
+        }
+        // maybe not necessary
+        tags = tags.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        
+        // Rating
+        let ratingLines = segments.first(where: { $0.part == .rating })?.lines ?? []
+        let rating: String
+        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: ratingLines)
+        if ratingVariables != (nil, nil) {
+            rating = ratingVariables.value!
+        } else {
+            let ratingAlternatives = findRatingAlternative(in: ratingLines)
+            rating = ratingAlternatives.value
+        }
+        
+        // Times
+        // As we have already matched the lines with the times we only need to find a time
+        
+        func calculateTimes(for lines: [String]) -> String {
+
+            for line in lines {
+                if line.rangeOfCharacter(from: decimalCharacters) != nil {
+                    let minuteValue = Double(calculateTimeInMinutes(input: line))
+                    let cookTime = formatTime(minuteValue)
+                    if cookTime != "0 s" && cookTime != "" {
+                        return cookTime
+                    }
+                }
+            }
+            return ""
+        }
+        let prepLines = segments.first(where: { $0.part == .prepTime })?.lines ?? []
+        let prepTime = calculateTimes(for: prepLines)
+        
+        let cookLines = segments.first(where: { $0.part == .cookTime })?.lines ?? []
+        let cookTime = calculateTimes(for: cookLines)
+        
+        let addLines = segments.first(where: { $0.part == .additionalTime })?.lines ?? []
+        let additionalTime = calculateTimes(for: addLines)
+        
+        let totalLines = segments.first(where: { $0.part == .totalTime })?.lines ?? []
+        let totalTime = calculateTimes(for: totalLines)
+        
+        
+        // Servings
+        let servingsLines = segments.first(where: { $0.part == .servings })?.lines ?? ["4"]
+        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: servingsLines)
+        // find the first number in the lines if findValue doesn't work
+        var servings = Int()
+        if servingsVariables.value == "" {
+            for line in servingsLines {
+                if let number = line.first(where: { $0.isNumber }) {
+                    if let servingsInt = Int(String(number)) {
+                        servings = servingsInt
+                        break
+                    }
+                }
+            }
+        } else {
+            servings = servingsVariables.value.flatMap { Int($0) } ?? 4
+        }
+        
+        
+        // Ingredients
+        let ingredientLines = segments.first(where:  { $0.part == .ingredients })?.lines ?? []
+        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für", ""], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: ingredientLines)
+        let ingredients = ingredientsVariables.ingredients
+        
+       // Directions
+        let directionLines = segments.first(where:  { $0.part == .directions })?.lines ?? []
+        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:", ""], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: directionLines)
+        let directions = directionsVariables.directions
+        
+        // Nutrition
+        let nutriLines = segments.first(where:  { $0.part == .nutrition })?.lines ?? []
+        let nutritionVariables = findSection(in: nutriLines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        let nutrition: String
+        
+        if nutritionVariables.value == nil {
+            nutrition = nutriLines.joined(separator: "\n")
+        } else {
+            nutrition = nutritionVariables.value ?? ""
+        }
+        
+        // Notes
+        let noteLines = segments.first(where:  { $0.part == .notes })?.lines ?? []
+        
+        let notesValues = findSection(in: noteLines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
+        let notes: String
+        if notesValues == (nil, nil) {
+            notes = noteLines.joined(separator: "\n")
+                .replacingOccurrences(of: "Tip:", with: "")
+                .replacingOccurrences(of: "Tipps:", with: "")
+                .replacingOccurrences(of: "Notes:", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            notes = notesValues.value ?? ""
+        }
+        
+        // Date
+        let dateLines = segments.first(where:  { $0.part == .date })?.lines ?? []
+        
+        var dateVariables = findFirstDateIndexAndDate(in: dateLines)
+        if dateVariables == (nil, nil) {
+            dateVariables = (Date.now, nil)
+        }
+    
+        let date = dateVariables.date ?? Date.now
+        
+        
+        // Language
+        let language: RecipeLanguage
+        if ingredientLines.contains("Zutaten") {
+            language = .german
+        } else {
+            language = .english
+        }
+        
+        return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: "", date: date, updated: Date.now, language: language)
+    }
+    
+    
+    
+    
+    
 
     
     
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
-    ///
     static func makeRecipeFromString(string: String) -> (recipe: Recipe, indexes: Set<Int>)  {
         
         // Helper to add the parsed indexes
@@ -231,12 +405,12 @@ struct Parser {
         
         // Categories
         let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
-        let categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized } ?? []
+        let categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
         checkAndAppendIndex(input: categoriesVariables.index)
         
         // Tags
         let tagsVariables = findValue(for: ["Tags:"], in: lines)
-        let tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
+        let tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
         checkAndAppendIndex(input: tagsVariables.index)
         
         // Rating
@@ -669,6 +843,8 @@ struct Parser {
                                             seconds = Double(numberArr.first ?? 0)
                                             numberArr.removeAll()
                                         }
+                } else {
+                    numberArr.removeAll()
                 }
             }
         }
@@ -953,22 +1129,31 @@ struct Parser {
     static func findDirections(searchStrings: [String], cutoff: [String], in lines: [String]) -> (directions: [Direction], indexes: [Int]) {
         var directions: [Direction] = []
         var indexes = [Int]()
-        if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
-            let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
-                cutoff.contains { prefix in
-                    line.hasPrefix(prefix)
-                }
-            } ?? lines.count
-            
-            let directionArray = Array(lines[directionIndex+1..<directionEndIndex])
-            
-            // add the indexes
-            let indexRange = (directionIndex..<directionEndIndex)
-            indexes += indexRange
-            
+        let directionArray: [String]
+        
+        // special parsing for segments (meaning searchStrings will contain ""
+            if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+                let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
+                    cutoff.contains { prefix in
+                        line.hasPrefix(prefix)
+                    }
+                } ?? lines.count
+                
+                directionArray = Array(lines[directionIndex+1..<directionEndIndex])
+                // add the indexes
+                let indexRange = (directionIndex..<directionEndIndex)
+                indexes += indexRange
+                
+            } else if searchStrings.contains("") {
+                directionArray = lines
+                indexes = Array(0..<lines.count)
+            } else {
+                directionArray = []
+            }
+        
             directions = directionsFromStrings(strings: directionArray)
             
-        }
+        
         return (directions, indexes)
     }
     

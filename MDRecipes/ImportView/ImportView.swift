@@ -18,6 +18,9 @@ struct ImportView: View {
     // edit view data
     @Binding var recipeData: Recipe.Data
     
+    // saving disabled
+    @Binding var saveDisabled: Bool
+    
     // indexes parsed
     @State private var indexes = [Int]()
     
@@ -50,62 +53,60 @@ Cooking can be dangerous
 """
     
     var body: some View {
-        
-//            VStack {
-                List {
-                    Section(header: Text("Paste Recipe here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
-                        TextEditor(text: $newRecipe)
-                            .frame(minHeight: 370)
-                        
-                    }
+        if counter < 1 || showingSheet {
+            List {
+                Section(header: Text("Paste Recipe here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
+                    TextEditor(text: $newRecipe)
+                        .frame(minHeight: 370)
                     
-                    Section {
-                        Button {
-                            counter += 1
-                            
-                            importer.recipeSegments = Parser.makeSegmentsFromString(string: newRecipe)
-                            
-                            showingSheet = true
-                            
-//                            let parseComponents = Parser.makeRecipeFromString(string: newRecipe)
-//                            recipeData = parseComponents.recipe.data
-//                            indexes = Array(parseComponents.indexes)
-                            
-                        } label: {
-                            Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
-                        }
+                }
+                
+                Section {
+                    Button {
+                        counter += 1
+                        
+                        importer.recipeSegments = Parser.makeSegmentsFromString(string: newRecipe)
+                        
+                        showingSheet = true
+                        
+                    } label: {
+                        Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
                     }
                 }
-//                if counter > 0 {
-//                    RecipeEditView(recipeData: $recipeData, fileManager: fileManager)
-//                }
-//            }
-            
+            }
             .fullScreenCover(isPresented: $showingSheet, content: {
                 NavigationView {
                     SegmentsImportView(importer: importer)
-//                        .navigationTitle("Edit Recipe Segments")
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Back") {
                                     showingSheet = false
-                                    
+                                    counter = 0
                                 }
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Save") {
+                                Button("Continue") {
+                                    
+                                    recipeData = Parser.makeDataFromSegments(segments: importer.recipeSegments)
+                                    
                                     showingSheet = false
                                     
-                                    // saving the new recipe ?? showing the recipe edit view with the recipe, something like that.
-//                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-                                    
-                                    
+                                    saveDisabled = false
                                     
                                 }
                             }
                         }
                 }
             })
+            
+        } else {
+            RecipeEditView(recipeData: $recipeData, fileManager: fileManager)
+                
+        }
+                
+            
+            
+            
         
             
         
@@ -114,6 +115,6 @@ Cooking can be dangerous
 
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
-        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data))
+        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), saveDisabled: .constant(true))
     }
 }

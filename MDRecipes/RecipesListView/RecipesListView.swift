@@ -22,6 +22,7 @@ struct RecipesListView: View {
     
     @State private var newRecipeData = Recipe.Data()
     
+    @State private var saveDisabled = true
     
     
     var body: some View {
@@ -126,7 +127,7 @@ struct RecipesListView: View {
                         .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Dismiss") {
+                                Button("Cancel") {
                                     editViewPresented = false
                                     
                                     // reseting newRecipeData
@@ -185,11 +186,11 @@ struct RecipesListView: View {
             })
             .fullScreenCover(isPresented: $importViewPresented, content: {
                 NavigationView {
-                    ImportView(fileManager: fileManager, recipeData: $newRecipeData)
+                    ImportView(fileManager: fileManager, recipeData: $newRecipeData, saveDisabled: $saveDisabled)
                         .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Dismiss") {
+                                Button("Cancel") {
                                     importViewPresented = false
                                     
                                     // reseting newRecipeData
@@ -213,36 +214,38 @@ struct RecipesListView: View {
                                     }
                                 }
                             }
-//                            ToolbarItem(placement: .navigationBarTrailing) {
-//                                Button("Save") {
-//                                    importViewPresented = false
-//
-//                                    // saving the new recipe
-//                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-//
-//                                    // reseting newRecipeData
-//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                        newRecipeData.timesCooked = 0
-//                                        newRecipeData.title = ""
-//                                        newRecipeData.source = ""
-//                                        newRecipeData.tags = []
-//                                        newRecipeData.categories = []
-//                                        newRecipeData.prepTime = ""
-//                                        newRecipeData.cookTime = ""
-//                                        newRecipeData.additionalTime = ""
-//                                        newRecipeData.totalTime = ""
-//                                        newRecipeData.notes = ""
-//                                        newRecipeData.nutrition = ""
-//                                        newRecipeData.directions = []
-//                                        newRecipeData.servings = 4
-//                                        newRecipeData.ingredients = []
-//                                        newRecipeData.images = ""
-//                                        newRecipeData.date = Date.now
-//
-//                                    }
-//
-//                                }
-//                            }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Save") {
+                                    importViewPresented = false
+
+                                    // saving the new recipe
+                                    fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+
+                                    // reseting newRecipeData
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        newRecipeData.timesCooked = 0
+                                        newRecipeData.title = ""
+                                        newRecipeData.source = ""
+                                        newRecipeData.tags = []
+                                        newRecipeData.categories = []
+                                        newRecipeData.prepTime = ""
+                                        newRecipeData.cookTime = ""
+                                        newRecipeData.additionalTime = ""
+                                        newRecipeData.totalTime = ""
+                                        newRecipeData.notes = ""
+                                        newRecipeData.nutrition = ""
+                                        newRecipeData.directions = []
+                                        newRecipeData.servings = 4
+                                        newRecipeData.ingredients = []
+                                        newRecipeData.images = ""
+                                        newRecipeData.date = Date.now
+
+                                    }
+
+                                }
+                                .disabled(saveDisabled)
+                                
+                            }
                         }
                 }
             })
