@@ -9,60 +9,68 @@ import PhotosUI
 import SwiftUI
 
 struct ImagesPickerView: View {
+    
+    // Images
+    @Binding var dataImages: [RecipeImageData]
+    
+    
+    // Pickers
     @State private var selectedItems = [PhotosPickerItem]()
-    @State private var selectedImages = [Image]()
     @State private var showCamera = false
-    @State private var imageData: Data?
+    
+    
 
     var body: some View {
-//        List {
-        
-            Section("Images") {
+
+        Section("Images") {
+            
+            // Images TODO: check how cam works after taking image and then selecting photos, because of the removeAll
+            ForEach(dataImages) { image in
+                ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
+            }
+            .onDelete { indexSet in
+                dataImages.remove(atOffsets: indexSet)
+            }
+                
+            .onMove { indexSet, newPlace in
+                dataImages.move(fromOffsets: indexSet, toOffset: newPlace)
+            }
+        }
+        Section {
                 PhotosPicker(selection: $selectedItems, matching: .any(of: [.panoramas, .screenshots, .images])) {
-                    Label("Select Photos", systemImage: "photo.stack")
+                    Label("Select Photos from Library", systemImage: "photo.stack")
                 }
 
                 Button {
                     self.showCamera = true
                 } label: {
-                    Label("Take Photos", systemImage: "camera")
+                    Label("Take a Photo", systemImage: "camera")
                 }
                 .sheet(isPresented: $showCamera) {
                     ImageThingy(sourceType: .camera, completionHandler: { image in
-                        if let data = image.jpegData(compressionQuality: 0.8) {
-                            self.imageData = data
-                        }
+                        dataImages.append(RecipeImageData(image: image, caption: "", isOldImage: false))
                     })
                 }
             }
-
-            Section {
-                ForEach(0..<selectedImages.count, id: \.self) { i in
-                    ImageDetailView(image: selectedImages[i])
-                }
-                if let data = imageData, let uiImage = UIImage(data: data) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300)
-                    TextField("Description", text: .constant(""))
-                }
-            }
-//        }
         .onChange(of: selectedItems) { _ in
             Task {
-                selectedImages.removeAll()
-
                 for item in selectedItems {
                     if let data = try? await item.loadTransferable(type: Data.self) {
                         if let uiImage = UIImage(data: data) {
-                            let image = Image(uiImage: uiImage)
-                            selectedImages.append(image)
+                            dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
                         }
                     }
                 }
+                selectedItems.removeAll()
             }
         }
+    }
+   
+    private func dataBinding(for image: RecipeImageData) -> Binding<RecipeImageData> {
+        guard let imageIndex = dataImages.firstIndex(where:  { $0.image == image.image }) else {
+            fatalError("Can't find the stupid DATA IMAGE in array")
+        }
+        return $dataImages[imageIndex]
     }
 }
 
@@ -108,7 +116,7 @@ struct ImageThingy: UIViewControllerRepresentable {
 struct ImagesPickerView_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            ImagesPickerView()
+            ImagesPickerView(dataImages: .constant([RecipeImageData(image: UIImage(contentsOfFile: "example.png") ?? UIImage(systemName: "lasso.and.sparkles")!, caption: "Just an example", isOldImage: true)]))
         }
         
     }

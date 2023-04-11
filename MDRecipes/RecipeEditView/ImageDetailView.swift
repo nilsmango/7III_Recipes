@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ImageDetailView: View {
     let image: Image
-    @State private var description = ""
+    @Binding var caption: String
     
     
     var body: some View {
@@ -18,7 +18,7 @@ struct ImageDetailView: View {
                 .resizable()
                 .scaledToFit()
             
-            TextField("Your description ...", text: $description, axis: .vertical)
+            TextField("Your caption ...", text: $caption, axis: .vertical)
                 .padding(5)
                 .background(
                 RoundedRectangle(cornerRadius: 10)
@@ -31,6 +31,6 @@ struct ImageDetailView: View {
 
 struct ImageDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ImageDetailView(image: Image(systemName: "photo"))
+        ImageDetailView(image: Image(systemName: "photo"), caption: .constant("Some caption"))
     }
 }

@@ -358,7 +358,7 @@ struct Parser {
             language = .english
         }
         
-        return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: [], date: date, updated: Date.now, language: language)
+        return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, dataImages: [], date: date, updated: Date.now, language: language)
     }
     
  
@@ -513,12 +513,13 @@ struct Parser {
             notesIndexes?.forEach { checkAndAppendIndex(input: $0) }
         }
         
-        // Images TODO: Implement images
-        let images = [RecipeImage]()
-        //        let imageValues = findImages(in: lines)
-        //        let images = imageValues.string
-        //        let imageIndexes = imageValues.indexes
-        //        imageIndexes?.forEach { checkAndAppendIndex(input: $0) }
+        
+        // Images
+        let imageValues = findImages(in: lines)
+        let images = imageValues.images
+        let imageIndexes = imageValues.indexes
+        imageIndexes?.forEach { checkAndAppendIndex(input: $0) }
+        
         
         // Date of Creation
         var dateVariables = findDate(for: "date:", in: lines)
@@ -640,21 +641,15 @@ struct Parser {
         lines.append(notesTitle)
         lines.append(recipe.notes)
         
-        // Images TODO: implement images
+        // Images
         lines.append("")
         let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
         lines.append(imagesTitle)
-        
-        //        // From this: ("\(title): \(imagePath)") - back to a markdown image link
-        //        let imageLines = recipe.images.components(separatedBy: "\n")
-        //        for line in imageLines {
-        //            if let colonIndex = recipe.images.firstIndex(of: ":"){
-        //                let title = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
-        //                let imagePath = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
-        //                lines.append("![\(title)](\(imagePath))")
-        //                }
-        //        }
-        //        lines.append("")
+        for image in recipe.images {
+            let imageLine = "![[\(image.imagePath)|\(image.caption)]]"
+            lines.append(imageLine)
+        }
+       
         
         // Return the markdown string
         let markdownContent = lines.joined(separator: "\n")
@@ -1320,23 +1315,46 @@ struct Parser {
     }
     
     // find the images section in the markdown file
-    private static func findImages(in lines: [String]) -> (string: String, indexes: [Int]?) {
+    private static func findImages(in lines: [String]) -> (images: [RecipeImage], indexes: [Int]?) {
         if let imagesIndex = lines.firstIndex(where: { $0 == "## Images" || $0 == "## Bilder"}) {
             let imageLines = lines[imagesIndex+1..<lines.count]
-            var imagesString = ""
-            for imageLine in imageLines {
-                if imageLine != "" {
-                    let startIndex = imageLine.index(imageLine.startIndex, offsetBy: 2) // skip "!["
-                    let endIndex = imageLine.endIndex
-                    let title = String(imageLine[startIndex..<endIndex]).trimmingCharacters(in: .whitespaces)
-                    let imagePath = imageLine.components(separatedBy: "(").last?.replacingOccurrences(of: ")", with: "") ?? ""
-                    imagesString.append("\(title): \(imagePath)\n")
-                }
-            }
-            imagesString = imagesString.trimmingCharacters(in: .newlines)
-            return (imagesString, Array(imagesIndex+1..<lines.count))
+            var imagesString = imageLines.joined(separator: "\n")
+            let images = extractImages(from: imagesString)
+            
+            return (images, Array(imagesIndex+1..<lines.count))
         }
-        return ("", nil)
+        return ([], nil)
+    }
+    
+    
+    private static func extractImages(from text: String) -> [RecipeImage] {
+        var images: [RecipeImage] = []
+        
+        let regex1 = try! NSRegularExpression(pattern: "!\\[\\[(.*?)\\]\\]")
+        let regex2 = try! NSRegularExpression(pattern: "!\\[(.*?)\\]\\((.*?)\\)")
+        
+        regex1.enumerateMatches(in: text, range: NSMakeRange(0, text.utf16.count)) { match, _, _ in
+            guard let match = match else { return }
+            let range = Range(match.range(at: 1), in: text)!
+            let matchString = String(text[range])
+            let components = matchString.components(separatedBy: "|")
+            if components.count == 2 {
+                let path = components[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                let caption = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
+                images.append(RecipeImage(imagePath: path, caption: caption))
+            }
+        }
+        
+        regex2.enumerateMatches(in: text, range: NSMakeRange(0, text.utf16.count)) { match, _, _ in
+            guard let match = match else { return }
+            let range1 = Range(match.range(at: 1), in: text)!
+            let caption = String(text[range1]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let range2 = Range(match.range(at: 2), in: text)!
+            let path = String(text[range2]).trimmingCharacters(in: .whitespacesAndNewlines)
+            images.append(RecipeImage(imagePath: path, caption: caption))
+        }
+        
+        return images
     }
     
     // find a date in the markdown file with a key

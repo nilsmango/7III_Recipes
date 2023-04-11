@@ -69,6 +69,7 @@
 		78F3185E29E53B2000DE31BE /* ImagesPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F3185D29E53B2000DE31BE /* ImagesPickerView.swift */; };
 		78F3186029E5442B00DE31BE /* ImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F3185F29E5442B00DE31BE /* ImageDetailView.swift */; };
 		78F3186229E5598F00DE31BE /* RecipeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F3186129E5598F00DE31BE /* RecipeImage.swift */; };
+		78F3186829E5B3D200DE31BE /* RecipeImageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F3186729E5B3D200DE31BE /* RecipeImageData.swift */; };
 		78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F553CF29D429E2001C9F56 /* RecipeEditView.swift */; };
 		78F553D429D48812001C9F56 /* LanguagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F553D329D48812001C9F56 /* LanguagePickerView.swift */; };
 		78F553D629D4B226001C9F56 /* TagsEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F553D529D4B226001C9F56 /* TagsEditView.swift */; };
@@ -142,6 +143,7 @@
 		78F3185D29E53B2000DE31BE /* ImagesPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesPickerView.swift; sourceTree = "<group>"; };
 		78F3185F29E5442B00DE31BE /* ImageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetailView.swift; sourceTree = "<group>"; };
 		78F3186129E5598F00DE31BE /* RecipeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeImage.swift; sourceTree = "<group>"; };
+		78F3186729E5B3D200DE31BE /* RecipeImageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeImageData.swift; sourceTree = "<group>"; };
 		78F553CF29D429E2001C9F56 /* RecipeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEditView.swift; sourceTree = "<group>"; };
 		78F553D329D48812001C9F56 /* LanguagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerView.swift; sourceTree = "<group>"; };
 		78F553D529D4B226001C9F56 /* TagsEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsEditView.swift; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				783B4B8929E00DE000551888 /* RecipeSegment.swift */,
 				782C65DA29D6D58000A95C18 /* Ingredient.swift */,
 				78F3186129E5598F00DE31BE /* RecipeImage.swift */,
+				78F3186729E5B3D200DE31BE /* RecipeImageData.swift */,
 				786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */,
 				786F9A1929CAF2D800CAA48B /* ConfettiSwiftUI */,
 				786F99FE29C84E4800CAA48B /* Helpers */,
@@ -447,6 +450,7 @@
 				786F9A0629C8520400CAA48B /* FlexibleContentView.swift in Sources */,
 				786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */,
 				782C65C829D56FFF00A95C18 /* IngredientsEditView.swift in Sources */,
+				78F3186829E5B3D200DE31BE /* RecipeImageData.swift in Sources */,
 				782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */,
 				782C65D229D58B0A00A95C18 /* ServingsCookedEditView.swift in Sources */,
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,

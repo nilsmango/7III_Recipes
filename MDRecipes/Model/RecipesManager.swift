@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 class RecipesManager: ObservableObject {
     
@@ -133,6 +134,8 @@ class RecipesManager: ObservableObject {
     }
     
     
+    
+    
     // MARK: RECIPES
     
     @Published var recipes = [Recipe]()
@@ -140,6 +143,8 @@ class RecipesManager: ObservableObject {
     /// The document directory
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 
+    
+    
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
     func loadMarkdownFiles() {
         // TODO: Change that to something that makes more sense.
@@ -148,7 +153,6 @@ class RecipesManager: ObservableObject {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
             for markdownFile in markdownFiles {
-                let name = markdownFile.lastPathComponent
                 let content = try String(contentsOf: markdownFile)
                 self.recipes.append(Parser.makeRecipeFromString(string: content).recipe)
             }
@@ -277,7 +281,7 @@ class RecipesManager: ObservableObject {
                                directions: Parser.reParsingDirections(directions: newRecipeData.directions), // re-parsing directions to find all the new timer from edits in the list.
                                nutrition: newRecipeData.nutrition,
                                notes: newRecipeData.notes,
-                               images: newRecipeData.images,
+                               images: updatingCleaningAndParsingImages(oldImages: newRecipeData.oldImages, newImages: newRecipeData.dataImages, recipeTitle: newRecipeData.title),
                                date: newRecipeData.date,
                                updated: Date.now,
                                language: newRecipeData.language)
@@ -292,6 +296,68 @@ class RecipesManager: ObservableObject {
         // update the timers
         loadTimers(for: newRecipe)
     }
+    
+    /// Updating, cleaning up the images in both Recipe and on disk
+    private func updatingCleaningAndParsingImages(oldImages: [RecipeImage], newImages: [RecipeImageData], recipeTitle: String) -> [RecipeImage] {
+        // check if there are any new images in the newImages
+        let newImages = newImages.filter( { $0.isOldImage == false })
+        // if there are no new images we simply return the newImages converted to RecipeImages
+        var recipeImages = [RecipeImage]()
+        if newImages.count < 1 {
+            for image in newImages {
+                // using the old image path, but the maybe new caption
+                if let oldRecipeImage = oldImages.first(where: { $0.id == image.id }) {
+                    recipeImages.append(RecipeImage(imagePath: oldRecipeImage.imagePath, caption: image.caption))
+                }
+            }
+        } else {
+            for image in newImages {
+                // using the old image path, but the maybe new caption
+                if let oldRecipeImage = oldImages.first(where: { $0.id == image.id }) {
+                    recipeImages.append(RecipeImage(imagePath: oldRecipeImage.imagePath, caption: image.caption))
+                } else {
+                    // safe the image and create the path
+                    recipeImages.append(saveImage(image: image.image, caption: image.caption, recipeName: recipeTitle))
+                    
+                }
+            }
+        }
+        return recipeImages
+    }
+    
+    /// Saving a images to disk and returns the RecipeImage
+    private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
+        let recipePhotosDirectory = documentsDirectory.appendingPathComponent("RecipePhotos")
+            
+            // Create the RecipePhotos directory if it doesn't exist
+            do {
+                try FileManager.default.createDirectory(at: recipePhotosDirectory, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("Error creating RecipePhotos directory: \(error.localizedDescription)")
+            }
+        var sanitizedCaptionReduced = String(Parser.sanitizeFileName(caption).prefix(4)) + String(Int.random(in: 10...99))
+        
+            // Save each selected image to the RecipePhotos directory
+        if let data = image.pngData() {
+            let fileName = "\(recipeName)-\(sanitizedCaptionReduced).png"
+            let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
+            
+            do {
+                try data.write(to: fileURL)
+                print("Image saved to: \(fileURL)")
+            } catch {
+                print("Error saving image: \(error.localizedDescription)")
+            }
+            return RecipeImage(imagePath: "\(fileURL)", caption: caption)
+        }
+               return RecipeImage(imagePath: "Couldn't save image", caption: caption)
+            }
+       
+    
+    
+    
+    
+    
     
     /// restore recipe from trash
     func restoreRecipe(recipe: Recipe) {

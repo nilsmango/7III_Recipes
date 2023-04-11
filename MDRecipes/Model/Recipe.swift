@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct Recipe: Identifiable, Codable {
     var title: String
@@ -85,7 +86,12 @@ extension Recipe {
         var directions: [Direction] = []
         var nutrition: String = ""
         var notes: String = ""
-        var images: [RecipeImage] = []
+        
+        var oldImages: [RecipeImage] = []
+        
+        var dataImages: [RecipeImageData] = []
+        
+        
         var date: Date = Date.now
         var updated: Date = Date.now
         
@@ -94,7 +100,7 @@ extension Recipe {
     }
     // for when we edit a recipe
     var data: Data {
-        return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language)
+        return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, oldImages: images, dataImages: images.map( { RecipeImageData(image: UIImage(contentsOfFile: $0.imagePath) ?? UIImage(systemName: "photo")!, caption: $0.caption, isOldImage: true, id: $0.id)  }), date: date, updated: updated, language: language)
     }
     
     // updating the recipe from the edit
@@ -115,7 +121,12 @@ extension Recipe {
         directions = Parser.reParsingDirections(directions: data.directions)
         nutrition = data.nutrition
         notes = data.notes
-        images = data.images
+        
+        // TODO: add the new selectedImages and captions use images to finde which one already are with a path and saved. the rest of dataImages need to get parsed and saved on disk. (pretty sure not here, check how we do it in recipeView and RecipesListView)
+        images = []
+        
+        
+        
         date = data.date
         updated = Date.now
         language = data.language
