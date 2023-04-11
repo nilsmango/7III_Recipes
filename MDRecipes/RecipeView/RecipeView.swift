@@ -114,9 +114,9 @@ struct RecipeView: View {
                     }
                     
                     
-                    if recipe.images != "" {
+                    if recipe.images.count > 0 {
                         Section("Images") {
-                            Text(recipe.images)
+//                            Text(recipe.images)
                         }
                     }
                     

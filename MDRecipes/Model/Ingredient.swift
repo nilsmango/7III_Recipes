@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 struct Ingredient: Identifiable, Codable {
     var text: String
     

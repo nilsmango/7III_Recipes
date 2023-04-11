@@ -41,7 +41,6 @@ struct Parser {
         }
         
         
-        
         // Title
         let title: String
         let titleVariable = findValue(for: ["# "], in: lines)
@@ -162,11 +161,11 @@ struct Parser {
         for lineNumber in unSegmentedArray {
             let lastIndex = unSegmentedParts.count - 1
             if lastIndex == -1 || unSegmentedParts[lastIndex].last! + 1 != lineNumber {
-                    unSegmentedParts.append([lineNumber])
+                unSegmentedParts.append([lineNumber])
             } else {
                 unSegmentedParts[lastIndex].append(lineNumber)
             }
-           }
+        }
         
         // Map the continuous lines as a unknown segment, only if they are not just ""
         for part in unSegmentedParts {
@@ -219,7 +218,7 @@ struct Parser {
         let sourceLines = segments.first(where: { $0.part == .source })?.lines ?? ["Source: Unknown"]
         let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: sourceLines)
         let source = makingSureWeGotValue(value: sourceVariables.value, lines: sourceLines, separator: " ")
-
+        
         // Categories
         let categorieLines = segments.first(where: { $0.part == .categories })?.lines ?? []
         let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: categorieLines)
@@ -260,7 +259,7 @@ struct Parser {
         // As we have already matched the lines with the times we only need to find a time
         
         func calculateTimes(for lines: [String]) -> String {
-
+            
             for line in lines {
                 if line.rangeOfCharacter(from: decimalCharacters) != nil {
                     let minuteValue = Double(calculateTimeInMinutes(input: line))
@@ -309,7 +308,7 @@ struct Parser {
         let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für", ""], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: ingredientLines)
         let ingredients = ingredientsVariables.ingredients
         
-       // Directions
+        // Directions
         let directionLines = segments.first(where:  { $0.part == .directions })?.lines ?? []
         let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:", ""], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: directionLines)
         let directions = directionsVariables.directions
@@ -347,7 +346,7 @@ struct Parser {
         if dateVariables == (nil, nil) {
             dateVariables = (Date.now, nil)
         }
-    
+        
         let date = dateVariables.date ?? Date.now
         
         
@@ -359,16 +358,10 @@ struct Parser {
             language = .english
         }
         
-        return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: "", date: date, updated: Date.now, language: language)
+        return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: [], date: date, updated: Date.now, language: language)
     }
     
-    
-    
-    
-    
-
-    
-    
+ 
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     static func makeRecipeFromString(string: String) -> (recipe: Recipe, indexes: Set<Int>)  {
@@ -521,11 +514,11 @@ struct Parser {
         }
         
         // Images TODO: Implement images
-        let images = ""
-//        let imageValues = findImages(in: lines)
-//        let images = imageValues.string
-//        let imageIndexes = imageValues.indexes
-//        imageIndexes?.forEach { checkAndAppendIndex(input: $0) }
+        let images = [RecipeImage]()
+        //        let imageValues = findImages(in: lines)
+        //        let images = imageValues.string
+        //        let imageIndexes = imageValues.indexes
+        //        imageIndexes?.forEach { checkAndAppendIndex(input: $0) }
         
         // Date of Creation
         var dateVariables = findDate(for: "date:", in: lines)
@@ -652,16 +645,16 @@ struct Parser {
         let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
         lines.append(imagesTitle)
         
-//        // From this: ("\(title): \(imagePath)") - back to a markdown image link
-//        let imageLines = recipe.images.components(separatedBy: "\n")
-//        for line in imageLines {
-//            if let colonIndex = recipe.images.firstIndex(of: ":"){
-//                let title = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
-//                let imagePath = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
-//                lines.append("![\(title)](\(imagePath))")
-//                }
-//        }
-//        lines.append("")
+        //        // From this: ("\(title): \(imagePath)") - back to a markdown image link
+        //        let imageLines = recipe.images.components(separatedBy: "\n")
+        //        for line in imageLines {
+        //            if let colonIndex = recipe.images.firstIndex(of: ":"){
+        //                let title = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
+        //                let imagePath = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
+        //                lines.append("![\(title)](\(imagePath))")
+        //                }
+        //        }
+        //        lines.append("")
         
         // Return the markdown string
         let markdownContent = lines.joined(separator: "\n")
@@ -796,9 +789,9 @@ struct Parser {
         var numberArr = [Int]()
         var hours = 0
         var minutes = 0
-    var seconds: Double = 0
+        var seconds: Double = 0
         
-    for (index, element) in cleanedString.enumerated() {
+        for (index, element) in cleanedString.enumerated() {
             let stringElement = String(element)
             //check if number or character
             if element.isNumber {
@@ -814,7 +807,7 @@ struct Parser {
                         }
                         numberArr.removeAll()
                         
-
+                        
                     } else if numberArr.count == 1 {
                         hours = numberArr.first ?? 0
                         numberArr.removeAll()
@@ -833,23 +826,23 @@ struct Parser {
                     }
                 } else if stringElement.lowercased() == "s" {
                     if numberArr.count > 1 {
-                                            var count = numberArr.count
-                                            for number in numberArr {
-                                                seconds += Double(number) * pow(10, Double(count - 1))
-                                                count = count - 1
-                                            }
-                                            numberArr.removeAll()
-                                        } else {
-                                            seconds = Double(numberArr.first ?? 0)
-                                            numberArr.removeAll()
-                                        }
+                        var count = numberArr.count
+                        for number in numberArr {
+                            seconds += Double(number) * pow(10, Double(count - 1))
+                            count = count - 1
+                        }
+                        numberArr.removeAll()
+                    } else {
+                        seconds = Double(numberArr.first ?? 0)
+                        numberArr.removeAll()
+                    }
                 } else {
                     numberArr.removeAll()
                 }
             }
         }
         
-    return hours * 60 + minutes + Int((seconds / 60).rounded())
+        return hours * 60 + minutes + Int((seconds / 60).rounded())
     }
     
     
@@ -977,7 +970,7 @@ struct Parser {
     
     /// getting a flexible string of the ingredient
     static func stringMaker(of cleanIngredient: String, selectedServings: Int, recipeServings: Int) -> String {
-    
+        
         
         let numbersRange = cleanIngredient.rangeOfCharacter(from: .decimalDigits)
         
@@ -986,7 +979,7 @@ struct Parser {
             if let firstCharacter = cleanIngredient.first, firstCharacter.isLetter {
                 return cleanIngredient
             }
-                
+            
             
             let input = cleanIngredient.components(separatedBy: .whitespaces).map { String($0) }
             
@@ -1016,7 +1009,7 @@ struct Parser {
                 
                 let output = rest.joined(separator: " ")
                 let secondPart = " " + output
-    
+                
                 return amountString + secondPart
                 
                 // easy to pluralize
@@ -1039,7 +1032,7 @@ struct Parser {
             
         } else {
             return cleanIngredient
-        
+            
         }
     }
     
@@ -1111,9 +1104,9 @@ struct Parser {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
                 let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                 
-                    let ingredientString = cleanUpIngredientString(string: rawString)
-                    let cleanIngredient = convertFractionToDouble(ingredientString)
-                    indexes.append(i)
+                let ingredientString = cleanUpIngredientString(string: rawString)
+                let cleanIngredient = convertFractionToDouble(ingredientString)
+                indexes.append(i)
                 
                 if rawString != "" && rawString != "Portionen" && rawString != "Anzahl Personen" {
                     ingredients.append(Ingredient(text: cleanIngredient))
@@ -1132,27 +1125,27 @@ struct Parser {
         let directionArray: [String]
         
         // special parsing for segments (meaning searchStrings will contain ""
-            if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
-                let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
-                    cutoff.contains { prefix in
-                        line.hasPrefix(prefix)
-                    }
-                } ?? lines.count
-                
-                directionArray = Array(lines[directionIndex+1..<directionEndIndex])
-                // add the indexes
-                let indexRange = (directionIndex..<directionEndIndex)
-                indexes += indexRange
-                
-            } else if searchStrings.contains("") {
-                directionArray = lines
-                indexes = Array(0..<lines.count)
-            } else {
-                directionArray = []
-            }
-        
-            directions = directionsFromStrings(strings: directionArray)
+        if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+            let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
+                cutoff.contains { prefix in
+                    line.hasPrefix(prefix)
+                }
+            } ?? lines.count
             
+            directionArray = Array(lines[directionIndex+1..<directionEndIndex])
+            // add the indexes
+            let indexRange = (directionIndex..<directionEndIndex)
+            indexes += indexRange
+            
+        } else if searchStrings.contains("") {
+            directionArray = lines
+            indexes = Array(0..<lines.count)
+        } else {
+            directionArray = []
+        }
+        
+        directions = directionsFromStrings(strings: directionArray)
+        
         
         return (directions, indexes)
     }
@@ -1169,89 +1162,89 @@ struct Parser {
         let testString = strings.first!
         
         // "Starts with a number"
-            if testString.range(of: startsWithNumber, options: .regularExpression) != nil {
-                for line in strings {
-                    // clean it up
-                    let cleanLine = addPeriodToNumberedString(line)
-                    // use regular expression to match the first string that begins with a number
-                    if cleanLine.range(of: #"^\d+\."#, options: .regularExpression) != nil {
-                        
-                        // append the current string to the directions array if it's not empty
-                        if currentString.isEmpty == false {
-                            let timerInMinutes = extractTimerInMinutes(from: currentString)
-                            let hasTimer = timerInMinutes > 0.2 ? true : false
-                            currentString = currentString.trimmingCharacters(in: .newlines)
-                            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                            directions.append(direction)
-                        }
-                        // start a new string with the matched string
-                        currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
-                    } else {
-                        // append the current string to the current string with a newline character
-                        currentString += "\n" + cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        if testString.range(of: startsWithNumber, options: .regularExpression) != nil {
+            for line in strings {
+                // clean it up
+                let cleanLine = addPeriodToNumberedString(line)
+                // use regular expression to match the first string that begins with a number
+                if cleanLine.range(of: #"^\d+\."#, options: .regularExpression) != nil {
+                    
+                    // append the current string to the directions array if it's not empty
+                    if currentString.isEmpty == false {
+                        let timerInMinutes = extractTimerInMinutes(from: currentString)
+                        let hasTimer = timerInMinutes > 0.2 ? true : false
+                        currentString = currentString.trimmingCharacters(in: .newlines)
+                        let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                        directions.append(direction)
                     }
-                }
-                // append the last current string to the directions array
-                let timerInMinutes = extractTimerInMinutes(from: currentString)
-                let hasTimer = timerInMinutes > 0 ? true : false
-                currentString = currentString.trimmingCharacters(in: .whitespacesAndNewlines)
-                let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                directions.append(direction)
-                
-            
-          // "Starts with 'Step' and a number"
-            } else if testString.range(of: startsWithStepNumber, options: .regularExpression) != nil {
-                var currentString = ""
-                for line in strings {
-                    if line.hasPrefix("Step") {
-                        // append the current string to the directions array if it's not empty
-                        if currentString != "" {
-                            let timerInMinutes = extractTimerInMinutes(from: currentString)
-                            let hasTimer = timerInMinutes > 0 ? true : false
-                            currentString = currentString.trimmingCharacters(in: .newlines)
-                            let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                            directions.append(direction)
-                        }
-                        // start a new current string
-                        currentString = "\(directions.count + 1). "
-                        
-                    }
-                    currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
-                }
-                // append the last current string to the directions array
-                let timerInMinutes = extractTimerInMinutes(from: currentString)
-                let hasTimer = timerInMinutes > 0 ? true : false
-                currentString = currentString.trimmingCharacters(in: .newlines)
-                let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                directions.append(direction)
-                
-        // No numbers and no steps
-            } else {
-                let linesCount = strings.count
-                
-                if linesCount <= 2 {
-                    for line in strings {
-                        let splitLines = line.split(separator: ". ")
-                        for line in splitLines {
-                            let currentString = String(line + ".")
-                            let timerInMinutes = extractTimerInMinutes(from: currentString)
-                            let hasTimer = timerInMinutes > 0 ? true : false
-                            let directionString = "\(directions.count+1). " + currentString
-                            let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                            directions.append(direction)
-                        }
-                    }
+                    // start a new string with the matched string
+                    currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
                 } else {
-                    for line in strings {
-                        let timerInMinutes = extractTimerInMinutes(from: line)
+                    // append the current string to the current string with a newline character
+                    currentString += "\n" + cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+            }
+            // append the last current string to the directions array
+            let timerInMinutes = extractTimerInMinutes(from: currentString)
+            let hasTimer = timerInMinutes > 0 ? true : false
+            currentString = currentString.trimmingCharacters(in: .whitespacesAndNewlines)
+            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+            directions.append(direction)
+            
+            
+            // "Starts with 'Step' and a number"
+        } else if testString.range(of: startsWithStepNumber, options: .regularExpression) != nil {
+            var currentString = ""
+            for line in strings {
+                if line.hasPrefix("Step") {
+                    // append the current string to the directions array if it's not empty
+                    if currentString != "" {
+                        let timerInMinutes = extractTimerInMinutes(from: currentString)
                         let hasTimer = timerInMinutes > 0 ? true : false
-                        let directionString = "\(directions.count+1). " + line
+                        currentString = currentString.trimmingCharacters(in: .newlines)
+                        let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                        directions.append(direction)
+                    }
+                    // start a new current string
+                    currentString = "\(directions.count + 1). "
+                    
+                }
+                currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            // append the last current string to the directions array
+            let timerInMinutes = extractTimerInMinutes(from: currentString)
+            let hasTimer = timerInMinutes > 0 ? true : false
+            currentString = currentString.trimmingCharacters(in: .newlines)
+            let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+            directions.append(direction)
+            
+            // No numbers and no steps
+        } else {
+            let linesCount = strings.count
+            
+            if linesCount <= 2 {
+                for line in strings {
+                    let splitLines = line.split(separator: ". ")
+                    for line in splitLines {
+                        let currentString = String(line + ".")
+                        let timerInMinutes = extractTimerInMinutes(from: currentString)
+                        let hasTimer = timerInMinutes > 0 ? true : false
+                        let directionString = "\(directions.count+1). " + currentString
                         let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
                         directions.append(direction)
                     }
                 }
-                // check how many lines - if less than 2? also count each line.
+            } else {
+                for line in strings {
+                    let timerInMinutes = extractTimerInMinutes(from: line)
+                    let hasTimer = timerInMinutes > 0 ? true : false
+                    let directionString = "\(directions.count+1). " + line
+                    let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                    directions.append(direction)
+                }
             }
+            // check how many lines - if less than 2? also count each line.
+        }
         return directions
     }
     
@@ -1264,7 +1257,6 @@ struct Parser {
     }
     
     
-    
     private static func addPeriodToNumberedString(_ inputString: String) -> String {
         let startsWithNumberPattern = #"^\d{1,2}"#
         let startsWithNumberAndDotPattern = #"^(\d+)\."#
@@ -1275,8 +1267,8 @@ struct Parser {
             let secondPart = newString.last!.trimmingCharacters(in: .whitespaces)
             let outputString = String(newString.first! + ". " + secondPart)
             return outputString
-        
-        // starts with only number
+            
+            // starts with only number
         } else if let range = inputString.range(of: startsWithNumberPattern, options: .regularExpression) {
             let matchedSubstring = String(inputString[range])
             let startIndex = matchedSubstring.count
@@ -1407,9 +1399,9 @@ struct Parser {
     private static func findRatingAlternative(in lines: [String]) -> (value: String, index: Int?) {
         let numberFormatter = NumberFormatter()
         for (index, string) in lines.enumerated() {
-                if let doubleValue = numberFormatter.number(from: String(string)), doubleValue.doubleValue <= 5.0 {
-                    let intValue = Int(doubleValue.doubleValue.rounded(.toNearestOrAwayFromZero))
-                    return (value: String(intValue), index: index)
+            if let doubleValue = numberFormatter.number(from: String(string)), doubleValue.doubleValue <= 5.0 {
+                let intValue = Int(doubleValue.doubleValue.rounded(.toNearestOrAwayFromZero))
+                return (value: String(intValue), index: index)
             }
         }
         return ("", nil)
@@ -1417,59 +1409,56 @@ struct Parser {
     
     // find any date if it's not prefixed correctly
     private static func findFirstDateIndexAndDate(in lines: [String]) -> (date: Date?, index: Int?) {
-            let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.date.rawValue)
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.date.rawValue)
+        
+        for (index, string) in lines.enumerated() {
+            let matches = detector?.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
             
-            for (index, string) in lines.enumerated() {
-                let matches = detector?.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
-                
-                if let match = matches?.first {
-                    return (match.date, index)
-                }
+            if let match = matches?.first {
+                return (match.date, index)
             }
-            
-            return (nil, nil)
         }
+        
+        return (nil, nil)
+    }
     
     /// get the pretty string for a recipe part enum
     static func getRecipePartName(for recipePart: RecipeParts) -> String {
-            switch recipePart {
-            case .title:
-                return "Title"
-            case .source:
-                return "Source"
-            case .categories:
-                return "Categories"
-            case .tags:
-                return "Tags"
-            case .rating:
-                return "Rating"
-            case .prepTime:
-                return "Prep Time"
-            case .cookTime:
-                return "Cook Time"
-            case .additionalTime:
-                return "Additional Time"
-            case .totalTime:
-                return "Total Time"
-            case .servings:
-                return "Servings"
-            case .ingredients:
-                return "Ingredients"
-            case .directions:
-                return "Directions"
-            case .nutrition:
-                return "Nutrition"
-            case .notes:
-                return "Notes"
-            case .date:
-                return "Creation Date"
-            case .remove:
-                return "Delete"
-            case .unknown:
-                return "???"
-            }
+        switch recipePart {
+        case .title:
+            return "Title"
+        case .source:
+            return "Source"
+        case .categories:
+            return "Categories"
+        case .tags:
+            return "Tags"
+        case .rating:
+            return "Rating"
+        case .prepTime:
+            return "Prep Time"
+        case .cookTime:
+            return "Cook Time"
+        case .additionalTime:
+            return "Additional Time"
+        case .totalTime:
+            return "Total Time"
+        case .servings:
+            return "Servings"
+        case .ingredients:
+            return "Ingredients"
+        case .directions:
+            return "Directions"
+        case .nutrition:
+            return "Nutrition"
+        case .notes:
+            return "Notes"
+        case .date:
+            return "Creation Date"
+        case .remove:
+            return "Delete"
+        case .unknown:
+            return "???"
         }
-  
-    
-    
+    }
 }

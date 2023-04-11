@@ -146,7 +146,7 @@ struct RecipesListView: View {
                                         newRecipeData.directions = []
                                         newRecipeData.servings = 4
                                         newRecipeData.ingredients = []
-                                        newRecipeData.images = ""
+                                        newRecipeData.images = []
                                         newRecipeData.date = Date.now
                                     }
                                 }
@@ -174,7 +174,7 @@ struct RecipesListView: View {
                                         newRecipeData.directions = []
                                         newRecipeData.servings = 4
                                         newRecipeData.ingredients = []
-                                        newRecipeData.images = ""
+                                        newRecipeData.images = []
                                         newRecipeData.date = Date.now
                                         
                                     }
@@ -209,7 +209,7 @@ struct RecipesListView: View {
                                         newRecipeData.directions = []
                                         newRecipeData.servings = 4
                                         newRecipeData.ingredients = []
-                                        newRecipeData.images = ""
+                                        newRecipeData.images = []
                                         newRecipeData.date = Date.now
                                     }
                                 }
@@ -237,7 +237,7 @@ struct RecipesListView: View {
                                         newRecipeData.directions = []
                                         newRecipeData.servings = 4
                                         newRecipeData.ingredients = []
-                                        newRecipeData.images = ""
+                                        newRecipeData.images = []
                                         newRecipeData.date = Date.now
 
                                     }

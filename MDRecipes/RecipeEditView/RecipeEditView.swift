@@ -119,10 +119,10 @@ struct RecipeEditView: View {
                             
                         }
                         
-                        Section("Images") {
+                        
                             // TODO: image picker
-                            Text(recipeData.images)
-                        }
+                            ImagesPickerView()
+                        
                         
                         
                     }
