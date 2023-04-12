@@ -116,7 +116,9 @@ struct RecipeView: View {
                     
                     if recipe.images.count > 0 {
                         Section("Images") {
-//                            Text(recipe.images)
+                            ForEach(recipe.images) { image in
+                                RecipeImageView(imagePath: image.imagePath, caption: image.caption)
+                            }
                         }
                     }
                     
@@ -182,6 +184,7 @@ struct RecipeView: View {
                                     
                                     fileManager.updateEditedRecipe(recipe: recipe, data: data)
                                     
+                                    data = Recipe.Data()
                                 }
                             }
                         }

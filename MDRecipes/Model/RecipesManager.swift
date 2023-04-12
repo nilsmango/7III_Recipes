@@ -42,29 +42,36 @@ class RecipesManager: ObservableObject {
     
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
       
-      private static var documentsFolder: URL {
-          let appIdentifier = "group.qrcoder.codes"
-          return FileManager.default.containerURL(
-              forSecurityApplicationGroupIdentifier: appIdentifier)!
-      }
-      
-      private static var timersFileURL: URL {
-          return documentsFolder.appendingPathComponent("timers.data")
-      }
-      
-      private static var trashFileURL: URL {
-          return documentsFolder.appendingPathComponent("trash.data")
-      }
+//      private static var documentsFolder: URL {
+//          let appIdentifier = "group.qrcoder.codes"
+//          return FileManager.default.containerURL(
+//              forSecurityApplicationGroupIdentifier: appIdentifier)!
+//      }
+//
+//      private static var timersFileURL: URL {
+//          return documentsFolder.appendingPathComponent("timers.data")
+//      }
+//
+//    private static var trashFileURL: URL {
+//        return documentsFolder.appendingPathComponent("trash.data")
+//    }
+          
+    
+    
       
       
       
       func saveTimersAndTrashToDisk() {
+          // New file URL to save the trash and timers to the same spot as the rest.
+          let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
+          let trashFileURL = documentsDirectory.appendingPathComponent("trash.data")
+          
           DispatchQueue.global(qos: .background).async { [weak self] in
               guard let timers = self?.timers else { fatalError("Self out of scope!") }
               guard let data = try? JSONEncoder().encode(timers) else { fatalError("Error encoding timers data") }
               
               do {
-                  let outFile = Self.timersFileURL
+                  let outFile = timersFileURL
                   try data.write(to: outFile)
               } catch {
                   fatalError("Couldn't write to file")
@@ -74,7 +81,7 @@ class RecipesManager: ObservableObject {
               guard let trashData = try? JSONEncoder().encode(trash) else { fatalError("Error encoding trash data") }
               
               do {
-                  let outFile = Self.trashFileURL
+                  let outFile = trashFileURL
                   try trashData.write(to: outFile)
               } catch {
                   fatalError("Couldn't write to file")
@@ -83,8 +90,12 @@ class RecipesManager: ObservableObject {
       }
           
       func loadTimersAndTrashFromDisk() {
+          // New file URL to save the trash and timers to the same spot as the rest.
+          let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
+          let trashFileURL = documentsDirectory.appendingPathComponent("trash.data")
+          
           DispatchQueue.global(qos: .background).async { [weak self] in
-              guard let timersData = try? Data(contentsOf: Self.timersFileURL) else {
+              guard let timersData = try? Data(contentsOf: timersFileURL) else {
                   return
               }
               guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: timersData) else {
@@ -102,7 +113,7 @@ class RecipesManager: ObservableObject {
                   }
               }
               
-              guard let trashData = try? Data(contentsOf: Self.trashFileURL) else {
+              guard let trashData = try? Data(contentsOf: trashFileURL) else {
                   return
               }
               guard let jsonTrash = try? JSONDecoder().decode([Recipe].self, from: trashData) else {
@@ -119,22 +130,33 @@ class RecipesManager: ObservableObject {
             }
     
     // MARK: TRASH
+    // The trash gets written to a json file like the timers. Above.
     
     @Published var trash = [Recipe]()
     
-    /// remove all recipes from the trash that have been in here more than 60 days
+    /// remove all recipes from the trash that have been in here more than 60 days, also delete the images from the recipe from disk
     private func updateTrash() {
         let calendar = Calendar.current
         let currentDate = Date.now
         let daysAgo = -60
         let cutOffDate = calendar.date(byAdding: .day, value: daysAgo, to: currentDate)!
         
+        // delete the images
+        let filesWillBeRemoved = trash.filter { $0.updated < cutOffDate }
+        
+        for file in filesWillBeRemoved {
+            for image in file.images {
+                deleteImage(imagePath: image.imagePath)
+            }
+        }
+        
+        // filtering to only keep the younger than 60 days recipes
         trash = trash.filter { $0.updated >= cutOffDate }
         
     }
     
     
-    
+    // TODO: save the trash array Recipes to the filemanager + Recipe Trash, + loadTrash from there as well.
     
     // MARK: RECIPES
     
@@ -252,8 +274,29 @@ class RecipesManager: ObservableObject {
         if recipe.title != data.title {
             deleteMarkdownFile(recipeTitle: recipe.title)
         }
+        
         // update recipe in the recipes array
-        recipes[index].update(from: data)
+        let newRecipe = Recipe(title: data.title,
+                               source: data.source,
+                               categories: data.categories,
+                               tags: data.tags,
+                               rating: data.rating,
+                               prepTime: data.prepTime,
+                               cookTime: data.cookTime,
+                               additionalTime: data.additionalTime,
+                               totalTime: data.totalTime,
+                               servings: data.servings,
+                               timesCooked: data.timesCooked,
+                               ingredients: data.ingredients,
+                               directions: Parser.reParsingDirections(directions: data.directions), // re-parsing directions to find all the new timer from edits in the list.
+                               nutrition: data.nutrition,
+                               notes: data.notes,
+                               images: updatingCleaningAndParsingImages(oldImages: data.oldImages, newImages: data.dataImages, recipeTitle: data.title),
+                               date: data.date,
+                               updated: Date.now,
+                               language: data.language)
+        
+        recipes[index] = newRecipe
         
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
@@ -300,10 +343,10 @@ class RecipesManager: ObservableObject {
     /// Updating, cleaning up the images in both Recipe and on disk
     private func updatingCleaningAndParsingImages(oldImages: [RecipeImage], newImages: [RecipeImageData], recipeTitle: String) -> [RecipeImage] {
         // check if there are any new images in the newImages
-        let newImages = newImages.filter( { $0.isOldImage == false })
+        let newImagesInNew = newImages.filter( { $0.isOldImage == false })
         // if there are no new images we simply return the newImages converted to RecipeImages
         var recipeImages = [RecipeImage]()
-        if newImages.count < 1 {
+        if newImagesInNew.count < 1 {
             for image in newImages {
                 // using the old image path, but the maybe new caption
                 if let oldRecipeImage = oldImages.first(where: { $0.id == image.id }) {
@@ -318,12 +361,35 @@ class RecipesManager: ObservableObject {
                 } else {
                     // safe the image and create the path
                     recipeImages.append(saveImage(image: image.image, caption: image.caption, recipeName: recipeTitle))
-                    
                 }
             }
         }
+        
+        // find all the old images that are missing in the new images and remove them from disk
+        let oldImagesInTheNewImages = newImages.filter { $0.isOldImage == true }
+        if oldImages.count != oldImagesInTheNewImages.count {
+            for image in oldImages {
+                if oldImagesInTheNewImages.first(where: { $0.id == image.id }) == nil {
+                    deleteImage(imagePath: image.imagePath)
+                }
+            }
+        }
+        
         return recipeImages
     }
+    
+    
+    /// Deleting an image from disk
+    private func deleteImage(imagePath: String) {
+        let url = URL(fileURLWithPath: imagePath)
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            print("Error deleting Markdown file for recipe with name \(imagePath): \(error.localizedDescription)")
+        }
+        
+    }
+    
     
     /// Saving a images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
@@ -335,29 +401,25 @@ class RecipesManager: ObservableObject {
             } catch {
                 print("Error creating RecipePhotos directory: \(error.localizedDescription)")
             }
-        var sanitizedCaptionReduced = String(Parser.sanitizeFileName(caption).prefix(4)) + String(Int.random(in: 10...99))
         
+        let sanitizedCaptionReduced = String(Parser.sanitizeFileName(caption).prefix(4)) + String(Int.random(in: 10...99))
+        let cleanRecipeName = recipeName.replacingOccurrences(of: " ", with: "-")
             // Save each selected image to the RecipePhotos directory
         if let data = image.pngData() {
-            let fileName = "\(recipeName)-\(sanitizedCaptionReduced).png"
+            let fileName = "\(cleanRecipeName)-\(sanitizedCaptionReduced).png"
             let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
             
             do {
                 try data.write(to: fileURL)
-                print("Image saved to: \(fileURL)")
+                print("Image saved to: \(fileURL.path()), with caption: \(caption)")
             } catch {
                 print("Error saving image: \(error.localizedDescription)")
             }
-            return RecipeImage(imagePath: "\(fileURL)", caption: caption)
+            return RecipeImage(imagePath: "\(fileURL.path())", caption: caption)
         }
                return RecipeImage(imagePath: "Couldn't save image", caption: caption)
             }
        
-    
-    
-    
-    
-    
     
     /// restore recipe from trash
     func restoreRecipe(recipe: Recipe) {

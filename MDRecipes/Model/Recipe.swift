@@ -103,32 +103,5 @@ extension Recipe {
         return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, oldImages: images, dataImages: images.map( { RecipeImageData(image: UIImage(contentsOfFile: $0.imagePath) ?? UIImage(systemName: "photo")!, caption: $0.caption, isOldImage: true, id: $0.id)  }), date: date, updated: updated, language: language)
     }
     
-    // updating the recipe from the edit
-    mutating func update(from data: Data) {
-        title = data.title
-        source = data.source
-        categories = data.categories
-        tags = data.tags
-        rating = data.rating
-        prepTime = data.prepTime
-        cookTime = data.cookTime
-        additionalTime = data.additionalTime
-        totalTime = data.totalTime
-        servings = data.servings
-        timesCooked = data.timesCooked
-        ingredients = data.ingredients
-        // re-parsing directions because we need to find all the timers created from edits.
-        directions = Parser.reParsingDirections(directions: data.directions)
-        nutrition = data.nutrition
-        notes = data.notes
-        
-        // TODO: add the new selectedImages and captions use images to finde which one already are with a path and saved. the rest of dataImages need to get parsed and saved on disk. (pretty sure not here, check how we do it in recipeView and RecipesListView)
-        images = []
-        
-        
-        
-        date = data.date
-        updated = Date.now
-        language = data.language
-    }
+   
 }

@@ -51,6 +51,7 @@ struct HomeView: View {
                         Text("New Recipe Button auch irgendwo hier unten, als erstes!(?)")
                         Text("Alles wie in erinnerungen app")
                         NavigationLink("Trash", destination: TrashList(fileManager: fileManager))
+                        
                     }
                 }
                 

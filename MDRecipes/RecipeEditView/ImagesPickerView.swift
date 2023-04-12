@@ -24,7 +24,6 @@ struct ImagesPickerView: View {
 
         Section("Images") {
             
-            // Images TODO: check how cam works after taking image and then selecting photos, because of the removeAll
             ForEach(dataImages) { image in
                 ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
             }
