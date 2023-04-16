@@ -11,7 +11,6 @@
 		782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9E629CE2F0E00EC23FC /* Recipe.swift */; };
 		782AB9ED29CE39C800EC23FC /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9EC29CE39C800EC23FC /* Direction.swift */; };
 		782C65C829D56FFF00A95C18 /* IngredientsEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65C729D56FFF00A95C18 /* IngredientsEditView.swift */; };
-		782C65CE29D5746100A95C18 /* RecipeRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65CD29D5746100A95C18 /* RecipeRatingView.swift */; };
 		782C65D029D5762600A95C18 /* HeadSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65CF29D5762600A95C18 /* HeadSectionView.swift */; };
 		782C65D229D58B0A00A95C18 /* ServingsCookedEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65D129D58B0A00A95C18 /* ServingsCookedEditView.swift */; };
 		782C65D729D6003200A95C18 /* IngredientEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782C65D629D6003200A95C18 /* IngredientEditView.swift */; };
@@ -62,6 +61,8 @@
 		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
 		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
 		78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D1520729D827990023DB08 /* DirectionTimerView.swift */; };
+		78D6D1B029E84A3F004FED05 /* SimpleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D1AF29E84A3F004FED05 /* SimpleListView.swift */; };
+		78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */; };
 		78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DCB73629D1B53B00D02A2C /* RecipeView.swift */; };
 		78F0A94D29D1EF0A00E59F56 /* String+Pluralize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */; };
 		78F0A94F29D1EF3D00E59F56 /* Inflector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94E29D1EF3D00E59F56 /* Inflector.swift */; };
@@ -83,7 +84,6 @@
 		782AB9E629CE2F0E00EC23FC /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		782AB9EC29CE39C800EC23FC /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		782C65C729D56FFF00A95C18 /* IngredientsEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientsEditView.swift; sourceTree = "<group>"; };
-		782C65CD29D5746100A95C18 /* RecipeRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRatingView.swift; sourceTree = "<group>"; };
 		782C65CF29D5762600A95C18 /* HeadSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadSectionView.swift; sourceTree = "<group>"; };
 		782C65D129D58B0A00A95C18 /* ServingsCookedEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServingsCookedEditView.swift; sourceTree = "<group>"; };
 		782C65D629D6003200A95C18 /* IngredientEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientEditView.swift; sourceTree = "<group>"; };
@@ -137,6 +137,8 @@
 		786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTimerView.swift; sourceTree = "<group>"; };
 		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
 		78D1520729D827990023DB08 /* DirectionTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimerView.swift; sourceTree = "<group>"; };
+		78D6D1AF29E84A3F004FED05 /* SimpleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleListView.swift; sourceTree = "<group>"; };
+		78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRatingEditView.swift; sourceTree = "<group>"; };
 		78DCB73629D1B53B00D02A2C /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
 		78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Pluralize.swift"; sourceTree = "<group>"; };
 		78F0A94E29D1EF3D00E59F56 /* Inflector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inflector.swift; sourceTree = "<group>"; };
@@ -193,7 +195,7 @@
 				78F0A95029D21DC500E59F56 /* DirectionView.swift */,
 				782C65DE29D7501800A95C18 /* ServingsView.swift */,
 				782C65CF29D5762600A95C18 /* HeadSectionView.swift */,
-				782C65CD29D5746100A95C18 /* RecipeRatingView.swift */,
+				78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */,
 				786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */,
 				78F3186929E6A24500DE31BE /* RecipeImageView.swift */,
 			);
@@ -204,6 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				786F9A0B29C8E0C000CAA48B /* HomeView.swift */,
+				78D6D1AF29E84A3F004FED05 /* SimpleListView.swift */,
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782C65DC29D7333600A95C18 /* FlexiStringsView.swift */,
 			);
@@ -471,7 +474,9 @@
 				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				783B4B8829E0073B00551888 /* SegmentView.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
+				78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */,
 				78623AD929DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift in Sources */,
+				78D6D1B029E84A3F004FED05 /* SimpleListView.swift in Sources */,
 				786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */,
 				78F553D429D48812001C9F56 /* LanguagePickerView.swift in Sources */,
 				786F9A1829CAE74D00CAA48B /* Parser.swift in Sources */,
@@ -496,7 +501,6 @@
 				78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */,
 				783B4B8C29E04CD100551888 /* SegmentStackView.swift in Sources */,
 				782EB6C329C460800086D2E7 /* RecipeViewTryOne.swift in Sources */,
-				782C65CE29D5746100A95C18 /* RecipeRatingView.swift in Sources */,
 				78623AD429D9AFC700B9CF65 /* TrashList.swift in Sources */,
 				786F9A0C29C8E0C000CAA48B /* HomeView.swift in Sources */,
 			);

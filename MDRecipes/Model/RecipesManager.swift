@@ -42,25 +42,7 @@ class RecipesManager: ObservableObject {
     
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
       
-//      private static var documentsFolder: URL {
-//          let appIdentifier = "group.qrcoder.codes"
-//          return FileManager.default.containerURL(
-//              forSecurityApplicationGroupIdentifier: appIdentifier)!
-//      }
-//
-//      private static var timersFileURL: URL {
-//          return documentsFolder.appendingPathComponent("timers.data")
-//      }
-//
-//    private static var trashFileURL: URL {
-//        return documentsFolder.appendingPathComponent("trash.data")
-//    }
-          
-    
-    
-      
-      
-      
+
       func saveTimersAndTrashToDisk() {
           // New file URL to save the trash and timers to the same spot as the rest.
           let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
@@ -262,7 +244,6 @@ class RecipesManager: ObservableObject {
         
     }
     
-    
     /// update an edited recipe
     func updateEditedRecipe(recipe: Recipe, data: Recipe.Data) {
         
@@ -270,13 +251,8 @@ class RecipesManager: ObservableObject {
             fatalError("Couldn't find recipe index in array")
         }
         
-        // check if title was changed, delete markdown file if it was
-        if recipe.title != data.title {
-            deleteMarkdownFile(recipeTitle: recipe.title)
-        }
-        
         // update recipe in the recipes array
-        let newRecipe = Recipe(title: data.title,
+        let newRecipeData = Recipe.Data(title: data.title,
                                source: data.source,
                                categories: data.categories,
                                tags: data.tags,
@@ -291,18 +267,25 @@ class RecipesManager: ObservableObject {
                                directions: Parser.reParsingDirections(directions: data.directions), // re-parsing directions to find all the new timer from edits in the list.
                                nutrition: data.nutrition,
                                notes: data.notes,
-                               images: updatingCleaningAndParsingImages(oldImages: data.oldImages, newImages: data.dataImages, recipeTitle: data.title),
+                               oldImages: updatingCleaningAndParsingImages(oldImages: data.oldImages, newImages: data.dataImages, recipeTitle: data.title),
                                date: data.date,
                                updated: Date.now,
                                language: data.language)
         
-        recipes[index] = newRecipe
+        recipes[index].update(from: newRecipeData)
+        
+        // check if title was changed, delete markdown file if it was
+        if recipe.title != data.title {
+            deleteMarkdownFile(recipeTitle: recipe.title)
+        }
+        
         
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
         
         // update our timers
         loadTimers(for: recipes[index])
+        
     }
     
     
@@ -346,7 +329,7 @@ class RecipesManager: ObservableObject {
         let newImagesInNew = newImages.filter( { $0.isOldImage == false })
         // if there are no new images we simply return the newImages converted to RecipeImages
         var recipeImages = [RecipeImage]()
-        if newImagesInNew.count < 1 {
+        if newImagesInNew.count == 0 {
             for image in newImages {
                 // using the old image path, but the maybe new caption
                 if let oldRecipeImage = oldImages.first(where: { $0.id == image.id }) {

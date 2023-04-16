@@ -52,6 +52,8 @@ struct HomeView: View {
                         Text("Alles wie in erinnerungen app")
                         NavigationLink("Trash", destination: TrashList(fileManager: fileManager))
                         
+                        SimpleListView(recipesManager: fileManager)
+                        
                     }
                 }
                 

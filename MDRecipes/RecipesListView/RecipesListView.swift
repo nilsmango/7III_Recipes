@@ -26,7 +26,7 @@ struct RecipesListView: View {
     
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
                     NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
@@ -250,7 +250,7 @@ struct RecipesListView: View {
                 }
             })
         }
-    }
+//    }
 }
 
 

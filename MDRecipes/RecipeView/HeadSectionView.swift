@@ -12,7 +12,6 @@ struct HeadSectionView: View {
     
     @ObservedObject var fileManager: RecipesManager
     
-    @Binding var rating: Int
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -27,8 +26,7 @@ struct HeadSectionView: View {
             }
             HStack {
                 Text("Rating:")
-                RecipeRatingView(rating: $rating, recipe: recipe, fileManager: fileManager)
-            
+                RecipeRatingEditView(recipe: recipe, fileManager: fileManager)
             }
             
             if recipe.prepTime != "" {
@@ -66,6 +64,6 @@ struct HeadSectionView: View {
 
 struct HeadSectionView_Previews: PreviewProvider {
     static var previews: some View {
-        HeadSectionView(recipe: Recipe.sampleData[0], fileManager: RecipesManager(), rating: .constant(3))
+        HeadSectionView(recipe: Recipe.sampleData[0], fileManager: RecipesManager())
     }
 }

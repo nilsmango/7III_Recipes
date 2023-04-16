@@ -103,5 +103,26 @@ extension Recipe {
         return Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, oldImages: images, dataImages: images.map( { RecipeImageData(image: UIImage(contentsOfFile: $0.imagePath) ?? UIImage(systemName: "photo")!, caption: $0.caption, isOldImage: true, id: $0.id)  }), date: date, updated: updated, language: language)
     }
     
-   
+    mutating func update(from data: Data) {
+        title = data.title
+        source = data.source
+        categories = data.categories
+        tags = data.tags
+        rating = data.rating
+        prepTime = data.prepTime
+        cookTime = data.cookTime
+        additionalTime = data.additionalTime
+        totalTime = data.totalTime
+        servings = data.servings
+        timesCooked = data.timesCooked
+        ingredients = data.ingredients
+        directions = data.directions
+        nutrition = data.nutrition
+        notes = data.notes
+        images = data.oldImages
+        language = data.language
+        date = data.date
+        updated = data.updated
+    }
 }
+

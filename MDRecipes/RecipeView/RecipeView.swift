@@ -21,38 +21,22 @@ struct RecipeView: View {
     @State private var counter = 0
     private let numberArray = [5, 70, 20]
     
-    // notes
-    @State private var note = ""
-    @State private var saveNotes = false
     
-    // rating
-    @State private var rating = 1
     
     // edit view
     @State private var editViewIsPresented = false
     // edit view data
     @State private var data: Recipe.Data = Recipe.Data()
     
+   
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             ZStack {
                 List {
                     Section {
-                        HeadSectionView(recipe: recipe, fileManager: fileManager, rating: $rating)
-                            .onAppear {
-                                
-                                // loading the rating
-                                rating = Int(String(recipe.rating.first ?? Character("1"))) ?? 1
-                                // loading the notes
-                                note = recipe.notes
-                            }
-                            .onDisappear {
-                                
-                                if saveNotes {
-                                    fileManager.updateNoteSection(of: recipe, to: note)
-                                }
-                            }
+                        HeadSectionView(recipe: recipe, fileManager: fileManager)
+                            
                     }
                     
                     Section("Servings") {
@@ -87,7 +71,7 @@ struct RecipeView: View {
                         Text(recipe.timesCooked == 1 ? "You have cooked this meal 1 time." : "You have cooked this meal \(recipe.timesCooked) times.")
                         HStack {
                             Text("Update Rating:")
-                            RecipeRatingView(rating: $rating, recipe: recipe, fileManager: fileManager)
+                            RecipeRatingEditView(recipe: recipe, fileManager: fileManager)
                                 
                         }
                     }
@@ -100,19 +84,19 @@ struct RecipeView: View {
                     
                     
                     Section("Notes") {
-                        ZStack(alignment: .leading) {
-                            TextEditor(text: $note)
-                            Text(note)
-                                .opacity(0)
-                                .padding(.vertical, 8)
+                        if recipe.notes != "" {
+                            Text(recipe.notes)
                         }
                         
+                        Button {
+                            // open a small window with the notes.
+                            // maybe I can use this? fileManager.updateNoteSection(of: recipe, to: note)
+                        } label: {
+                            Label("Add notes", systemImage: "square.and.pencil")
+                        }
+                        .buttonStyle(.bordered)
+                        
                     }
-                    
-                    .onChange(of: note) { _ in
-                        saveNotes = true
-                    }
-                    
                     
                     if recipe.images.count > 0 {
                         Section("Images") {
@@ -167,6 +151,7 @@ struct RecipeView: View {
                 }
             }
             
+            
             .sheet(isPresented: $editViewIsPresented) {
                 NavigationView {
                     RecipeEditView(recipeData: $data, fileManager: fileManager)
@@ -183,8 +168,6 @@ struct RecipeView: View {
                                     editViewIsPresented = false
                                     
                                     fileManager.updateEditedRecipe(recipe: recipe, data: data)
-                                    
-                                    data = Recipe.Data()
                                 }
                             }
                         }
@@ -194,7 +177,7 @@ struct RecipeView: View {
         
         
         
-    }
+//    }
 }
 
 struct RecipeView_Previews: PreviewProvider {

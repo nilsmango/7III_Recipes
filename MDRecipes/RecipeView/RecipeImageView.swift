@@ -18,6 +18,9 @@ struct RecipeImageView: View {
                             .aspectRatio(contentMode: .fit)
                     } else {
                         Text("Error loading image")
+                            .onAppear {
+                                print(imagePath)
+                            }
                     }
             Text(caption)
         }
