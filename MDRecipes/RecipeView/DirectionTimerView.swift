@@ -19,7 +19,6 @@ struct DirectionTimerView: View {
     @Binding var timer: DirectionTimer
     
     
-    
     // Step done indicator.
     @State private var done = false
     
@@ -50,8 +49,10 @@ struct DirectionTimerView: View {
 
                 if done == false && timer.timerInMinutes > 0.9 {
                         Button(action: {
-                            
-                                timer.running.toggle()
+                            // make target date
+                            timer.targetDate = Date(timeIntervalSinceNow: TimeInterval(timer.timerInMinutes * 60))
+                            // TODO: schedule a notification for the date. Get the timer to stop at the date as well.
+                            timer.running.toggle()
                             
                             
                         }) {
