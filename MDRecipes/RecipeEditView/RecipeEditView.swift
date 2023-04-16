@@ -61,22 +61,22 @@ struct RecipeEditView: View {
                         
                         HStack {
                             Text("Prep time:")
-                            TextField("Time Unit", text: $recipeData.prepTime)
+                            TextField("20 Minutes", text: $recipeData.prepTime)
                         }
                         
                         HStack {
                             Text("Cook time:")
-                            TextField("Time Unit", text: $recipeData.cookTime)
+                            TextField("1 h", text: $recipeData.cookTime)
                         }
                         
                         HStack {
                             Text("Additional time:")
-                            TextField("Time Unit", text: $recipeData.additionalTime)
+                            TextField("1 h 20 min", text: $recipeData.additionalTime)
                         }
                         
                         HStack {
                             Text("Total time:")
-                            TextField("Time Unit", text: $recipeData.totalTime)
+                            TextField("140 min", text: $recipeData.totalTime)
                         }
                     }
                     

@@ -84,17 +84,7 @@ struct RecipeView: View {
                     
                     
                     Section("Notes") {
-                        if recipe.notes != "" {
-                            Text(recipe.notes)
-                        }
-                        
-                        Button {
-                            // open a small window with the notes.
-                            // maybe I can use this? fileManager.updateNoteSection(of: recipe, to: note)
-                        } label: {
-                            Label("Add notes", systemImage: "square.and.pencil")
-                        }
-                        .buttonStyle(.bordered)
+                        NotesView(recipe: recipe, fileManager: fileManager)
                         
                     }
                     
