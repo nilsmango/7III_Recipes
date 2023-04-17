@@ -25,8 +25,10 @@ struct TimerButtonView: View {
         }) {
             Image(systemName: "timer")
             if dirTimer.running == .running {
-//                Text(timer.targetDate, style: .timer)
-                Text(dateToDateFormatted(from: currentDate, to: dirTimer.targetDate))
+                if dirTimer.stepName != "" {
+                    
+                }
+                Text((dirTimer.stepName != "" ? dirTimer.stepName : "Step " + String(dirTimer.step)) + ": "  + dateToDateFormatted(from: currentDate, to: dirTimer.targetDate))
                     .monospacedDigit()
                     .onAppear {
                         if currentDate >= dirTimer.targetDate {
@@ -43,12 +45,8 @@ struct TimerButtonView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                 numberOfShakes = 0
                             }
-                            
-                            
-                            
                         }
                     }
-                    
                     
             } else if dirTimer.running == .stopped {
                 if dirTimer.timerInMinutes > 0.99 {
@@ -58,7 +56,7 @@ struct TimerButtonView: View {
                 }
                 
             } else {
-                Text("0:00")
+                Text((dirTimer.stepName != "" ? dirTimer.stepName : "Step " + String(dirTimer.step)) + ": 0:00")
                     .monospacedDigit()
             }
         }
@@ -71,6 +69,6 @@ struct TimerButtonView: View {
 
 struct TimerButtonView_Previews: PreviewProvider {
     static var previews: some View {
-        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 67), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
+        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
     }
 }
