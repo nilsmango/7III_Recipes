@@ -23,7 +23,7 @@ class RecipesManager: ObservableObject {
                 timers.remove(at: index)
             }
             if direction.hasTimer {
-                timers.append(DirectionTimer(targetDate: Date.now, timerInMinutes: direction.timerInMinutes, recipeTitle: recipe.title, step: direction.step, running: false, id: direction.id))
+                timers.append(DirectionTimer(targetDate: Date.now, timerInMinutes: direction.timerInMinutes, recipeTitle: recipe.title, step: direction.step, running: .stopped, id: direction.id))
             }
         }
     }
@@ -41,8 +41,6 @@ class RecipesManager: ObservableObject {
     
     
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
-      
-
       func saveTimersAndTrashToDisk() {
           // New file URL to save the trash and timers to the same spot as the rest.
           let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
@@ -89,7 +87,7 @@ class RecipesManager: ObservableObject {
                   for timer in self!.timers {
                       if timer.targetDate < Date.now {
                           if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
-                              self!.timers[index].running = false
+                              self!.timers[index].running = .stopped
                           }
                       }
                   }
@@ -110,6 +108,52 @@ class RecipesManager: ObservableObject {
                 // update the trash
                 updateTrash()
             }
+    
+    
+    
+    /// starting or stoping a timer
+    /// starts and stops notification of timer and timer itself
+    func toggleTimer(timer: DirectionTimer) {
+        if let index = timers.firstIndex(where: { $0.id == timer.id }) {
+            if timer.running == .running {
+                // stop timer
+                timers[index].running = .stopped
+                // remove notification for this timer
+                
+                
+            } else if timer.running == .stopped {
+                // start timer
+                timers[index].targetDate = Date(timeIntervalSinceNow: TimeInterval(timer.timerInMinutes * 60))
+                timers[index].running = .running
+                // add a notification for this timer
+
+            } else if timer.running == .alarm {
+                timers[index].running = .stopped
+            }
+            
+            
+        } else {
+            print("Couldn't find timer")
+        }
+    }
+    
+    func alarm(for timer: DirectionTimer) {
+        if let index = timers.firstIndex(where: { $0.id == timer.id }) {
+            timers[index].running = .alarm
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                if self.timers[index].running == .alarm {
+                    self.timers[index].running = .stopped
+                }
+                
+            }
+        } else {
+            print("Couldn't find timer")
+        }
+    }
+    
+    
+    
     
     // MARK: TRASH
     // The trash gets written to a json file like the timers. Above.

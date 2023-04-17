@@ -53,7 +53,7 @@ struct RecipeView: View {
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
                             if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
-                                DirectionTimerView(fileManager: fileManager, direction: direction, recipe: recipe, timer: $fileManager.timers[timerManagerIndex])
+                                DirectionTimerView(fileManager: fileManager, direction: direction, recipe: recipe, timer: fileManager.timers[timerManagerIndex])
                             } else {
                                 DirectionView(fileManager: fileManager, direction: direction, recipe: recipe)
                             }

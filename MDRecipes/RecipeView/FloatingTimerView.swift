@@ -10,10 +10,10 @@ import SwiftUI
 struct FloatingTimerView: View {
     var targetDate: Date
     var step: Int
-    var running: Bool
+    var running: TimerStatus
     
     var body: some View {
-        if running {
+        if running == .running {
            
                     HStack {
                         Image(systemName: "timer")
@@ -32,6 +32,6 @@ struct FloatingTimerView: View {
 
 struct FloatingTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        FloatingTimerView(targetDate: Date.now.addingTimeInterval(4), step: 4, running: true)
+        FloatingTimerView(targetDate: Date.now.addingTimeInterval(4), step: 4, running: .running)
     }
 }

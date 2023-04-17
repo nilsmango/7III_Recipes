@@ -16,7 +16,7 @@ struct DirectionTimerView: View {
     var direction: Direction
     var recipe: Recipe
     
-    @Binding var timer: DirectionTimer
+    var timer: DirectionTimer
     
     
     // Step done indicator.
@@ -47,26 +47,8 @@ struct DirectionTimerView: View {
                         showDirectionsEdit = true
                     }
 
-                if done == false && timer.timerInMinutes > 0.9 {
-                        Button(action: {
-                            // make target date
-                            timer.targetDate = Date(timeIntervalSinceNow: TimeInterval(timer.timerInMinutes * 60))
-                            // TODO: schedule a notification for the date. Get the timer to stop at the date as well.
-                            timer.running.toggle()
-                            
-                            
-                        }) {
-                            Image(systemName: "timer")
-                            if timer.running {
-                                Text(timer.targetDate, style: .timer)
-                                    .monospacedDigit()
-                            } else {
-                                Text("\(Int(timer.timerInMinutes)) min")
-                            }
-                        }
-                        .foregroundColor(.white)
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue)
+                if done == false {
+                        TimerButtonView(fileManager: fileManager, dirTimer: timer)
                     }
                 }
         }
@@ -105,7 +87,7 @@ struct DirectionTimerView: View {
 
 struct DirectionTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        DirectionTimerView(fileManager: RecipesManager() ,direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), recipe: RecipesManager().recipes.first!, timer: .constant(DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: true, id: UUID())))
+        DirectionTimerView(fileManager: RecipesManager() ,direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), recipe: RecipesManager().recipes.first!, timer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
     }
 }
 
