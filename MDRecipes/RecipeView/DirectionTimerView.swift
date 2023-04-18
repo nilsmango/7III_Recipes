@@ -11,8 +11,6 @@ import SwiftUI
 
 struct DirectionTimerView: View {
     @ObservedObject var fileManager: RecipesManager
-    @ObservedObject var delegate: NotificationDelegate
-//    @ObservedObject var timerManager: TimerManager
     
     var direction: Direction
     var recipe: Recipe
@@ -49,7 +47,7 @@ struct DirectionTimerView: View {
                     }
 
                 if done == false {
-                    TimerButtonView(fileManager: fileManager, dirTimer: timer, delegate: delegate)
+                    TimerButtonView(fileManager: fileManager, dirTimer: timer)
                     }
                 }
         }
@@ -88,7 +86,7 @@ struct DirectionTimerView: View {
 
 struct DirectionTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        DirectionTimerView(fileManager: RecipesManager(), delegate: NotificationDelegate() ,direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), recipe: RecipesManager().recipes.first!, timer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
+        DirectionTimerView(fileManager: RecipesManager(),direction: Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2), recipe: RecipesManager().recipes.first!, timer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
     }
 }
 

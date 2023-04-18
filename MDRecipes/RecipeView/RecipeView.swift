@@ -11,7 +11,6 @@ struct RecipeView: View {
     @Environment(\.dismiss) var dismiss
     
     @ObservedObject var fileManager: RecipesManager
-    @ObservedObject var delegate: NotificationDelegate
     
     var recipe: Recipe
     
@@ -54,7 +53,7 @@ struct RecipeView: View {
                     Section("Directions") {
                         ForEach(recipe.directions) { direction in
                             if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
-                                DirectionTimerView(fileManager: fileManager, delegate: delegate, direction: direction, recipe: recipe, timer: fileManager.timers[timerManagerIndex])
+                                DirectionTimerView(fileManager: fileManager, direction: direction, recipe: recipe, timer: fileManager.timers[timerManagerIndex])
                             } else {
                                 DirectionView(fileManager: fileManager, direction: direction, recipe: recipe)
                             }
@@ -145,7 +144,7 @@ struct RecipeView: View {
             
             .sheet(isPresented: $editViewIsPresented) {
                 NavigationView {
-                    RecipeEditView(recipeData: $data, fileManager: fileManager, delegate: delegate)
+                    RecipeEditView(recipeData: $data, fileManager: fileManager)
                         .navigationTitle("Edit Recipe")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
@@ -173,6 +172,6 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(fileManager: RecipesManager(), delegate: NotificationDelegate(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe)
+        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe)
     }
 }

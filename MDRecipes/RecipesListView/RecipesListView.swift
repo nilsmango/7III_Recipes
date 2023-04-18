@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RecipesListView: View {
     @ObservedObject var fileManager: RecipesManager
-    @ObservedObject var delegate: NotificationDelegate
     
     @State private var editMode: EditMode = .inactive
     
@@ -30,7 +29,7 @@ struct RecipesListView: View {
 //        NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(fileManager: fileManager, delegate: delegate, recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager,recipe: recipe)) {
                         // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }
@@ -124,7 +123,7 @@ struct RecipesListView: View {
             }
             .fullScreenCover(isPresented: $editViewPresented, content: {
                 NavigationView {
-                    RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager, delegate: delegate)
+                    RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager)
                         .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -187,7 +186,7 @@ struct RecipesListView: View {
             })
             .fullScreenCover(isPresented: $importViewPresented, content: {
                 NavigationView {
-                    ImportView(fileManager: fileManager, delegate: delegate, recipeData: $newRecipeData, saveDisabled: $saveDisabled)
+                    ImportView(fileManager: fileManager, recipeData: $newRecipeData, saveDisabled: $saveDisabled)
                         .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -260,6 +259,6 @@ struct RecipesListView_Previews: PreviewProvider {
         let fileManager = RecipesManager()
         fileManager.recipes = Recipe.sampleData
         
-        return RecipesListView(fileManager: fileManager, delegate: NotificationDelegate(), category: "Main Course")
+        return RecipesListView(fileManager: fileManager, category: "Main Course")
     }
 }

@@ -1318,7 +1318,7 @@ struct Parser {
     private static func findImages(in lines: [String]) -> (images: [RecipeImage], indexes: [Int]?) {
         if let imagesIndex = lines.firstIndex(where: { $0 == "## Images" || $0 == "## Bilder"}) {
             let imageLines = lines[imagesIndex+1..<lines.count]
-            var imagesString = imageLines.joined(separator: "\n")
+            let imagesString = imageLines.joined(separator: "\n")
             let images = extractImages(from: imagesString)
             
             return (images, Array(imagesIndex+1..<lines.count))

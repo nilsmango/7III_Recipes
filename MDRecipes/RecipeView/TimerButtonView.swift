@@ -18,9 +18,7 @@ struct TimerButtonView: View {
     
     @State var numberOfShakes: CGFloat = 0
     
-    // in-App notification
-    @ObservedObject var delegate: NotificationDelegate
-    
+    // Notifications
     private let notificationCenter = UNUserNotificationCenter.current()
     
     var body: some View {
@@ -69,8 +67,8 @@ struct TimerButtonView: View {
                         currentDate = input
                         if currentDate >= dirTimer.targetDate {
                             fileManager.alarm(for: dirTimer)
-                            withAnimation(.linear(duration: 5)) {
-                                numberOfShakes = 40
+                            withAnimation(.linear(duration: 4)) {
+                                numberOfShakes = 35
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                 numberOfShakes = 0
@@ -102,13 +100,13 @@ struct TimerButtonView: View {
                             print(error.localizedDescription)
                         }
                     }
-                    notificationCenter.delegate = delegate
+                    notificationCenter.delegate = fileManager
         }
     }
 }
 
 struct TimerButtonView_Previews: PreviewProvider {
     static var previews: some View {
-        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()), delegate: NotificationDelegate())
+        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .running, id: UUID()))
     }
 }

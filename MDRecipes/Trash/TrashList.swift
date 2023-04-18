@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TrashList: View {
     @ObservedObject var fileManager: RecipesManager
-    @ObservedObject var delegate: NotificationDelegate
     
     let calendar = Calendar.current
     
@@ -37,6 +36,6 @@ struct TrashList: View {
 
 struct TrashList_Previews: PreviewProvider {
     static var previews: some View {
-        TrashList(fileManager: RecipesManager(), delegate: NotificationDelegate())
+        TrashList(fileManager: RecipesManager())
     }
 }
