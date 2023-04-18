@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {    
     @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var delegate: NotificationDelegate
     
     @State var searchText = ""
     
@@ -22,12 +23,12 @@ struct HomeView: View {
                 ScrollView {
                     VStack {
                         LazyVGrid(columns: columns) {
-                            NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
+                            NavigationLink(destination: RecipesListView(fileManager: fileManager, delegate: delegate, category: "")) {
                                 FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
                             }
                             
                             ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
+                                NavigationLink(destination: RecipesListView(fileManager: fileManager, delegate: delegate, category: category)) {
                                     FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                         
                                 }
@@ -50,7 +51,7 @@ struct HomeView: View {
                         
                         Text("New Recipe Button auch irgendwo hier unten, als erstes!(?)")
                         Text("Alles wie in erinnerungen app")
-                        NavigationLink("Trash", destination: TrashList(fileManager: fileManager))
+                        NavigationLink("Trash", destination: TrashList(fileManager: fileManager, delegate: delegate))
                         
                         
                     }
@@ -69,7 +70,7 @@ struct HomeView: View {
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, delegate: delegate, recipe: recipe)) {
                                             ListItemView(recipe: recipe)
                                         }
                                         
@@ -110,7 +111,7 @@ struct HomeView_Previews: PreviewProvider {
             let fileManager = RecipesManager()
             fileManager.recipes = Recipe.sampleData
             
-        return HomeView(fileManager: fileManager)
+        return HomeView(fileManager: fileManager, delegate: NotificationDelegate())
         }
     }
 

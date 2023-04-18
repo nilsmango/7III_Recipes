@@ -110,7 +110,7 @@ class RecipesManager: ObservableObject {
             }
     
     
-    
+   
     /// starting or stoping a timer
     /// starts and stops notification of timer and timer itself
     func toggleTimer(timer: DirectionTimer) {
@@ -118,14 +118,13 @@ class RecipesManager: ObservableObject {
             if timer.running == .running {
                 // stop timer
                 timers[index].running = .stopped
-                // remove notification for this timer
                 
                 
             } else if timer.running == .stopped {
                 // start timer
                 timers[index].targetDate = Date(timeIntervalSinceNow: TimeInterval(timer.timerInMinutes * 60))
                 timers[index].running = .running
-                // add a notification for this timer
+                
 
             } else if timer.running == .alarm {
                 timers[index].running = .stopped

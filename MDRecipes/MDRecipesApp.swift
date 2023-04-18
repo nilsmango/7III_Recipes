@@ -10,12 +10,13 @@ import SwiftUI
 @main
 struct MDRecipesApp: App {
     @StateObject private var fileManager = RecipesManager()
+    @StateObject private var delegate = NotificationDelegate()
         
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
-            HomeView(fileManager: fileManager)
+            HomeView(fileManager: fileManager, delegate: delegate)
                 .onAppear {
                     fileManager.loadMarkdownFiles()
                     // loading all the timers afresh

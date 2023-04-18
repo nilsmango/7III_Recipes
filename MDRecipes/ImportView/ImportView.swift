@@ -11,6 +11,7 @@ struct ImportView: View {
     @StateObject var importer = Importer()
     
     @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var delegate: NotificationDelegate
     
     // Segments View
     @State private var showingSheet = false
@@ -100,7 +101,7 @@ Cooking can be dangerous
             })
             
         } else {
-            RecipeEditView(recipeData: $recipeData, fileManager: fileManager)
+            RecipeEditView(recipeData: $recipeData, fileManager: fileManager, delegate: delegate)
                 
         }
                 
@@ -115,6 +116,6 @@ Cooking can be dangerous
 
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
-        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), saveDisabled: .constant(true))
+        ImportView(importer: Importer(), fileManager: RecipesManager(), delegate: NotificationDelegate(), recipeData: .constant(Recipe.sampleData[0].data), saveDisabled: .constant(true))
     }
 }

@@ -11,6 +11,7 @@ struct RecipeEditView: View {
     @Binding var recipeData: Recipe.Data
     
     @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var delegate: NotificationDelegate
     
     @State private var newIngredient = ""
     
@@ -145,7 +146,7 @@ struct RecipeEditView: View {
 
 struct RecipeEditView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager())
+        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager(), delegate: NotificationDelegate())
     }
 }
 
