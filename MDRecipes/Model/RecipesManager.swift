@@ -47,6 +47,37 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
+    func timerStepper(timer: DirectionTimer, add: Bool) {
+        if let index = timers.firstIndex(where: { $0.id == timer.id }) {
+            let stepperValue: Double
+            if add {
+                if timer.timerInMinutes >= 20 {
+                    stepperValue = 5.0
+                } else if timer.timerInMinutes >= 10 {
+                    stepperValue = 2.0
+                } else if timer.timerInMinutes >= 1 {
+                    stepperValue = 1.0
+                } else {
+                    stepperValue = 1.0 - timer.timerInMinutes
+                }
+            } else {
+                if timer.timerInMinutes >= 25 {
+                    stepperValue = -5.0
+                } else if timer.timerInMinutes >= 12 {
+                    stepperValue = -2.0
+                } else if timer.timerInMinutes >= 2 {
+                    stepperValue = -1.0
+                }   else if timer.timerInMinutes >= 0.2 {
+                        stepperValue = -10/60
+                } else {
+                    stepperValue = 0.0
+                }
+            }
+            let newTimerMinutes = timer.timerInMinutes + stepperValue
+            timers[index].timerInMinutes = newTimerMinutes
+        }
+    }
+    
     
     
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
