@@ -162,7 +162,7 @@ struct RecipeView: View {
                     
                 }
             }
-            .sheet(isPresented: $addImages) {
+            .fullScreenCover(isPresented: $addImages) {
                 NavigationView {
                     List {
                         ImagesPickerView(dataImages: $dataImages)
@@ -178,7 +178,7 @@ struct RecipeView: View {
                                 Button("Save") {
                                     addImages = false
                                     
-                                    var newRecipeData = data
+                                    var newRecipeData = recipe.data
                                     // update recipeData with new images
                                     newRecipeData.dataImages = dataImages
                                     // update recipe

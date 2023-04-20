@@ -60,6 +60,7 @@
 		786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */; };
 		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
 		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
+		78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */; };
 		78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D1520729D827990023DB08 /* DirectionTimerView.swift */; };
 		78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */; };
 		78D6D20B29EC3FDA004FED05 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20A29EC3FDA004FED05 /* NotesView.swift */; };
@@ -139,6 +140,8 @@
 		786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimer.swift; sourceTree = "<group>"; };
 		786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTimerView.swift; sourceTree = "<group>"; };
 		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
+		78C22AF229F12E8800CEA2BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButtonView.swift; sourceTree = "<group>"; };
 		78D1520729D827990023DB08 /* DirectionTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimerView.swift; sourceTree = "<group>"; };
 		78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRatingEditView.swift; sourceTree = "<group>"; };
 		78D6D20A29EC3FDA004FED05 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
@@ -186,6 +189,7 @@
 				783B4B7F29DDA7C700551888 /* DirectionsEditTextView.swift */,
 				78F553D329D48812001C9F56 /* LanguagePickerView.swift */,
 				78F3185D29E53B2000DE31BE /* ImagesPickerView.swift */,
+				78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */,
 				78F3185F29E5442B00DE31BE /* ImageDetailView.swift */,
 			);
 			path = RecipeEditView;
@@ -257,6 +261,7 @@
 		782EB6AB29C3A3A20086D2E7 /* MDRecipes */ = {
 			isa = PBXGroup;
 			children = (
+				78C22AF229F12E8800CEA2BE /* Info.plist */,
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
 				782C65D329D58F0000A95C18 /* HomeView */,
 				78623AD229D9AF6600B9CF65 /* Trash */,
@@ -501,6 +506,7 @@
 				786F9A0029C84E5C00CAA48B /* View+readSize.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
 				78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */,
+				78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */,
 				78F553D629D4B226001C9F56 /* TagsEditView.swift in Sources */,
 				783B4B8429DEB41200551888 /* QuickIngredientsEditView.swift in Sources */,
 				783B4B8A29E00DE000551888 /* RecipeSegment.swift in Sources */,
@@ -646,6 +652,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MDRecipes/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to the camera to take photos for your recipes.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -654,8 +662,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -685,6 +693,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MDRecipes/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to the camera to take photos for your recipes.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -693,8 +703,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";

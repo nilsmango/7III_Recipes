@@ -41,11 +41,8 @@ struct ImagesPickerView: View {
                         Label("Select Photos from Library", systemImage: "photo.stack")
                     }
                     
-                    Button {
-                        self.showCamera = true
-                    } label: {
-                        Label("Take a Photo", systemImage: "camera")
-                    }
+                    CameraButtonView(showCamera: $showCamera, dataImages: $dataImages)
+                    
                     .onChange(of: selectedItems) { _ in
                         Task {
                             for item in selectedItems {
@@ -58,11 +55,7 @@ struct ImagesPickerView: View {
                             selectedItems.removeAll()
                         }
                     }
-                    .sheet(isPresented: $showCamera) {
-                        ImageThingy(sourceType: .camera, completionHandler: { image in
-                            dataImages.append(RecipeImageData(image: image, caption: "", isOldImage: false))
-                        })
-                    }
+                    
                 }
         } else {
             Section("Add Images") {
@@ -70,33 +63,30 @@ struct ImagesPickerView: View {
                     Label("Select Photos from Library", systemImage: "photo.stack")
                 }
                 
-                Button {
-                    self.showCamera = true
-                } label: {
-                    Label("Take a Photo", systemImage: "camera")
-                }
-                .sheet(isPresented: $showCamera) {
-                    ImageThingy(sourceType: .camera, completionHandler: { image in
-                        dataImages.append(RecipeImageData(image: image, caption: "", isOldImage: false))
-                    })
-                }
-                .onChange(of: selectedItems) { _ in
-                    Task {
-                        for item in selectedItems {
-                            if let data = try? await item.loadTransferable(type: Data.self) {
-                                if let uiImage = UIImage(data: data) {
-                                    dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
-                                }
+                CameraButtonView(showCamera: $showCamera, dataImages: $dataImages)
+                
+            }
+            .onChange(of: selectedItems) { _ in
+                Task {
+                    for item in selectedItems {
+                        if let data = try? await item.loadTransferable(type: Data.self) {
+                            if let uiImage = UIImage(data: data) {
+                                dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
                             }
                         }
-                        selectedItems.removeAll()
                     }
+                    selectedItems.removeAll()
                 }
             }
         }
-            
+           
+    
         
     }
+    
+    
+    
+ 
    
     private func dataBinding(for image: RecipeImageData) -> Binding<RecipeImageData> {
         guard let imageIndex = dataImages.firstIndex(where:  { $0.image == image.image }) else {
@@ -106,45 +96,8 @@ struct ImagesPickerView: View {
     }
 }
 
-struct ImageThingy: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIImagePickerController
-    typealias CompletionHandler = (UIImage) -> Void
 
-    let sourceType: UIImagePickerController.SourceType
-    let completionHandler: CompletionHandler
 
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(completionHandler: completionHandler)
-    }
-
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let completionHandler: CompletionHandler
-
-        init(completionHandler: @escaping CompletionHandler) {
-            self.completionHandler = completionHandler
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                completionHandler(image)
-            }
-            picker.dismiss(animated: true, completion: nil)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true, completion: nil)
-        }
-    }
-}
 struct ImagesPickerView_Previews: PreviewProvider {
     static var previews: some View {
         List {

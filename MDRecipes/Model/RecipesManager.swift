@@ -461,17 +461,27 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
         let recipePhotosDirectory = documentsDirectory.appendingPathComponent("RecipePhotos")
             
-            // Create the RecipePhotos directory if it doesn't exist
-            do {
-                try FileManager.default.createDirectory(at: recipePhotosDirectory, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print("Error creating RecipePhotos directory: \(error.localizedDescription)")
-            }
+        // Create the RecipePhotos directory if it doesn't exist
+        do {
+            try FileManager.default.createDirectory(at: recipePhotosDirectory, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("Error creating RecipePhotos directory: \(error.localizedDescription)")
+        }
         
         let sanitizedCaptionReduced = String(Parser.sanitizeFileName(caption).prefix(4)) + String(Int.random(in: 10...99))
         let cleanRecipeName = recipeName.replacingOccurrences(of: " ", with: "-")
-            // Save each selected image to the RecipePhotos directory
-        if let data = image.pngData() {
+        
+        // Rotate the image if necessary
+        var rotatedImage = image
+        if image.imageOrientation != .up {
+            UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+            rotatedImage = UIGraphicsGetImageFromCurrentImageContext() ?? image
+            UIGraphicsEndImageContext()
+        }
+        
+        // Save each selected image to the RecipePhotos directory
+        if let data = rotatedImage.pngData() {
             let fileName = "\(cleanRecipeName)-\(sanitizedCaptionReduced).png"
             let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
             
@@ -483,8 +493,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             }
             return RecipeImage(imagePath: "\(fileURL.path())", caption: caption)
         }
-               return RecipeImage(imagePath: "Couldn't save image", caption: caption)
-            }
+        return RecipeImage(imagePath: "Couldn't save image", caption: caption)
+    }
        
     
     /// restore recipe from trash
