@@ -398,7 +398,8 @@ struct Parser {
         
         // Categories
         let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
-        let categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
+        var categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? ["No Category"]
+        if categories == [] || categories == [""] { categories = ["No Category"] }
         checkAndAppendIndex(input: categoriesVariables.index)
         
         // Tags

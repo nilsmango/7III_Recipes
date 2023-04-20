@@ -334,10 +334,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             fatalError("Couldn't find recipe index in array")
         }
         
+        // ad no category to all recipes without a category
+        var categories = data.categories
+        if categories.isEmpty {
+            categories = ["No Category"]
+        }
+        
         // update recipe in the recipes array
         let newRecipeData = Recipe.Data(title: data.title,
                                source: data.source,
-                               categories: data.categories,
+                               categories: categories,
                                tags: data.tags,
                                rating: data.rating,
                                prepTime: data.prepTime,
@@ -354,6 +360,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                                date: data.date,
                                updated: Date.now,
                                language: data.language)
+        
         
         recipes[index].update(from: newRecipeData)
         
@@ -375,9 +382,15 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     /// save a new recipe
     func saveNewRecipe(newRecipeData: Recipe.Data) {
         
+        // ad no category to all recipes without a category
+        var categories = newRecipeData.categories
+        if categories.isEmpty {
+            categories = ["No Category"]
+        }
+        
         let newRecipe = Recipe(title: newRecipeData.title,
                                source: newRecipeData.source,
-                               categories: newRecipeData.categories,
+                               categories: categories,
                                tags: newRecipeData.tags,
                                rating: newRecipeData.rating,
                                prepTime: newRecipeData.prepTime,
@@ -626,9 +639,17 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 }
             }
         }
-        return categories.sorted()
+        
+        categories.sort()
+        // put "No Category" at the end of the index
+        if let index = categories.firstIndex(where: { $0 == "No Category" }) {
+            categories.remove(at: index)
+            categories.append("No Category")
+        }
+        
+        return categories
     }
-    
+
     
     /// get a list of tags from the recipes
     func getAllTags() -> [String] {
@@ -666,7 +687,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         return ingredients.sorted()
     }
     
-    
+    /// get a random recipe
+    func randomRecipe() -> Recipe? {
+        return recipes.randomElement()
+    }
     
     
     // Sorting

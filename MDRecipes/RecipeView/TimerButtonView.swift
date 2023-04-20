@@ -94,7 +94,7 @@ struct TimerButtonView: View {
             .tint(dirTimer.running == .alarm ? .red : .blue)
             .modifier(ShakeEffect(shakeNumber: numberOfShakes))
             
-            if dirTimer.running != .running {
+            if dirTimer.running == .stopped {
                 Button(action: {
                     fileManager.timerStepper(timer: dirTimer, add: false)
                 }) {

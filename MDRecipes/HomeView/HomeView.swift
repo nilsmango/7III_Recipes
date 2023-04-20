@@ -12,9 +12,9 @@ struct HomeView: View {
     
     @State var searchText = ""
     
-    
-    
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    
+    private var randomRecipe: Recipe? { fileManager.randomRecipe() }
     
     var body: some View {
         NavigationStack {
@@ -29,10 +29,15 @@ struct HomeView: View {
                             ForEach(fileManager.getAllCategories(), id: \.self) { category in
                                 NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
                                     FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
-                                        
+                                    
                                 }
                                 
+                            }
+                            if randomRecipe != nil {
+                                NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!)) {
+                                    RandomRecipeView()
                                     
+                                }
                             }
                             
                         }
@@ -64,8 +69,7 @@ struct HomeView: View {
                 
             } else {
                 List {
-  
-                        ForEach(fileManager.getAllCategories(), id: \.self) { category in
+                          ForEach(fileManager.getAllCategories(), id: \.self) { category in
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in

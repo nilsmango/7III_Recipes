@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		782821FF29F177F4006128CA /* RandomRecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782821FE29F177F4006128CA /* RandomRecipeView.swift */; };
 		782AB9E529CE0A9600EC23FC /* ScrollingListExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9E429CE0A9600EC23FC /* ScrollingListExperiment.swift */; };
 		782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9E629CE2F0E00EC23FC /* Recipe.swift */; };
 		782AB9ED29CE39C800EC23FC /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9EC29CE39C800EC23FC /* Direction.swift */; };
@@ -84,6 +85,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		782821FE29F177F4006128CA /* RandomRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomRecipeView.swift; sourceTree = "<group>"; };
 		782AB9E429CE0A9600EC23FC /* ScrollingListExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingListExperiment.swift; sourceTree = "<group>"; };
 		782AB9E629CE2F0E00EC23FC /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		782AB9EC29CE39C800EC23FC /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 			children = (
 				786F9A0B29C8E0C000CAA48B /* HomeView.swift */,
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
+				782821FE29F177F4006128CA /* RandomRecipeView.swift */,
 				782C65DC29D7333600A95C18 /* FlexiStringsView.swift */,
 			);
 			path = HomeView;
@@ -460,6 +463,7 @@
 				782C65D729D6003200A95C18 /* IngredientEditView.swift in Sources */,
 				78623AD729D9FB6700B9CF65 /* ImportView.swift in Sources */,
 				786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */,
+				782821FF29F177F4006128CA /* RandomRecipeView.swift in Sources */,
 				783B4B8E29E148E600551888 /* Importer.swift in Sources */,
 				783B4B8029DDA7C700551888 /* DirectionsEditTextView.swift in Sources */,
 				782C65DF29D7501800A95C18 /* ServingsView.swift in Sources */,

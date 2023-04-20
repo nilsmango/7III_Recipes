@@ -38,13 +38,7 @@ private struct ImagePicker: UIViewControllerRepresentable {
         let imagePicker = UIImagePickerController()
         imagePicker.sourceType = sourceType
         imagePicker.delegate = context.coordinator
-        imagePicker.modalPresentationStyle = .fullScreen
         return imagePicker
-    }
-    class CustomImagePickerController: UIImagePickerController {
-        override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-            return [.portrait]
-        }
     }
     
     

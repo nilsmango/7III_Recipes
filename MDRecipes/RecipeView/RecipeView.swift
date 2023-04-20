@@ -116,7 +116,7 @@ struct RecipeView: View {
                         }
                         
                         Text("Created: \(recipe.date, style: .date)")
-                        
+                        Text("Last update: \(recipe.updated, style: .date)")
                         if recipe.tags.count > 0 {
                             FlexiStringsView(strings: recipe.tags)
                         }
