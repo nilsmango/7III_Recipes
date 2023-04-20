@@ -41,9 +41,13 @@ struct NotesView: View {
             
         } else {
             VStack {
-                TextEditor(text: $newNote)
-                    .focused($isFieldFocused)
-                    .padding(.bottom, 8)
+                ZStack {
+                    TextEditor(text: $newNote)
+                        .focused($isFieldFocused)
+                    Text(newNote)
+                        .opacity(0)
+                }
+                .padding(.bottom, 8)
                 HStack {
                     Button {
                         editing = false

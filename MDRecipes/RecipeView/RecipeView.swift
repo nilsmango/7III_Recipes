@@ -27,8 +27,9 @@ struct RecipeView: View {
     @State private var editViewIsPresented = false
     // edit view data
     @State private var data: Recipe.Data = Recipe.Data()
-    
-   
+   // image add view
+    @State private var addImages = false
+    @State private var dataImages = [RecipeImageData]()
     
     var body: some View {
 //        NavigationStack {
@@ -88,21 +89,42 @@ struct RecipeView: View {
                         
                     }
                     
-                    if recipe.images.count > 0 {
+                    
                         Section("Images") {
-                            ForEach(recipe.images) { image in
-                                RecipeImageView(imagePath: image.imagePath, caption: image.caption)
+                            if recipe.images.count > 0 {
+                                ForEach(recipe.images) { image in
+                                    RecipeImageView(imagePath: image.imagePath, caption: image.caption)
+                                }
+                            } else {
+                                Button {
+                                    addImages = true
+                                    
+                                } label: {
+                                    Label("Add Images", systemImage: "camera")
+                                }
+                                .buttonStyle(.bordered)
                             }
+                                
+                            
+                            
                         }
-                    }
+                    
                     
                     Section("Info") {
-                        Text("Source: \(recipe.source)")
+                        if recipe.source != "" {
+                            Text("Source: \(recipe.source)")
+                        }
+                        
                         Text("Created: \(recipe.date, style: .date)")
                         
-                        FlexiStringsView(strings: recipe.tags)
+                        if recipe.tags.count > 0 {
+                            FlexiStringsView(strings: recipe.tags)
+                        }
+                        if recipe.categories.count > 0 {
+                            FlexiStringsView(strings: recipe.categories)
+                        }
                         
-                        FlexiStringsView(strings: recipe.categories)
+                        
                     }
                     
                     
@@ -138,6 +160,32 @@ struct RecipeView: View {
                     }
 
                     
+                }
+            }
+            .sheet(isPresented: $addImages) {
+                NavigationView {
+                    List {
+                        ImagesPickerView(dataImages: $dataImages)
+                    }
+                    
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Cancel") {
+                                    addImages = false
+                                }
+                            }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Save") {
+                                    addImages = false
+                                    
+                                    var newRecipeData = data
+                                    // update recipeData with new images
+                                    newRecipeData.dataImages = dataImages
+                                    // update recipe
+                                    fileManager.updateEditedRecipe(recipe: recipe, data: newRecipeData)
+                                }
+                            }
+                        }
                 }
             }
             

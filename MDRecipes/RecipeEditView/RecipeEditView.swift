@@ -120,7 +120,6 @@ struct RecipeEditView: View {
                         }
                         
                         
-                            // TODO: image picker
                         ImagesPickerView(dataImages: $recipeData.dataImages)
                         
                         

@@ -21,25 +21,55 @@ struct ImagesPickerView: View {
     
 
     var body: some View {
-
+        if dataImages.count > 0 {
         Section("Images") {
             
-            ForEach(dataImages) { image in
-                ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
-            }
-            .onDelete { indexSet in
-                dataImages.remove(atOffsets: indexSet)
-            }
+                ForEach(dataImages) { image in
+                    ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
+                }
+                .onDelete { indexSet in
+                    dataImages.remove(atOffsets: indexSet)
+                }
                 
-            .onMove { indexSet, newPlace in
-                dataImages.move(fromOffsets: indexSet, toOffset: newPlace)
+                .onMove { indexSet, newPlace in
+                    dataImages.move(fromOffsets: indexSet, toOffset: newPlace)
+                }
             }
-        }
-        Section {
+        
+                Section {
+                    PhotosPicker(selection: $selectedItems, matching: .any(of: [.panoramas, .screenshots, .images])) {
+                        Label("Select Photos from Library", systemImage: "photo.stack")
+                    }
+                    
+                    Button {
+                        self.showCamera = true
+                    } label: {
+                        Label("Take a Photo", systemImage: "camera")
+                    }
+                    .onChange(of: selectedItems) { _ in
+                        Task {
+                            for item in selectedItems {
+                                if let data = try? await item.loadTransferable(type: Data.self) {
+                                    if let uiImage = UIImage(data: data) {
+                                        dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
+                                    }
+                                }
+                            }
+                            selectedItems.removeAll()
+                        }
+                    }
+                    .sheet(isPresented: $showCamera) {
+                        ImageThingy(sourceType: .camera, completionHandler: { image in
+                            dataImages.append(RecipeImageData(image: image, caption: "", isOldImage: false))
+                        })
+                    }
+                }
+        } else {
+            Section("Add Images") {
                 PhotosPicker(selection: $selectedItems, matching: .any(of: [.panoramas, .screenshots, .images])) {
                     Label("Select Photos from Library", systemImage: "photo.stack")
                 }
-
+                
                 Button {
                     self.showCamera = true
                 } label: {
@@ -50,19 +80,22 @@ struct ImagesPickerView: View {
                         dataImages.append(RecipeImageData(image: image, caption: "", isOldImage: false))
                     })
                 }
-            }
-        .onChange(of: selectedItems) { _ in
-            Task {
-                for item in selectedItems {
-                    if let data = try? await item.loadTransferable(type: Data.self) {
-                        if let uiImage = UIImage(data: data) {
-                            dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
+                .onChange(of: selectedItems) { _ in
+                    Task {
+                        for item in selectedItems {
+                            if let data = try? await item.loadTransferable(type: Data.self) {
+                                if let uiImage = UIImage(data: data) {
+                                    dataImages.append(RecipeImageData(image: uiImage, caption: "", isOldImage: false))
+                                }
+                            }
                         }
+                        selectedItems.removeAll()
                     }
                 }
-                selectedItems.removeAll()
             }
         }
+            
+        
     }
    
     private func dataBinding(for image: RecipeImageData) -> Binding<RecipeImageData> {
