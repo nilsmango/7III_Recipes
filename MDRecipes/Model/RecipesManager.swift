@@ -419,6 +419,30 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         loadTimers(for: newRecipe)
     }
     
+    /// make a duplication of the recipe
+    func duplicateRecipe(recipe: Recipe) -> String {
+        let newTitle = recipe.title + " Variation \(Int.random(in: 0...9))\(randomLetter())\(randomLetter())"
+        if let index = recipes.firstIndex(where: { $0.id == recipe.id }) {
+            // change the OG recipe to a version
+            var recipeVersion = recipe
+            recipeVersion.title = newTitle
+            recipes[index] = recipeVersion
+            
+            // append the old recipe with a new id
+            var oldRecipe = recipe
+            oldRecipe.id = UUID()
+            recipes.append(oldRecipe)
+        } else {
+            print("Couldn't find recipe to duplicate")
+        }
+        return newTitle
+    }
+    
+    /// Returns a random letter
+    private func randomLetter() -> Character {
+        return Character(UnicodeScalar(arc4random_uniform(26) + 97)!)
+    }
+    
     /// Updating, cleaning up the images in both Recipe and on disk
     private func updatingCleaningAndParsingImages(oldImages: [RecipeImage], newImages: [RecipeImageData], recipeTitle: String) -> [RecipeImage] {
         // check if there are any new images in the newImages

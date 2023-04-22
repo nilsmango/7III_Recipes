@@ -70,7 +70,7 @@ Cooking can be dangerous
                         showingSheet = true
                         
                     } label: {
-                        Label(counter > 0 ? "Update" : "Decode", systemImage: "gearshape.2.fill")
+                        Label(counter > 0 ? "Update" : "Decode", systemImage: "wand.and.stars")
                     }
                 }
             }

@@ -145,6 +145,17 @@ struct RecipeView: View {
                         } label: {
                             Label("Edit Recipe", systemImage: "square.and.pencil")
                         }
+                        Button {
+                            let newTitle = fileManager.duplicateRecipe(recipe: recipe)
+                            data = recipe.data
+                            // making sure the edit view has the right title
+                            data.title = newTitle
+                            editViewIsPresented = true
+                            
+                        } label: {
+                            Label("Duplicate Recipe", systemImage: "doc.badge.plus")
+                        }
+                        
                         Button(role: .destructive, action: {
                             if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
                                 let indexSet = IndexSet(integer: index)

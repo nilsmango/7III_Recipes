@@ -74,7 +74,7 @@ struct TitleEditView: View {
                 
             }
             if badTitle {
-                Text("Title already taken, choose another one or I will.")
+                Text("Title already taken, choose another one or we will change it for you.")
                     .font(.caption)
             }
             

@@ -32,7 +32,7 @@ struct Recipe: Identifiable, Codable {
     var date: Date
     var updated: Date
 
-    let id: UUID
+    var id: UUID
 
     init(title: String, source: String, categories: [String], tags: [String], rating: String, prepTime: String, cookTime: String, additionalTime: String, totalTime: String, servings: Int, timesCooked: Int, ingredients: [Ingredient], directions: [Direction], nutrition: String, notes: String, images: [RecipeImage], date: Date, updated: Date, language: RecipeLanguage, id: UUID = UUID()) {
         self.title = title
