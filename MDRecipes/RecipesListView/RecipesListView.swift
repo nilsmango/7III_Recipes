@@ -77,39 +77,37 @@ struct RecipesListView: View {
                     }
                 label: { Label("Sort by", systemImage: "arrow.up.arrow.down") }
                     
+                
+                Button(action: {
+                    editViewPresented = true
+                }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
+                
+                
+                
+                Button {
+                    importViewPresented = true
                 } label: {
+                    Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
+                }
+                Button(action: {
+                    let name = "Curry No. \(Int.random(in: 0...1000))"
+                    let filename = Parser.sanitizeFileName(name)
+                    fileManager.createMarkdownFile(name: filename, content: "# \(name)\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
+                    // add the timers to our timer manager also
+                    if let recipe = fileManager.recipes.last {
+                        fileManager.loadTimers(for: recipe)
+                    }
+                    // save the fake recipe to markdown folder
+                    fileManager.saveRecipeAsMarkdownFile(recipe: fileManager.recipes.last!)
+                    
+                }) { Label("New Fake Recipe", systemImage: "hammer.circle")}
+            
+                }
+            label: {
                     Label("Options", systemImage: "ellipsis.circle")
                         .labelStyle(.iconOnly)
                 }
-                Menu {
-                    Button(action: {
-                        editViewPresented = true
-                    }) { Label("Write Yourself", systemImage: "square.and.pencil")}
-                    
-                    
-                    
-                    Button {
-                        importViewPresented = true
-                    } label: {
-                        Label("Import from Text", systemImage: "square.and.arrow.down")
-                    }
-                    Button(action: {
-                        let name = "Curry No. \(Int.random(in: 0...1000))"
-                        let filename = Parser.sanitizeFileName(name)
-                        fileManager.createMarkdownFile(name: filename, content: "# \(name)\n\nSource:\nTags: #wichtig, #bad\nKategorien: Main Course\nRating: \(Int.random(in: 1...5))/5\nPrep time: 30min\nCook time:\nAdditional time:\nTotal time: \(Int.random(in: 1...4))h\(Int.random(in: 1...49))min\nServings: 4\nTimes Cooked: \(Int.random(in: 0...9))\n\n## Zutaten\n- [ ] 200g rote Linsen\n- [ ] 250ml Kokosmilch\n- [ ] 2 Karotten\n- [ ] 2 Kartoffeln\n- [ ] 20g Koriander\n- [ ] 1 Zwiebel (groß)\n- [ ] 3 Zehen Knoblauch\n- [ ] 1 Chili (rot)\n- [ ] 15g Ingwer\n- [ ] 1 EL Tomatenmark\n- [ ] 4 TL Koriandersaat (gemahlen)\n- [ ] 2 TL Kreuzkümmel (gemahlen)\n- [ ] 2 TL Kurkuma\n- [ ] 2 TL Garam masala Gewürzmischung\n- [ ] 800ml Gemüsebrühe\n- [ ] Salz\n- [ ] Zucker\n- [ ] Zitronensaft\n- [ ] Butter zum Anbraten\n\n## Directions\n1. Take the lime and the coconut\n2. Drink it all up\n3. Call me in the morning after \(Int.random(in: 2...40)) minutes.\n\nEnjoy!")
-                        // add the timers to our timer manager also
-                        if let recipe = fileManager.recipes.last {
-                            fileManager.loadTimers(for: recipe)
-                        }
-                        // save the fake recipe to markdown folder
-                        fileManager.saveRecipeAsMarkdownFile(recipe: fileManager.recipes.last!)
-                        
-                    }) { Label("New Fake Recipe", systemImage: "hammer.circle")}
-                    
-                    
-                } label: {
-                    Label("New Recipe", systemImage: "plus.circle")
-                }
+                
                 
                 
             }
@@ -239,7 +237,8 @@ struct RecipesListView: View {
                                         newRecipeData.ingredients = []
                                         newRecipeData.dataImages = []
                                         newRecipeData.date = Date.now
-
+                                        
+                                        saveDisabled = true
                                     }
 
                                 }

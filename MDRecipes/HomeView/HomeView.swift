@@ -16,6 +16,15 @@ struct HomeView: View {
     
     private var randomRecipe: Recipe? { fileManager.randomRecipe() }
     
+    // Edit Things
+    @State private var editViewPresented = false
+    
+    @State private var importViewPresented = false
+    
+    @State private var newRecipeData = Recipe.Data()
+    
+    @State private var importSaveDisabled = true
+    
     var body: some View {
         NavigationStack {
             if searchText.isEmpty {
@@ -65,7 +74,33 @@ struct HomeView: View {
                     .gray
                     .opacity(0.1)
                 )
-                .navigationTitle("Categories")
+//                .navigationTitle("Categories")
+                .toolbar {
+                    Menu {
+                        Button(action: {  } ) {
+                            Label("About", systemImage: "info.circle")
+                        }
+                        Button(action: {
+                            // TODO: Add donation thing
+                        } ) {
+                            Label("Tip us 1 USD!", systemImage: "heart")
+                        }
+                        Button(action: {
+                            editViewPresented = true
+                        }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
+                        
+                        
+                        
+                        Button {
+                            importViewPresented = true
+                        } label: {
+                            Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
+                        }
+                    } label: {
+                        Label("Options", systemImage: "ellipsis.circle")
+                            .labelStyle(.iconOnly)
+                    }
+                }
                 
             } else {
                 List {
@@ -93,19 +128,142 @@ struct HomeView: View {
                 }
                 
             }
-            
-                
-            
-            
-            
-            
+    
                 
         }
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
         .background(ignoresSafeAreaEdges: .all)
         
-        
+        .fullScreenCover(isPresented: $editViewPresented, content: {
+            NavigationView {
+                RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager)
+                    .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancel") {
+                                editViewPresented = false
+                                
+                                // reseting newRecipeData
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    newRecipeData.timesCooked = 0
+                                    newRecipeData.title = ""
+                                    newRecipeData.source = ""
+                                    newRecipeData.tags = []
+                                    newRecipeData.categories = []
+                                    newRecipeData.prepTime = ""
+                                    newRecipeData.cookTime = ""
+                                    newRecipeData.additionalTime = ""
+                                    newRecipeData.totalTime = ""
+                                    newRecipeData.notes = ""
+                                    newRecipeData.nutrition = ""
+                                    newRecipeData.directions = []
+                                    newRecipeData.servings = 4
+                                    newRecipeData.ingredients = []
+                                    newRecipeData.dataImages = []
+                                    newRecipeData.date = Date.now
+                                }
+                            }
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Save") {
+                                editViewPresented = false
+                                
+                                // saving the new recipe
+                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+                                
+                                // reseting newRecipeData
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    newRecipeData.timesCooked = 0
+                                    newRecipeData.title = ""
+                                    newRecipeData.source = ""
+                                    newRecipeData.tags = []
+                                    newRecipeData.categories = []
+                                    newRecipeData.prepTime = ""
+                                    newRecipeData.cookTime = ""
+                                    newRecipeData.additionalTime = ""
+                                    newRecipeData.totalTime = ""
+                                    newRecipeData.notes = ""
+                                    newRecipeData.nutrition = ""
+                                    newRecipeData.directions = []
+                                    newRecipeData.servings = 4
+                                    newRecipeData.ingredients = []
+                                    newRecipeData.dataImages = []
+                                    newRecipeData.date = Date.now
+                                    
+                                }
+                                
+                            }
+                        }
+                    }
+            }
+        })
+        .fullScreenCover(isPresented: $importViewPresented, content: {
+            NavigationView {
+                ImportView(fileManager: fileManager, recipeData: $newRecipeData, saveDisabled: $importSaveDisabled)
+                    .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancel") {
+                                importViewPresented = false
+                                
+                                // reseting newRecipeData
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    newRecipeData.timesCooked = 0
+                                    newRecipeData.title = ""
+                                    newRecipeData.source = ""
+                                    newRecipeData.tags = []
+                                    newRecipeData.categories = []
+                                    newRecipeData.prepTime = ""
+                                    newRecipeData.cookTime = ""
+                                    newRecipeData.additionalTime = ""
+                                    newRecipeData.totalTime = ""
+                                    newRecipeData.notes = ""
+                                    newRecipeData.nutrition = ""
+                                    newRecipeData.directions = []
+                                    newRecipeData.servings = 4
+                                    newRecipeData.ingredients = []
+                                    newRecipeData.dataImages = []
+                                    newRecipeData.date = Date.now
+                                }
+                            }
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Save") {
+                                importViewPresented = false
+
+                                // saving the new recipe
+                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+
+                                // reseting newRecipeData
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    newRecipeData.timesCooked = 0
+                                    newRecipeData.title = ""
+                                    newRecipeData.source = ""
+                                    newRecipeData.tags = []
+                                    newRecipeData.categories = []
+                                    newRecipeData.prepTime = ""
+                                    newRecipeData.cookTime = ""
+                                    newRecipeData.additionalTime = ""
+                                    newRecipeData.totalTime = ""
+                                    newRecipeData.notes = ""
+                                    newRecipeData.nutrition = ""
+                                    newRecipeData.directions = []
+                                    newRecipeData.servings = 4
+                                    newRecipeData.ingredients = []
+                                    newRecipeData.dataImages = []
+                                    newRecipeData.date = Date.now
+                                    
+                                    importSaveDisabled = true
+                                }
+
+                            }
+                            .disabled(importSaveDisabled)
+                            
+                        }
+                    }
+            }
+        })
     }
 }
 
