@@ -20,7 +20,7 @@ struct TitleEditView: View {
         titles.map({ Parser.sanitizeFileName($0) })
     }
     
-    // checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
+    /// checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
     private var invalidTitle: Bool {
         ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
     }
@@ -31,13 +31,23 @@ struct TitleEditView: View {
     
     @State var oldTitle = "Some title you would never think of"
     
+    /// creating a unique title
     private func createUniqueTitle() {
+        
         if invalidTitle  {
-            // save the committed title so we can reuse it for version numbering
-            let chosenTitle = title
+            
             for versionNumber in (2...200) {
-                // adding a funny version number to the committed title
-                title = chosenTitle + " No. \(versionNumber)"
+                // if last character is a number then increase that number
+                if let lastNumber = Int(String(title.last!)) {
+                    let incrementedLastDigit = lastNumber + 1
+                    let newTitle = String(title.dropLast()) + String(incrementedLastDigit)
+                    title = newTitle
+                    
+                } else {
+                    // adding a funny version number to the title if there is no number in the last character
+                    title = title + " No. \(versionNumber)"
+                }
+                // check if new title is unique, else try again.
                 if !invalidTitle {
                     return
                 }
@@ -75,11 +85,7 @@ struct TitleEditView: View {
                                 oldTitle = title
                             }
                         }
-                        
-                        
-                        
                     }
-                
             }
             if badTitle {
                 Text("Title already taken, choose another one or we will change it for you.")
