@@ -711,9 +711,15 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         return ingredients.sorted()
     }
     
+    
+    /// get a list of all the titles in the library
+    func getTitles() -> [String] {
+        recipes.map { $0.title }
+    }
+    
     /// get a random recipe
     func randomRecipe() -> Recipe? {
-        return recipes.randomElement()
+        recipes.randomElement()
     }
     
     

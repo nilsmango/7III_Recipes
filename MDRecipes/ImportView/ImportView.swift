@@ -100,7 +100,7 @@ Cooking can be dangerous
             })
             
         } else {
-            RecipeEditView(recipeData: $recipeData, fileManager: fileManager)
+            RecipeEditView(recipeData: $recipeData, fileManager: fileManager, comingFromImportView: true)
                 
         }
                 

@@ -79,7 +79,7 @@ struct Settings: View {
       HStack {
         Text("Alignment")
         Picker("Choose alignment", selection: $model.alignmentIndex) {
-          ForEach(0..<model.alignments.count) {
+            ForEach(0..<model.alignments.count, id: \.self) {
             Text(alignmentName[$0])
           }
         }

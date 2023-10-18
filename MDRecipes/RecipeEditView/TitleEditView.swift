@@ -25,6 +25,8 @@ struct TitleEditView: View {
         ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
     }
     
+    let comingFromImportView: Bool
+    
     @FocusState private var titleIsFocused: Bool
     
     @State var oldTitle = "Some title you would never think of"
@@ -33,7 +35,7 @@ struct TitleEditView: View {
         if invalidTitle  {
             // save the committed title so we can reuse it for version numbering
             let chosenTitle = title
-            for versionNumber in (2...20) {
+            for versionNumber in (2...200) {
                 // adding a funny version number to the committed title
                 title = chosenTitle + " No. \(versionNumber)"
                 if !invalidTitle {
@@ -66,9 +68,15 @@ struct TitleEditView: View {
                     }
                 
                     .onAppear {
-                        if title != "" {
-                            oldTitle = title
+                        if comingFromImportView {
+                            createUniqueTitle()
+                        } else {
+                            if title != "" {
+                                oldTitle = title
+                            }
                         }
+                        
+                        
                         
                     }
                 
@@ -84,6 +92,6 @@ struct TitleEditView: View {
 
 struct TitleEditView_Previews: PreviewProvider {
     static var previews: some View {
-        TitleEditView(title: .constant("Testing"), titles: ["Testing", "Other Title"])
+        TitleEditView(title: .constant("Testing"), titles: ["Testing", "Other Title"], comingFromImportView: false)
     }
 }

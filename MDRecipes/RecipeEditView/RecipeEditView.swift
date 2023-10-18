@@ -14,15 +14,11 @@ struct RecipeEditView: View {
     
     @State private var newIngredient = ""
     
+    var comingFromImportView: Bool = false
+    
     var rating: Int {
         Int(String(recipeData.rating.first ?? Character("1"))) ?? 1
     }
-    
-    // for Title Edit View
-    private var titles: [String] {
-        fileManager.recipes.map { $0.title }
-    }
-    
     
     
     var body: some View {
@@ -31,7 +27,7 @@ struct RecipeEditView: View {
                 
                 List {
                     Section("Name & Co.") {
-                        TitleEditView(title: $recipeData.title, titles: titles)
+                        TitleEditView(title: $recipeData.title, titles: fileManager.getTitles(), comingFromImportView: comingFromImportView)
                         
                         HStack {
                             Text("Source:")

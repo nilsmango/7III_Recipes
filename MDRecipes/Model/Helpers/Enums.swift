@@ -19,7 +19,7 @@ enum RecipeLanguage: String, CaseIterable, Identifiable, Codable {
 }
 
 enum RecipeParts: String, CaseIterable, Identifiable, Codable {
-    case title, rating, servings, prepTime, cookTime, additionalTime, totalTime, date, ingredients, directions, nutrition, notes, categories, tags,  source, unknown, remove
+    case remove, title, rating, servings, prepTime, cookTime, additionalTime, totalTime, date, ingredients, directions, nutrition, notes, categories, tags,  source, unknown
     var id: Self { self }
 }
 
