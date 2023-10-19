@@ -38,7 +38,7 @@ struct TitleEditView: View {
             
             for versionNumber in (2...200) {
                 // if last character is a number then increase that number
-                if let lastNumber = Int(String(title.last!)) {
+                if let lastNumber = Int(String(title.last ?? "r")) {
                     let incrementedLastDigit = lastNumber + 1
                     let newTitle = String(title.dropLast()) + String(incrementedLastDigit)
                     title = newTitle

@@ -9,7 +9,35 @@ import Foundation
 
 struct Parser {
     
-    /// Creating an Array of RecipeSegments from a String
+    // MARK: Constants
+    // Note: we are searching for these strings case insensitive.
+    static let titleStrings = ["# "]
+    static let sourceStrings = ["Source", "Quelle", "Recipe by", "Rezept von", "By"]
+    static let categoriesStrings = ["Categories", "Kategorien"]
+    static let tagStrings = ["Tags"]
+    static let ratingStrings = ["Rating", "Bewertung"]
+    static let prepTimeStrings = ["Prep time", "Vorbereitungszeit", "Arbeitszeit", "Vor- und Zubereitung"]
+    static let cookTimeStrings = ["Cook time", "Active Time", "Kochzeit", "Backzeit", "Koch-/Backzeit"]
+    static let additionalTimeStrings = ["Additional time", "Zusätzliche Zeit"]
+    static let totalTimeStrings = ["Total Time", "Gesamtzeit", "Zubereitungszeit"]
+    static let servingsStrings = ["Servings", "Serves", "Yields", "Portionen", "Zutaten für", "Zutaten (für", "persons", "for"]
+    
+    static let ingredientsStrings = ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten"]
+    static let ingredientsCutoff = ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Steps", "Step 1", "Bring", "Instructions", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving"]
+    
+    static let directionsStrings = ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Instructions", "Und so wirds"]
+    static let directionsCutoff = ["## ", "Nutrition", "Nährwert", "Tips", "Tipps", "I MADE IT", "Notes", "Anmerkung", "Notizen", "Tip"]
+    
+    static let nutritionStrings = ["## Nutrition", "## Nährwert", "Nutrition", "NUTRITION", "Nährwert"]
+    static let nutritionCutoff = ["## ", "Zubereitung", "Ingredients", "Directions", "Zutaten", "Notes", "Notizen", "Tip", "Tipps", "Anmerkung"]
+    
+    static let notesStrings = ["## Notes", "## Notizen", "Tips", "Tipps", "Tip", "Notes", "Anmerkung", "Notizen"]
+    static let tipsStrings = ["Tip:", "Tipps:", "Notes:"]
+    static let notesCutoff = ["## "]
+    
+    // MARK: Main Parsers
+    
+    /// Creating an Array of RecipeSegments from a String, used to import Recipe from a String
     static func makeSegmentsFromString(string: String) -> [RecipeSegment]  {
         
         // Output Segments
@@ -43,7 +71,7 @@ struct Parser {
         
         // Title
         let title: String
-        let titleVariable = findValue(for: ["# "], in: lines)
+        let titleVariable = findValue(for: titleStrings, in: lines)
         if titleVariable != (nil, nil) {
             title = lines[titleVariable.index!]
             indexesFound.insert(titleVariable.index!)
@@ -54,19 +82,19 @@ struct Parser {
         }
         
         // Source
-        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: lines)
+        let sourceVariables = findValue(for: sourceStrings, in: lines, anchored: false)
         checkAndAppendSegmentsAndIndexes(recipePart: .source, variablesIndex: sourceVariables.index)
         
         // Categories
-        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
+        let categoriesVariables = findValue(for: categoriesStrings, in: lines, anchored: false)
         checkAndAppendSegmentsAndIndexes(recipePart: .categories, variablesIndex: categoriesVariables.index)
         
         // Tags
-        let tagsVariables = findValue(for: ["Tags:"], in: lines)
+        let tagsVariables = findValue(for: tagStrings, in: lines, anchored: false)
         checkAndAppendSegmentsAndIndexes(recipePart: .tags, variablesIndex: tagsVariables.index)
         
         // Rating
-        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: lines)
+        let ratingVariables = findValue(for: ratingStrings, in: lines, anchored: false)
         if ratingVariables != (nil, nil) {
             checkAndAppendSegmentsAndIndexes(recipePart: .rating, variablesIndex: ratingVariables.index)
         } else {
@@ -91,22 +119,23 @@ struct Parser {
             return indexes
         }
         // Prep Time
-        checkAndAppendSegmentsAndIndexes(recipePart: .prepTime, variablesIndex: calculateIndexesForTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"]))
+        checkAndAppendSegmentsAndIndexes(recipePart: .prepTime, variablesIndex: calculateIndexesForTimes(for: prepTimeStrings))
         // Cook Time
-        checkAndAppendSegmentsAndIndexes(recipePart: .cookTime, variablesIndex: calculateIndexesForTimes(for: ["Cook time:", "Active Time", "Active Time", "Active time:", "Kochzeit", "Kochzeit:", "Koch-/Backzeit:", "Koch-/Backzeit"]))
+        checkAndAppendSegmentsAndIndexes(recipePart: .cookTime, variablesIndex: calculateIndexesForTimes(for: cookTimeStrings))
         // Additional Time
-        checkAndAppendSegmentsAndIndexes(recipePart: .additionalTime, variablesIndex: calculateIndexesForTimes(for: ["Additional time:", "Zusätzliche Zeit:", "Zusätzliche Zeit"]))
+        checkAndAppendSegmentsAndIndexes(recipePart: .additionalTime, variablesIndex: calculateIndexesForTimes(for: additionalTimeStrings))
         // Total Time
-        checkAndAppendSegmentsAndIndexes(recipePart: .totalTime, variablesIndex: calculateIndexesForTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit", "Zubereitungszeit:", "Zubereitungszeit"]))
+        checkAndAppendSegmentsAndIndexes(recipePart: .totalTime, variablesIndex: calculateIndexesForTimes(for: totalTimeStrings))
         
         
         // Servings
-        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: lines)
+        let servingsVariables = findValue(for: servingsStrings, in: lines, anchored: false)
         var servingsIndexes = [servingsVariables.index]
-        if servingsVariables.value == "" {
-            // check next line has a number in it
+        // check if the servings string line has a number in it
+        if !containsNumber(in: lines[servingsVariables.index!]) {
+            // if no number is found check the next line
             let nextLine = lines[servingsVariables.index!+1]
-            if nextLine.first(where: { $0.isNumber }) != nil {
+            if containsNumber(in: nextLine) {
                 servingsIndexes.append(servingsVariables.index!+1)
             }
         }
@@ -114,23 +143,23 @@ struct Parser {
         
         
         // Ingredients
-        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: lines)
+        let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)
         checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes)
         
         
         // Directions
-        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: lines)
+        let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: lines)
         checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes)
         
         // Nutrition
-        let nutritionVariables = findSection(in: lines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        let nutritionVariables = findSection(in: lines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
         checkAndAppendSegmentsAndIndexes(recipePart: .nutrition, variablesIndex: nutritionVariables.indexes)
         
         // Notes
-        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
+        let notesValues = findSection(in: lines, for: notesStrings, cutoffStrings: notesCutoff)
         let notesIndexes: [Int?]
         if notesValues == (nil, nil) {
-            let noteVariables = findValue(for: ["Tip:", "Tipps:", "Notes:"], in: lines)
+            let noteVariables = findValue(for: tipsStrings, in: lines)
             if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 && noteVariables.index! > nutritionVariables.indexes?.last ?? 0 {
                 notesIndexes = Array(noteVariables.index!..<lines.count)
             } else {
@@ -177,7 +206,6 @@ struct Parser {
         }
         
         
-        
         // Sort the recipeSegments to represent the original lines
         recipeSegments.sort { lhs, rhs in
             guard let index1 = lines.firstIndex(where: { $0 == lhs.lines.first }),
@@ -190,7 +218,7 @@ struct Parser {
         return recipeSegments
     }
     
-    /// Creating a recipe.data from edited recipe segments
+    /// Creating a recipe.data from edited recipe segments in the Import Recipe from String
     static func makeDataFromSegments(segments: [RecipeSegment]) -> Recipe.Data {
         
         // Helper that checks if the normal parsing for the Segment Lines does not give us the desired result and simply takes the Segment Lines as the value in that case
@@ -206,13 +234,15 @@ struct Parser {
         // Title
         let titleLines = segments.first(where: { $0.part == .title })?.lines ?? ["Unknown"]
         let title: String
-        let titleVariable = findValue(for: ["# "], in: titleLines)
+        let titleVariable = findValue(for: titleStrings, in: titleLines)
         if titleVariable != (nil, nil) {
             title = titleVariable.value!
         } else  {
             let alternativeTitle = findTitleAlternative(in: titleLines)
             title = alternativeTitle.value
         }
+        
+        // MARK: until here I have checked the code
         
         // Source
         let sourceLines = segments.first(where: { $0.part == .source })?.lines ?? ["Source: Unknown"]
@@ -283,9 +313,10 @@ struct Parser {
         let totalLines = segments.first(where: { $0.part == .totalTime })?.lines ?? []
         let totalTime = calculateTimes(for: totalLines)
         
-        
+        // TODO: this does not work yet
         // Servings
         let servingsLines = segments.first(where: { $0.part == .servings })?.lines ?? ["4"]
+        // case insensitive but anchored
         let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: servingsLines)
         // find the first number in the lines if findValue doesn't work
         var servings = Int()
@@ -361,7 +392,6 @@ struct Parser {
         return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, dataImages: [], date: date, updated: Date.now, language: language)
     }
     
- 
     /// Creating a Recipe struct from a Markdown Recipe.
     /// With German and English parsing
     static func makeRecipeFromString(string: String) -> (recipe: Recipe, indexes: Set<Int>)  {
@@ -381,7 +411,7 @@ struct Parser {
         
         // Title
         let title: String
-        let titleVariable = findValue(for: ["# "], in: lines)
+        let titleVariable = findValue(for: titleStrings, in: lines)
         if titleVariable != (nil, nil) {
             title = titleVariable.value!
             indexesFound.insert(titleVariable.index!)
@@ -392,24 +422,26 @@ struct Parser {
         }
         
         // Source
-        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: lines)
+        let sourceVariables = findValue(for: sourceStrings, in: lines, anchored: false)
         let source = sourceVariables.value ?? "Unknown"
         checkAndAppendIndex(input: sourceVariables.index)
         
         // Categories
-        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: lines)
+        let categoriesVariables = findValue(for: categoriesStrings, in: lines, anchored: false)
         var categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? ["No Category"]
         if categories == [] || categories == [""] { categories = ["No Category"] }
         checkAndAppendIndex(input: categoriesVariables.index)
         
         // Tags
-        let tagsVariables = findValue(for: ["Tags:"], in: lines)
+        let tagsVariables = findValue(for: tagStrings, in: lines, anchored: false)
         let tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
         checkAndAppendIndex(input: tagsVariables.index)
         
+        // MARK: checked until here
+        
         // Rating
         let rating: String
-        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: lines)
+        let ratingVariables = findValue(for: ratingStrings, in: lines)
         if ratingVariables != (nil, nil) {
             rating = ratingVariables.value!
             checkAndAppendIndex(input: ratingVariables.index)
@@ -444,13 +476,13 @@ struct Parser {
             
         }
         
-        let prepTime = calculateTimes(for: ["Prep time:", "Vorbereitungszeit:", "Vorbereitungszeit", "Arbeitszeit", "Arbeitszeit:", "Vor- und zubereiten:"])
-        let cookTime = calculateTimes(for: ["Cook time:", "Active Time", "Active Time", "Active time:", "Kochzeit", "Kochzeit:", "Koch-/Backzeit:", "Koch-/Backzeit"])
-        let additionalTime = calculateTimes(for: ["Additional time:", "Zusätzliche Zeit:", "Zusätzliche Zeit"])
-        let totalTime = calculateTimes(for: ["Total time:", "Total time", "Total Time", "Gesamtzeit:", "Gesamtzeit", "Zubereitungszeit:", "Zubereitungszeit"])
+        let prepTime = calculateTimes(for: prepTimeStrings)
+        let cookTime = calculateTimes(for: cookTimeStrings)
+        let additionalTime = calculateTimes(for: additionalTimeStrings)
+        let totalTime = calculateTimes(for: totalTimeStrings)
         
         // Servings
-        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: lines)
+        let servingsVariables = findValue(for: servingsStrings, in: lines)
         checkAndAppendIndex(input: servingsVariables.index)
         let servings: Int
         if servingsVariables.value == "" {
@@ -473,28 +505,28 @@ struct Parser {
         checkAndAppendIndex(input: timesCookedVariables.index)
         
         // Ingredients
-        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für"], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: lines)
+        let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)
         let ingredients = ingredientsVariables.ingredients
         let indexes = ingredientsVariables.indexes
         indexes.forEach { checkAndAppendIndex(input: $0) }
         
         // Directions
-        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:"], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: lines)
+        let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: lines)
         let directions = directionsVariables.directions
         let dirIndexes = directionsVariables.indexes
         dirIndexes.forEach { checkAndAppendIndex(input: $0) }
         
         // Nutrition
-        let nutritionVariables = findSection(in: lines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        let nutritionVariables = findSection(in: lines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
         let nutrition = nutritionVariables.value ?? ""
         let nutritionIndexes = nutritionVariables.indexes
         nutritionIndexes?.forEach { checkAndAppendIndex(input: $0)}
         
         // Notes
-        let notesValues = findSection(in: lines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
+        let notesValues = findSection(in: lines, for: notesStrings, cutoffStrings: notesCutoff)
         let notes: String
         if notesValues == (nil, nil) {
-            let noteVariables = findValue(for: ["Tip:", "Tipps:", "Notes:"], in: lines)
+            let noteVariables = findValue(for: tipsStrings, in: lines)
             if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 && noteVariables.index! > nutritionIndexes?.last ?? 0 {
                 let additionalNotes = lines[noteVariables.index!+1..<lines.count].joined(separator: "\n")
                 if noteVariables.value == "" {
@@ -1057,22 +1089,64 @@ struct Parser {
     // MARK: RECIPE to MARKDOWN and vice versa
     
     
-    // Find a value for given keys in an array of strings. Case insensitive.
-    private static func findValue(for keys: [String], in lines: [String]) -> (value: String?, index: Int?) {
+    /// Find a value for given keys in an array of strings and remove the key. Case insensitive and with optional non anchoring to start. Returns the String without the key if there is any and the index of the lines.
+    private static func findValue(for keys: [String], in lines: [String], anchored: Bool = true) -> (value: String?, index: Int?) {
         for key in keys {
-            // search case insensitive
-            if let index = lines.firstIndex(where: { $0.range(of: key, options: [.caseInsensitive, .anchored]) != nil }) {
-                // drop the key
-                let value = String(lines[index].dropFirst(key.count).trimmingCharacters(in: .whitespaces))
-                return (value, index)
+            // search case insensitive and anchored if true
+            if anchored {
+                if let index = lines.firstIndex(where: { $0.range(of: key, options: [.caseInsensitive, .anchored]) != nil }) {
+                    // drop the key until after the first space or ":"
+                    let line = lines[index]
+                    let lineWithoutKey = String(line.dropFirst(key.count))
+                    
+                    // find out if there is a :
+                    if lineWithoutKey.first == ":" {
+                        let value = String(line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespaces))
+                        return (value, index)
+                    } else {
+                        let value = String(line.dropFirst(key.count).trimmingCharacters(in: .whitespaces))
+                        return (value, index)
+                    }
+                }
+                
+            } else {
+                // searching without anchoring to the front
+                if let index = lines.firstIndex(where: { $0.range(of: key, options: [.caseInsensitive]) != nil }) {
+                    let line = lines[index]
+                    let rangeOfKey = line.range(of: key, options: .caseInsensitive)!
+                    
+                    // drop the key + : or space
+                    if let upperRangeOfWholeKey = line[rangeOfKey.upperBound...].range(of: ":") {
+                        
+                        if line.index(upperRangeOfWholeKey.upperBound, offsetBy: 1, limitedBy: line.endIndex) != nil {
+                            let value = String(line[line.index(upperRangeOfWholeKey.upperBound, offsetBy: 1)...]).trimmingCharacters(in: .whitespaces)
+                            return (value, index)
+                        } else {
+                                let value = String(line[line.index(upperRangeOfWholeKey.upperBound, offsetBy: 0)...]).trimmingCharacters(in: .whitespaces)
+                                return (value, index)
+                            
+                        }
+                        
+                    } else {
+                        // just drop the key
+                        if line.index(rangeOfKey.upperBound, offsetBy: 1, limitedBy: line.endIndex) != nil {
+                            let value = String(line[line.index(rangeOfKey.upperBound, offsetBy: 1)...]).trimmingCharacters(in: .whitespaces)
+                            return (value, index)
+                        } else {
+                            let value = String(line[line.index(rangeOfKey.upperBound, offsetBy: 0)...]).trimmingCharacters(in: .whitespaces)
+                            return (value, index)
+                        }
+                    }
+                }
             }
+            
         }
         return (nil, nil)
     }
     
     // extracting, cleaning and calculating prep, cook, etc. times
     private static func parsingTimes(for keys: [String], in lines: [String]) -> (value: String, index: Int?) {
-        let rawValue = findValue(for: keys, in: lines)
+        let rawValue = findValue(for: keys, in: lines, anchored: false)
         if rawValue != (nil, nil) {
             let string = rawValue.value
             let index = rawValue.index
@@ -1085,17 +1159,25 @@ struct Parser {
         
     }
     
-    // find the Ingredients or Zutaten list in the markdown file
+    /// find the Ingredients or Zutaten list in the markdown file
     private static func findIngredients(searchStrings: [String], cutoff: [String], in lines: [String]) -> (ingredients: [Ingredient], indexes: [Int]) {
         var ingredients: [Ingredient] = []
         var indexes = [Int]()
-        if let ingredientIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+        // looking for the first line that has the prefix that contains one of the search strings
+        if let ingredientIndex = lines.firstIndex(where: { line in
+            searchStrings.contains { prefix in
+            line.hasPrefix(prefix)
+        } }) {
             indexes.append(ingredientIndex)
+            
+            // looking for the first line after the ingredients title that has the prefix of the cutoff search strings
             let nextTitleIndex = lines[ingredientIndex+1..<lines.count].firstIndex { line in
                 cutoff.contains { prefix in
                     line.hasPrefix(prefix)
                 }
             } ?? lines.count
+            
+            // now making the ingredients into a checklist
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
                 let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1108,7 +1190,6 @@ struct Parser {
                     ingredients.append(Ingredient(text: cleanIngredient))
                     
                 }
-                
             }
         }
         return (ingredients, indexes)
@@ -1121,7 +1202,13 @@ struct Parser {
         let directionArray: [String]
         
         // special parsing for segments (meaning searchStrings will contain ""
-        if let directionIndex = lines.firstIndex(where: { searchStrings.contains($0) }) {
+        // find the line that has the prefix of the search string
+        if let directionIndex = lines.firstIndex(where:  { line in
+            searchStrings.contains { prefix in
+            line.hasPrefix(prefix)
+        } }) {
+            
+            // looking for the first line after the ingredients title that has the prefix of the cutoff search strings
             let directionEndIndex = lines[directionIndex+1..<lines.count].firstIndex { line in
                 cutoff.contains { prefix in
                     line.hasPrefix(prefix)
@@ -1155,6 +1242,7 @@ struct Parser {
         let startsWithNumber = "^\\d+.*"
         let startsWithStepNumber = "^Step\\s+\\d+.*"
         
+        // TODO: make this work if no strings are in the first
         let testString = strings.first!
         
         // "Starts with a number"
@@ -1377,15 +1465,25 @@ struct Parser {
         return dateFormatter.string(from: date)
     }
     
-    // find out what language the markdown file is in
+    /// find out what language the markdown file is in
     private static func findLanguage(in lines: [String]) -> RecipeLanguage {
         if lines.firstIndex(where: { $0 == "## Zutaten" }) != nil {
             return .german
         } else {
             return .english
         }
-        
     }
+    
+    /// find out if there is a number in a string
+    private static func containsNumber(in input: String) -> Bool {
+        for character in input {
+            if character.isNumber {
+                return true
+            }
+        }
+        return false
+    }
+    
     
     /// sanitize any filename by removing ":/?*\"<>|."
     static func sanitizeFileName(_ fileName: String) -> String {
