@@ -615,22 +615,22 @@ struct Parser {
         
         // Prep time
         let prepTimeKey = recipe.language == .german ? "Vorbereitungszeit" : "Prep time"
-        let prepTimeValue = "\(recipe.prepTime) min"
+        let prepTimeValue = "\(recipe.prepTime)"
         lines.append("\(prepTimeKey): \(prepTimeValue)")
         
         // Cook time
         let cookTimeKey = recipe.language == .german ? "Kochzeit" : "Cook time"
-        let cookTimeValue = "\(recipe.cookTime) min"
+        let cookTimeValue = "\(recipe.cookTime)"
         lines.append("\(cookTimeKey): \(cookTimeValue)")
         
         // Additional time
         let addTimeKey = recipe.language == .german ? "Zusätzliche Zeit" : "Additional time"
-        let addTimeValue = "\(recipe.additionalTime) min"
+        let addTimeValue = "\(recipe.additionalTime)"
         lines.append("\(addTimeKey): \(addTimeValue)")
         
         // Total time
         let totalTimeKey = recipe.language == .german ? "Gesamtzeit" : "Total time"
-        let totalTimeValue = "\(recipe.totalTime) min"
+        let totalTimeValue = "\(recipe.totalTime)"
         lines.append("\(totalTimeKey): \(totalTimeValue)")
         
         // Servings

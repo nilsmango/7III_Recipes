@@ -89,6 +89,7 @@ struct RecipesListView: View {
                 } label: {
                     Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
                 }
+
                 Button(action: {
                     let name = "Curry No. \(Int.random(in: 0...1000))"
                     let filename = Parser.sanitizeFileName(name)
