@@ -17,7 +17,7 @@ struct Parser {
     static let tagStrings = ["Tags"]
     static let ratingStrings = ["Rating", "Bewertung"]
     static let prepTimeStrings = ["Prep time", "Vorbereitungszeit", "Arbeitszeit", "Vor- und Zubereitung"]
-    static let cookTimeStrings = ["Cook time", "Active Time", "Kochzeit", "Backzeit", "Koch-/Backzeit"]
+    static let cookTimeStrings = ["Cook time", "Cooking time", "Active Time", "Kochzeit", "Backzeit", "Koch-/Backzeit"]
     static let additionalTimeStrings = ["Additional time", "Zusätzliche Zeit"]
     static let totalTimeStrings = ["Total Time", "Gesamtzeit", "Zubereitungszeit"]
     static let servingsStrings = ["Servings", "Serves", "Yields", "Portionen", "Zutaten für", "Zutaten (für", "persons", "for"]
@@ -258,9 +258,10 @@ struct Parser {
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         
         
+        // MARK: tags is done
         // Tags
         let tagLines = segments.first(where: { $0.part == .tags })?.lines ?? []
-        let tagsVariables = findValue(for: ["Tags:"], in: tagLines)
+        let tagsVariables = findValue(for: tagStrings, in: tagLines, anchored: false)
         var rawLine = tagsVariables.value
         if tagsVariables.value == "" || tagsVariables.value == nil {
             rawLine = tagLines.joined(separator: ", ").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -271,8 +272,9 @@ struct Parser {
             let partArray = part.components(separatedBy: " ")
             tags += partArray
         }
-        // maybe not necessary
         tags = tags.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        tags = tags.map { checkingAndAddingHashtag(for: $0) }
+        
         
         // Rating
         let ratingLines = segments.first(where: { $0.part == .rating })?.lines ?? []
@@ -434,7 +436,8 @@ struct Parser {
         
         // Tags
         let tagsVariables = findValue(for: tagStrings, in: lines, anchored: false)
-        let tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
+        var tags = tagsVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? []
+        tags = tags.map { checkingAndAddingHashtag(for: $0) }
         checkAndAppendIndex(input: tagsVariables.index)
         
         // MARK: checked until here
@@ -981,7 +984,7 @@ struct Parser {
         }
     }
     
-    /// formatting time to show h, min and s if and where we need to in a button
+    /// formatting a time to show h, min and s values where appropriate
     static func formatTime(_ time: Double) -> String {
         if time >= 60 {
             if time.truncatingRemainder(dividingBy: 60) == 0 {
@@ -1537,6 +1540,15 @@ struct Parser {
         }
         
         return (nil, nil)
+    }
+    
+    /// checking if a string is starting with a # and adding one if there is none
+    private static func checkingAndAddingHashtag(for string: String) -> String {
+        if string.first == "#" {
+            return string
+        } else {
+            return "#" + string
+        }
     }
     
     /// get the pretty string for a recipe part enum
