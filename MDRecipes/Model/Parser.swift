@@ -95,6 +95,7 @@ struct Parser {
         
         // Rating
         let ratingVariables = findValue(for: ratingStrings, in: lines, anchored: false)
+        
         if ratingVariables != (nil, nil) {
             checkAndAppendSegmentsAndIndexes(recipePart: .rating, variablesIndex: ratingVariables.index)
         } else {
@@ -242,23 +243,19 @@ struct Parser {
             title = alternativeTitle.value
         }
         
-        // MARK: until here I have checked the code
-        
         // Source
         let sourceLines = segments.first(where: { $0.part == .source })?.lines ?? ["Source: Unknown"]
-        let sourceVariables = findValue(for: ["Source:", "Quelle:", "Recipe by", "Rezept von", "BY", "By:"], in: sourceLines)
+        let sourceVariables = findValue(for: sourceStrings, in: sourceLines)
         let source = makingSureWeGotValue(value: sourceVariables.value, lines: sourceLines, separator: " ")
         
         // Categories
         let categorieLines = segments.first(where: { $0.part == .categories })?.lines ?? []
-        let categoriesVariables = findValue(for: ["Categories:", "Kategorien:"], in: categorieLines)
+        let categoriesVariables = findValue(for: categoriesStrings, in: categorieLines)
         let rawCategories = makingSureWeGotValue(value: categoriesVariables.value, lines: categorieLines, separator: " ")
         let categories = rawCategories.components(separatedBy: " ")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         
-        
-        // MARK: tags is done
         // Tags
         let tagLines = segments.first(where: { $0.part == .tags })?.lines ?? []
         let tagsVariables = findValue(for: tagStrings, in: tagLines, anchored: false)
@@ -279,14 +276,15 @@ struct Parser {
         // Rating
         let ratingLines = segments.first(where: { $0.part == .rating })?.lines ?? []
         let rating: String
-        let ratingVariables = findValue(for: ["Rating:", "Bewertung:"], in: ratingLines)
+        let ratingVariables = findValue(for: ratingStrings, in: ratingLines, anchored: false)
         if ratingVariables != (nil, nil) {
-            rating = ratingVariables.value!
+            rating = makingCorrectRatingFormat(for: ratingVariables.value!)
         } else {
             let ratingAlternatives = findRatingAlternative(in: ratingLines)
             rating = ratingAlternatives.value
         }
         
+        // MARK: until here I have checked the code
         // Times
         // As we have already matched the lines with the times we only need to find a time
         
@@ -444,9 +442,9 @@ struct Parser {
         
         // Rating
         let rating: String
-        let ratingVariables = findValue(for: ratingStrings, in: lines)
+        let ratingVariables = findValue(for: ratingStrings, in: lines, anchored: false)
         if ratingVariables != (nil, nil) {
-            rating = ratingVariables.value!
+            rating = makingCorrectRatingFormat(for: ratingVariables.value!)
             checkAndAppendIndex(input: ratingVariables.index)
         } else {
             let ratingAlternatives = findRatingAlternative(in: lines)
@@ -1521,7 +1519,7 @@ struct Parser {
         for (index, string) in lines.enumerated() {
             if let doubleValue = numberFormatter.number(from: String(string)), doubleValue.doubleValue <= 5.0 {
                 let intValue = Int(doubleValue.doubleValue.rounded(.toNearestOrAwayFromZero))
-                return (value: String(intValue), index: index)
+                return (value: String(intValue) + "/5", index: index)
             }
         }
         return ("", nil)
@@ -1548,6 +1546,50 @@ struct Parser {
             return string
         } else {
             return "#" + string
+        }
+    }
+    
+    /// checking if a string is a rating in the expected format int/int and make it so if it isn't
+    private static func makingCorrectRatingFormat(for string: String) -> String {
+        
+        func givingLegalRating(input: String) -> String {
+            let firstCharacter = input[input.startIndex]
+            if firstCharacter.isNumber {
+                let firstNumber = Int(String(firstCharacter))!
+                if firstNumber <= 5 {
+                    return String(firstCharacter) + "/5"
+                } else {
+                    return "5/5"
+                }
+            } else {
+                return ""
+            }
+        }
+        
+        func findFirstNumber(input: String) -> String {
+            for character in input {
+                if character.isNumber {
+                    return String(character)
+                }
+            }
+            
+            return ""
+        }
+        
+        if string.count >= 3 {
+            let stringIndex = string.index(string.startIndex, offsetBy: 1)
+            if string[stringIndex] == "/" {
+                return string
+            } else {
+                let number = findFirstNumber(input: string)
+                return givingLegalRating(input: number)
+            }
+            
+        } else if string.count > 0 {
+            let number = findFirstNumber(input: string)
+            return givingLegalRating(input: number)
+        } else {
+            return ""
         }
     }
     
