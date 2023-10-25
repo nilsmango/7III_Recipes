@@ -331,21 +331,21 @@ struct Parser {
             servings = servingsVariables.value.flatMap { Int($0) } ?? 4
         }
         
-        // MARK: until here I have checked the code
-
         // Ingredients
         let ingredientLines = segments.first(where:  { $0.part == .ingredients })?.lines ?? []
-        let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für", ""], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: ingredientLines)
+        let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: ingredientLines)
         let ingredients = ingredientsVariables.ingredients
         
         // Directions
         let directionLines = segments.first(where:  { $0.part == .directions })?.lines ?? []
-        let directionsVariables = findDirections(searchStrings: ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Gesamtzeit", "Instructions", "Und so wirds gemacht:", ""], cutoff: ["## ", "Nährwert pro Portion", "Tips", "Tip:", "Tipps:", "I MADE IT", "Notes"], in: directionLines)
+        let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: directionLines)
         let directions = directionsVariables.directions
+        
+
         
         // Nutrition
         let nutriLines = segments.first(where:  { $0.part == .nutrition })?.lines ?? []
-        let nutritionVariables = findSection(in: nutriLines, for: ["## Nutrition", "## Nährwertangaben", "Nährwerte pro Portion", "Nährwerte", "Nährwert pro Portion", "NUTRITION PER SERVING", "Nutrition Facts"], cutoffStrings: ["## ", "Zubereitung", "Ingredients"])
+        let nutritionVariables = findSection(in: nutriLines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
         let nutrition: String
         
         if nutritionVariables.value == nil {
@@ -353,6 +353,8 @@ struct Parser {
         } else {
             nutrition = nutritionVariables.value ?? ""
         }
+        
+        // MARK: until here I have checked the code
         
         // Notes
         let noteLines = segments.first(where:  { $0.part == .notes })?.lines ?? []
@@ -451,7 +453,6 @@ struct Parser {
             checkAndAppendIndex(input: ratingAlternatives.index)
         }
         
-        // MARK: checked until here
         
         // Times
         func calculateTimes(for keys: [String]) -> String {
