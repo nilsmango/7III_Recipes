@@ -20,7 +20,7 @@ struct Parser {
     static let cookTimeStrings = ["Cook time", "Cooking time", "Active Time", "Kochzeit", "Backzeit", "Koch-/Backzeit"]
     static let additionalTimeStrings = ["Additional time", "Zusätzliche Zeit"]
     static let totalTimeStrings = ["Total Time", "Gesamtzeit", "Zubereitungszeit"]
-    static let servingsStrings = ["Servings", "Serves", "Yields", "Portionen", "Zutaten für", "Zutaten (für", "persons", "for"]
+    static let servingsStrings = ["Servings", "Serves", "Yields", "Portionen", "Zutaten für", "Zutaten (für", "persons", "for", "Feeds"]
     
     static let ingredientsStrings = ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten"]
     static let ingredientsCutoff = ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Steps", "Step 1", "Bring", "Instructions", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving"]
@@ -284,12 +284,10 @@ struct Parser {
             rating = ratingAlternatives.value
         }
         
-        // MARK: until here I have checked the code
         // Times
         // As we have already matched the lines with the times we only need to find a time
         
         func calculateTimes(for lines: [String]) -> String {
-            
             for line in lines {
                 if line.rangeOfCharacter(from: decimalCharacters) != nil {
                     let minuteValue = Double(calculateTimeInMinutes(input: line))
@@ -301,6 +299,7 @@ struct Parser {
             }
             return ""
         }
+        
         let prepLines = segments.first(where: { $0.part == .prepTime })?.lines ?? []
         let prepTime = calculateTimes(for: prepLines)
         
@@ -313,11 +312,10 @@ struct Parser {
         let totalLines = segments.first(where: { $0.part == .totalTime })?.lines ?? []
         let totalTime = calculateTimes(for: totalLines)
         
-        // TODO: this does not work yet
         // Servings
         let servingsLines = segments.first(where: { $0.part == .servings })?.lines ?? ["4"]
         // case insensitive but anchored
-        let servingsVariables = findValue(for: ["Servings:", "Servings", "Serves:", "Serves", "YIELDS:", "Yields", "Portionen:", "Zutaten für", "Zutaten (für"], in: servingsLines)
+        let servingsVariables = findValue(for: servingsStrings, in: servingsLines, anchored: false)
         // find the first number in the lines if findValue doesn't work
         var servings = Int()
         if servingsVariables.value == "" {
@@ -333,7 +331,8 @@ struct Parser {
             servings = servingsVariables.value.flatMap { Int($0) } ?? 4
         }
         
-        
+        // MARK: until here I have checked the code
+
         // Ingredients
         let ingredientLines = segments.first(where:  { $0.part == .ingredients })?.lines ?? []
         let ingredientsVariables = findIngredients(searchStrings: ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten", "Zutaten für", ""], cutoff: ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Step 1", "Bring", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving", "Instructions"], in: ingredientLines)
@@ -438,7 +437,7 @@ struct Parser {
         tags = tags.map { checkingAndAddingHashtag(for: $0) }
         checkAndAppendIndex(input: tagsVariables.index)
         
-        // MARK: checked until here
+        
         
         // Rating
         let rating: String
@@ -451,6 +450,8 @@ struct Parser {
             rating = ratingAlternatives.value
             checkAndAppendIndex(input: ratingAlternatives.index)
         }
+        
+        // MARK: checked until here
         
         // Times
         func calculateTimes(for keys: [String]) -> String {
@@ -467,14 +468,12 @@ struct Parser {
                         checkAndAppendIndex(input: timeValues.index!+1)
                     }
                 }
-                
             }
             if cookingTime == "0 s" {
                 return ""
             } else {
                 return cookingTime
             }
-            
         }
         
         let prepTime = calculateTimes(for: prepTimeStrings)
@@ -483,7 +482,7 @@ struct Parser {
         let totalTime = calculateTimes(for: totalTimeStrings)
         
         // Servings
-        let servingsVariables = findValue(for: servingsStrings, in: lines)
+        let servingsVariables = findValue(for: servingsStrings, in: lines, anchored: false)
         checkAndAppendIndex(input: servingsVariables.index)
         let servings: Int
         if servingsVariables.value == "" {
