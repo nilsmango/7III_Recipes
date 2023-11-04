@@ -11,7 +11,7 @@ struct RecipeRatingEditView: View {
     let recipe: Recipe
     
     var ratingInt: Int {
-        Int(String(recipe.rating.first ?? Character("1")))!
+        Int(String(recipe.rating.first ?? Character("0")))!
     }
     
     @ObservedObject var fileManager: RecipesManager
