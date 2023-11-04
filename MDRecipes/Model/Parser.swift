@@ -1178,11 +1178,14 @@ struct Parser {
                 }
             } ?? lines.count
             
-            // now making the ingredients into a checklist
+            // now making the ingredients into a checklist, also removing any solo "-"
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
-                let rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                
+                var rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                if rawString.first == "-" {
+                    rawString.removeFirst()
+                    rawString = rawString.trimmingCharacters(in: .whitespaces)
+                }
                 let ingredientString = cleanUpIngredientString(string: rawString)
                 let cleanIngredient = convertFractionToDouble(ingredientString)
                 indexes.append(i)
