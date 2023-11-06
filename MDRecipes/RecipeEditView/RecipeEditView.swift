@@ -17,7 +17,7 @@ struct RecipeEditView: View {
     var comingFromImportView: Bool = false
     
     var rating: Int {
-        Int(String(recipeData.rating.first ?? Character("1"))) ?? 1
+        Int(String(recipeData.rating.first ?? Character("0"))) ?? 0
     }
     
     

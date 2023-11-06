@@ -57,9 +57,11 @@ struct SegmentView: View {
                             .onAppear {
                                 selectedPart = segment.part
                             }
+                            
                             .onChange(of: selectedPart) { [oldValue = selectedPart] newValue in
                                 // This is to check if it's not the change on appear from above
                                 if oldValue == segment.part {
+                                    // TODO: ask if first line is title Howto: if more than one line: with changing a state askForTitle with reAssignSegment - then show a question in the view here above! (maybe only if it was unknown?)
                                     importer.reAssignSegment(oldValue: oldValue, newValue: newValue)
                                 }
                             }

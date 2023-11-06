@@ -215,6 +215,7 @@ struct RecipesListView: View {
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
+                                    saveDisabled = true
                                     importViewPresented = false
 
                                     // saving the new recipe
@@ -239,7 +240,7 @@ struct RecipesListView: View {
                                         newRecipeData.dataImages = []
                                         newRecipeData.date = Date.now
                                         
-                                        saveDisabled = true
+                                        
                                     }
 
                                 }

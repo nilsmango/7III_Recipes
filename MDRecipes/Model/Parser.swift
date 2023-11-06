@@ -26,6 +26,7 @@ struct Parser {
     static let ingredientsCutoff = ["## ", "Directions", "Zubereitung", "DIRECTIONS", "Steps", "Step 1", "Bring", "Instructions", "Auf die", "Nährwerte pro Portion", "Dieses Rezept", "Local Offers", "The cost per serving"]
     
     static let directionsStrings = ["## Directions", "## Zubereitung", "Step 1", "Directions", "Zubereitung", "Method", "Steps", "DIRECTIONS", "Instructions", "Und so wirds"]
+    
     static let directionsCutoff = ["## ", "Nutrition", "Nährwert", "Tips", "Tipps", "I MADE IT", "Notes", "Anmerkung", "Notizen", "Tip"]
     
     static let nutritionStrings = ["## Nutrition", "## Nährwert", "Nutrition", "NUTRITION", "Nährwert"]
@@ -50,18 +51,23 @@ struct Parser {
         var indexesFound = Set<Int>()
         
         // Helper for multiple lines
-        func checkAndAppendSegmentsAndIndexes(recipePart: RecipeParts, variablesIndex: Any?) {
+        func checkAndAppendSegmentsAndIndexes(recipePart: RecipeParts, variablesIndex: Any?, firstLineIsTitle: Bool = false) {
             if let index = variablesIndex {
                 switch index {
                 case let intIndex as Int:
                     let line = lines[intIndex]
                     indexesFound.insert(intIndex)
-                    recipeSegments.append(RecipeSegment(part: recipePart, lines: [line]))
+                    recipeSegments.append(RecipeSegment(part: recipePart, lines: [line], titleLineWeDontShow: ""))
                 case let intArrayIndex as [Int]:
-                    let linesArray = intArrayIndex.map { lines[$0] }
+                    let linesArray: [String]
+                    if firstLineIsTitle {
+                        linesArray = intArrayIndex.dropFirst().map { lines[$0] }
+                    } else {
+                        linesArray = intArrayIndex.map { lines[$0] }
+                    }
                     let cleanedLinesArray = Array(linesArray.drop(while: { $0.isEmpty } ).reversed().drop(while: { $0.isEmpty }).reversed())
                     indexesFound.formUnion(intArrayIndex)
-                    recipeSegments.append(RecipeSegment(part: recipePart, lines: cleanedLinesArray))
+                    recipeSegments.append(RecipeSegment(part: recipePart, lines: cleanedLinesArray, titleLineWeDontShow: firstLineIsTitle ? lines[intArrayIndex.first ?? 0] : ""))
                 default:
                     break
                 }
@@ -145,16 +151,16 @@ struct Parser {
         
         // Ingredients
         let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)
-        checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes)
+        checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes, firstLineIsTitle: true)
         
         
         // Directions
         let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: lines)
-        checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes)
+        checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes, firstLineIsTitle: true)
         
         // Nutrition
         let nutritionVariables = findSection(in: lines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
-        checkAndAppendSegmentsAndIndexes(recipePart: .nutrition, variablesIndex: nutritionVariables.indexes)
+        checkAndAppendSegmentsAndIndexes(recipePart: .nutrition, variablesIndex: nutritionVariables.indexes, firstLineIsTitle: true)
         
         // Notes
         let notesValues = findSection(in: lines, for: notesStrings, cutoffStrings: notesCutoff)
@@ -169,7 +175,7 @@ struct Parser {
         } else {
             notesIndexes = notesValues.indexes!
         }
-        checkAndAppendSegmentsAndIndexes(recipePart: .notes, variablesIndex: notesIndexes)
+        checkAndAppendSegmentsAndIndexes(recipePart: .notes, variablesIndex: notesIndexes, firstLineIsTitle: true)
         
         
         // Date of Creation
@@ -235,7 +241,7 @@ struct Parser {
         // Title
         let titleLines = segments.first(where: { $0.part == .title })?.lines ?? ["Unknown"]
         let title: String
-        let titleVariable = findValue(for: titleStrings, in: titleLines)
+        let titleVariable = findValue(for: titleStrings, in: titleLines, justReturnValueIfNothingIsFound: true)
         if titleVariable != (nil, nil) {
             title = titleVariable.value!
         } else  {
@@ -285,8 +291,7 @@ struct Parser {
         }
         
         // Times
-        // As we have already matched the lines with the times we only need to find a time
-        
+        // -> As we have already matched the lines with the times we only need to find a time
         func calculateTimes(for lines: [String]) -> String {
             for line in lines {
                 if line.rangeOfCharacter(from: decimalCharacters) != nil {
@@ -333,16 +338,13 @@ struct Parser {
         
         // Ingredients
         let ingredientLines = segments.first(where:  { $0.part == .ingredients })?.lines ?? []
-        let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: ingredientLines)
-        let ingredients = ingredientsVariables.ingredients
+        let ingredients = findIngredientsInSegment(segments: ingredientLines)
         
         // Directions
         let directionLines = segments.first(where:  { $0.part == .directions })?.lines ?? []
-        let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: directionLines)
-        let directions = directionsVariables.directions
+        let directions = directionsFromStrings(strings: directionLines)
         
 
-        
         // Nutrition
         let nutriLines = segments.first(where:  { $0.part == .nutrition })?.lines ?? []
         let nutritionVariables = findSection(in: nutriLines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
@@ -358,18 +360,12 @@ struct Parser {
         
         // Notes
         let noteLines = segments.first(where:  { $0.part == .notes })?.lines ?? []
-        
-        let notesValues = findSection(in: noteLines, for: ["## Notes", "## Notizen", "Tips", "Notes"], cutoffStrings: ["## "])
-        let notes: String
-        if notesValues == (nil, nil) {
-            notes = noteLines.joined(separator: "\n")
+        let notes = noteLines.joined(separator: "\n")
                 .replacingOccurrences(of: "Tip:", with: "")
                 .replacingOccurrences(of: "Tipps:", with: "")
                 .replacingOccurrences(of: "Notes:", with: "")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-        } else {
-            notes = notesValues.value ?? ""
-        }
+        
         
         // Date
         let dateLines = segments.first(where:  { $0.part == .date })?.lines ?? []
@@ -381,7 +377,7 @@ struct Parser {
         
         let date = dateVariables.date ?? Date.now
         
-        
+        // TODO: fix this
         // Language
         let language: RecipeLanguage
         if ingredientLines.contains("Zutaten") {
@@ -1091,7 +1087,7 @@ struct Parser {
     
     
     /// Find a value for given keys in an array of strings and remove the key. Case insensitive and with optional non anchoring to start. Returns the String without the key if there is any and the index of the lines.
-    private static func findValue(for keys: [String], in lines: [String], anchored: Bool = true) -> (value: String?, index: Int?) {
+    private static func findValue(for keys: [String], in lines: [String], anchored: Bool = true, justReturnValueIfNothingIsFound: Bool = false) -> (value: String?, index: Int?) {
         for key in keys {
             // search case insensitive and anchored if true
             if anchored {
@@ -1142,7 +1138,13 @@ struct Parser {
             }
             
         }
-        return (nil, nil)
+        if justReturnValueIfNothingIsFound {
+            return (lines.first, 0)
+        } else {
+            return (nil, nil)
+        }
+        
+        
     }
     
     // extracting, cleaning and calculating prep, cook, etc. times
@@ -1190,13 +1192,31 @@ struct Parser {
                 let cleanIngredient = convertFractionToDouble(ingredientString)
                 indexes.append(i)
                 
-                if rawString != "" && rawString != "Portionen" && rawString != "Anzahl Personen" {
+                if cleanIngredient != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
                     ingredients.append(Ingredient(text: cleanIngredient))
                     
                 }
             }
         }
         return (ingredients, indexes)
+    }
+    
+    // finding ingredients in a segment
+    private static func findIngredientsInSegment(segments: [String]) -> [Ingredient] {
+        var ingredients = [Ingredient]()
+        for ingredientLine in segments {
+            var rawIngredient = ingredientLine.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if rawIngredient.first == "-" {
+                rawIngredient.removeFirst()
+                rawIngredient = rawIngredient.trimmingCharacters(in: .whitespaces)
+            }
+            let ingredientString = cleanUpIngredientString(string: rawIngredient)
+            let cleanIngredient = convertFractionToDouble(ingredientString)
+            if cleanIngredient != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
+                ingredients.append(Ingredient(text: cleanIngredient))
+            }
+        }
+        return ingredients
     }
     
     // find the Directions or Zubereitung in the markdown file
@@ -1224,9 +1244,9 @@ struct Parser {
             let indexRange = (directionIndex..<directionEndIndex)
             indexes += indexRange
             
-        } else if searchStrings.contains("") {
-            directionArray = lines
-            indexes = Array(0..<lines.count)
+//        } else if searchStrings.contains("") {
+//            directionArray = lines
+//            indexes = Array(0..<lines.count)
         } else {
             directionArray = []
         }
