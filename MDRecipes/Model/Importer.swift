@@ -11,8 +11,8 @@ class Importer: ObservableObject {
     
     @Published var recipeSegments = [RecipeSegment]()
     
-    
-    func reAssignSegment(oldValue: RecipeParts, newValue: RecipeParts) {
+    /// reassigning segments returns true if we have more than one line and need to check if there is a title in there
+    func reAssignSegment(oldValue: RecipeParts, newValue: RecipeParts) -> Bool {
         // move the line to the new segment or remove it entirely
             if let oldSegmentIndex = recipeSegments.firstIndex(where: { $0.part == oldValue }) {
                 // save the lines
@@ -41,8 +41,13 @@ class Importer: ObservableObject {
                             }
                         }
                     }
+                
+                // check if there are more than one lines now
+                if lines.count > 1 {
+                    return true
+                }
             }
-        
+        return false
     }
     
     func reAssignLine(segmentPart: RecipeParts, newLinePart: RecipeParts, line: String) {

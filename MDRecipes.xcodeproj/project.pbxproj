@@ -40,6 +40,7 @@
 		7864173829C4770B00D67DE0 /* FilterTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864173729C4770B00D67DE0 /* FilterTesting.swift */; };
 		78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1B29CAF2D800CAA48B /* RoundedCross.swift */; };
 		78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */; };
+		786C03292AF981EE00B021E3 /* TitleAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C03282AF981EE00B021E3 /* TitleAlertView.swift */; };
 		786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F329C4EF2900CAA48B /* WHStack.swift */; };
 		786F99F629C4F05700CAA48B /* ViewArrayBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F529C4F05700CAA48B /* ViewArrayBuilder.swift */; };
 		786F99F829C4F0A100CAA48B /* WrapStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F99F729C4F0A100CAA48B /* WrapStack.swift */; };
@@ -118,6 +119,7 @@
 		78623AD629D9FB6700B9CF65 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		78623AD829DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertFractionsIntoDoubles.swift; sourceTree = "<group>"; };
 		7864173729C4770B00D67DE0 /* FilterTesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterTesting.swift; sourceTree = "<group>"; };
+		786C03282AF981EE00B021E3 /* TitleAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleAlertView.swift; sourceTree = "<group>"; };
 		786F99F329C4EF2900CAA48B /* WHStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHStack.swift; sourceTree = "<group>"; };
 		786F99F529C4F05700CAA48B /* ViewArrayBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewArrayBuilder.swift; sourceTree = "<group>"; };
 		786F99F729C4F0A100CAA48B /* WrapStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapStack.swift; sourceTree = "<group>"; };
@@ -325,6 +327,7 @@
 				78623AD629D9FB6700B9CF65 /* ImportView.swift */,
 				783B4B8529DFF67B00551888 /* SegmentsImportView.swift */,
 				783B4B8729E0073B00551888 /* SegmentView.swift */,
+				786C03282AF981EE00B021E3 /* TitleAlertView.swift */,
 				783B4B8B29E04CD100551888 /* SegmentStackView.swift */,
 			);
 			path = ImportView;
@@ -488,6 +491,7 @@
 				786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */,
 				782EB6BF29C3A4650086D2E7 /* RecipesManager.swift in Sources */,
 				78F3186029E5442B00DE31BE /* ImageDetailView.swift in Sources */,
+				786C03292AF981EE00B021E3 /* TitleAlertView.swift in Sources */,
 				786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */,
 				782AB9ED29CE39C800EC23FC /* Direction.swift in Sources */,
 				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
