@@ -151,12 +151,19 @@ struct Parser {
         
         // Ingredients
         let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)
-        checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes, firstLineIsTitle: true)
+        // making sure we don't get an empty ingredients segment
+        if ingredientsVariables.ingredients.count > 0 {
+            checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes, firstLineIsTitle: true)
+        }
+        
         
         
         // Directions
         let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: lines)
-        checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes, firstLineIsTitle: true)
+        // making sure we don't get empty directions
+        if directionsVariables.directions.count > 0 {
+            checkAndAppendSegmentsAndIndexes(recipePart: .directions, variablesIndex: directionsVariables.indexes, firstLineIsTitle: true)
+        }
         
         // Nutrition
         let nutritionVariables = findSection(in: lines, for: nutritionStrings, cutoffStrings: nutritionCutoff)
@@ -1267,29 +1274,31 @@ struct Parser {
         let startsWithStepNumber = "^Step\\s+\\d+.*"
         
         // TODO: make this work if no strings are in the first
-        let testString = strings.first!
+        let testString = strings.first(where: { $0.trimmingCharacters(in: .whitespaces) != "" }) ?? ""
         
         // "Starts with a number"
         if testString.range(of: startsWithNumber, options: .regularExpression) != nil {
             for line in strings {
-                // clean it up
-                let cleanLine = addPeriodToNumberedString(line)
-                // use regular expression to match the first string that begins with a number
-                if cleanLine.range(of: #"^\d+\."#, options: .regularExpression) != nil {
-                    
-                    // append the current string to the directions array if it's not empty
-                    if currentString.isEmpty == false {
-                        let timerInMinutes = extractTimerInMinutes(from: currentString)
-                        let hasTimer = timerInMinutes > 0.2 ? true : false
-                        currentString = currentString.trimmingCharacters(in: .newlines)
-                        let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                        directions.append(direction)
+                if line.trimmingCharacters(in: .whitespaces) != "" {
+                    // clean it up
+                    let cleanLine = addPeriodToNumberedString(line)
+                    // use regular expression to match the first string that begins with a number
+                    if cleanLine.range(of: #"^\d+\."#, options: .regularExpression) != nil {
+                        
+                        // append the current string to the directions array if it's not empty
+                        if currentString.isEmpty == false {
+                            let timerInMinutes = extractTimerInMinutes(from: currentString)
+                            let hasTimer = timerInMinutes > 0.2 ? true : false
+                            currentString = currentString.trimmingCharacters(in: .newlines)
+                            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                            directions.append(direction)
+                        }
+                        // start a new string with the matched string
+                        currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
+                    } else {
+                        // append the current string to the current string with a newline character
+                        currentString += "\n" + cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                    // start a new string with the matched string
-                    currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
-                } else {
-                    // append the current string to the current string with a newline character
-                    currentString += "\n" + cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
             }
             // append the last current string to the directions array
@@ -1332,23 +1341,27 @@ struct Parser {
             
             if linesCount <= 2 {
                 for line in strings {
-                    let splitLines = line.split(separator: ". ")
-                    for line in splitLines {
-                        let currentString = String(line + ".")
-                        let timerInMinutes = extractTimerInMinutes(from: currentString)
-                        let hasTimer = timerInMinutes > 0 ? true : false
-                        let directionString = "\(directions.count+1). " + currentString
-                        let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                        directions.append(direction)
+                    if line.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                        let splitLines = line.split(separator: ". ")
+                        for line in splitLines {
+                            let currentString = String(line + ".")
+                            let timerInMinutes = extractTimerInMinutes(from: currentString)
+                            let hasTimer = timerInMinutes > 0 ? true : false
+                            let directionString = "\(directions.count+1). " + currentString
+                            let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                            directions.append(direction)
+                        }
                     }
                 }
             } else {
                 for line in strings {
-                    let timerInMinutes = extractTimerInMinutes(from: line)
-                    let hasTimer = timerInMinutes > 0 ? true : false
-                    let directionString = "\(directions.count+1). " + line
-                    let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                    directions.append(direction)
+                    if line.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                        let timerInMinutes = extractTimerInMinutes(from: line)
+                        let hasTimer = timerInMinutes > 0 ? true : false
+                        let directionString = "\(directions.count+1). " + line
+                        let direction = Direction(step: directions.count+1, text: directionString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                        directions.append(direction)
+                    }
                 }
             }
             // check how many lines - if less than 2? also count each line.

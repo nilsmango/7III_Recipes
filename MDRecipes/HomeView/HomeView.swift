@@ -205,6 +205,7 @@ struct HomeView: View {
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Cancel") {
+                                importSaveDisabled = true
                                 importViewPresented = false
                                 
                                 // reseting newRecipeData
