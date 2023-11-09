@@ -209,13 +209,42 @@ struct Parser {
                 unSegmentedParts[lastIndex].append(lineNumber)
             }
         }
-        
-        // Map the continuous lines as a unknown segment, only if they are not just ""
+
+        // Make segments out of the unsegmented parts but splits them if there is an empty line.
         for part in unSegmentedParts {
-            let lines = part.map { lines[$0] }
-            if lines.joined().trimmingCharacters(in: .whitespaces) != "" {
-                let cleanedLines = Array(lines.drop(while: { $0.isEmpty }).reversed().drop(while: { $0.isEmpty }).reversed())
-                recipeSegments.append(RecipeSegment(part: .unknown, lines: cleanedLines))
+            
+            var adaptivePart = part
+            
+            // run this until our adaptive part is empty
+            while adaptivePart.count > 0 {
+                
+                // an array of the unsegmented lines of that part
+                var partLines = adaptivePart.map { lines[$0] }
+                // find an empty line if there is one
+                if let nextEmptyLineIndex = partLines.firstIndex(where: { $0.trimmingCharacters(in: .whitespacesAndNewlines) == "" }) {
+                    if nextEmptyLineIndex > 0 {
+                        // our segments lines are
+                        let continuousLines = Array(partLines[0..<nextEmptyLineIndex])
+                        // add the new segment
+                        recipeSegments.append(RecipeSegment(part: .unknown, lines: continuousLines))
+                        // set part to the rest if nextEmptyLine is not the last line
+                        if nextEmptyLineIndex < adaptivePart.count - 1 {
+                            let restArraySlice = adaptivePart[(nextEmptyLineIndex + 1)...]
+                            adaptivePart = Array(restArraySlice)
+                        } else {
+                            break
+                        }
+                        
+                    } else {
+                        // remove that index first index
+                        adaptivePart.removeFirst()
+                    }
+                } else {
+                    // the whole part is one segment
+                    recipeSegments.append(RecipeSegment(part: .unknown, lines: partLines))
+                    // break the loop
+                    break
+                }
             }
         }
         
