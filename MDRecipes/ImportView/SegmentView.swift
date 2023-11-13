@@ -62,9 +62,10 @@ struct SegmentView: View {
                                     // This is to check if it's not the change on appear from above
                                     if oldValue == segment.part {
                                         // TODO: ask if first line is title Howto: if more than one line: with changing a state askForTitle with reAssignSegment - then show a question in the view here above! (maybe only if it was unknown?)
-                                        if importer.reAssignSegment(oldValue: oldValue, newValue: newValue) {
+                                        if importer.reAssignSegment(oldValue: oldValue, newValue: newValue, id: segment.id) {
                                             print("need to check if title is first line")
                                             // TODO: show a message that asks: is (first line) the title of this segment?
+                                            
                                             showAlert = true
                                         }
                                     }
@@ -117,7 +118,7 @@ struct SegmentView: View {
             }
             .padding()
             .overlay(
-                TitleAlertView(showAlert: $showAlert, firstLine: "Ingredientisis", segment: "Ingredients")
+                TitleAlertView(showAlert: $showAlert, firstLine: segment.lines.first ?? "Couldn't find line", segment: selectedPart.rawValue)
             )
         }
                     

@@ -22,7 +22,7 @@ struct TitleAlertView: View {
                         if showSearchStringQuestion {
                             Text("Do you want to add \"\(firstLine)\" to the search strings we use to find the segments?")
                         } else {
-                            Text("Is \"\(firstLine)\" part of the segment \"\(segment)\" or only the title?")
+                            Text("The first line reads \"\(firstLine)\", is it part of the segment \"\(segment)\" or only the title?")
                         }
                     }
                     .foregroundColor(Color(.systemBackground))

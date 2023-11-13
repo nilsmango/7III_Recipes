@@ -12,34 +12,28 @@ class Importer: ObservableObject {
     @Published var recipeSegments = [RecipeSegment]()
     
     /// reassigning segments returns true if we have more than one line and need to check if there is a title in there
-    func reAssignSegment(oldValue: RecipeParts, newValue: RecipeParts) -> Bool {
+    func reAssignSegment(oldValue: RecipeParts, newValue: RecipeParts, id: UUID) -> Bool {
+        print("Reassigning segment")
         // move the line to the new segment or remove it entirely
-            if let oldSegmentIndex = recipeSegments.firstIndex(where: { $0.part == oldValue }) {
+            if let oldSegmentIndex = recipeSegments.firstIndex(where: { $0.id == id }) {
                 // save the lines
                 let lines = recipeSegments[oldSegmentIndex].lines
-                // remove the lines
+                
+                // remove the segment
                 recipeSegments.remove(at: oldSegmentIndex)
                 
-                
-                    if let newSegmentIndex = recipeSegments.firstIndex(where: { $0.part == newValue }) {
+                // check if there already is a segment with the new segment part
+                    if let knownSegmentIndex = recipeSegments.firstIndex(where: { $0.part == newValue }) {
                         // in front if the segment comes after the old segment, append if the new segment comes before the old segment
-                        if oldSegmentIndex > newSegmentIndex {
-                            recipeSegments[newSegmentIndex].lines.append(contentsOf: lines)
+                        if oldSegmentIndex > knownSegmentIndex {
+                            recipeSegments[knownSegmentIndex].lines.append(contentsOf: lines)
                         } else {
-                            recipeSegments[newSegmentIndex].lines.insert(contentsOf: lines, at: 0)
+                            recipeSegments[knownSegmentIndex].lines.insert(contentsOf: lines, at: 0)
                         }
-                        
+                    // if the new part is not already in the recipeSegments
                     } else {
-                        // check if linePart comes before or after the segmentPart in the cases of RecipeParts
-                        let allCases = RecipeParts.allCases
-                        if let newIndex = allCases.firstIndex(of: newValue),
-                           let oldIndex = allCases.firstIndex(of: oldValue) {
-                            if oldIndex > newIndex {
-                                recipeSegments.insert(RecipeSegment(part: newValue, lines: lines), at: oldSegmentIndex)
-                            } else {
-                                recipeSegments.insert(RecipeSegment(part: newValue, lines: lines), at: oldSegmentIndex + 1)
-                            }
-                        }
+                        // just insert it back where we had it
+                        recipeSegments.insert(RecipeSegment(part: newValue, lines: lines), at: oldSegmentIndex)
                     }
                 
                 // check if there are more than one lines now
@@ -51,34 +45,51 @@ class Importer: ObservableObject {
     }
     
     func reAssignLine(segmentPart: RecipeParts, newLinePart: RecipeParts, line: String) {
-        // move the line to the new segment or remove it entirely
+        // find the segment index
             if let segmentIndex = recipeSegments.firstIndex(where: { $0.part == segmentPart }) {
-                
-                recipeSegments[segmentIndex].lines.removeAll(where: { $0 == line})
-                if newLinePart != .remove  {
-                    if let newSegmentIndex = recipeSegments.firstIndex(where: { $0.part == newLinePart }) {
-                        // in front if the segment comes after the old segment, append if the new segment comes before the old segment
-                        if segmentIndex > newSegmentIndex {
-                            recipeSegments[newSegmentIndex].lines.append(line)
+                // check if we find our line there
+                if let lineIndexInFirstSegment = recipeSegments[segmentIndex].lines.firstIndex(where: { $0 == line }) {
+                    recipeSegments[segmentIndex].lines.remove(at: lineIndexInFirstSegment)
+                } else {
+                    // find the next segment
+                    if let nextSegmentIndex = recipeSegments.lastIndex(where: { $0.part == segmentPart }) {
+                        // check if we find our line there
+                        if let lineIndexInSecondSegment = recipeSegments[nextSegmentIndex].lines.firstIndex(where: { $0 == line }) {
+                            recipeSegments[nextSegmentIndex].lines.remove(at: lineIndexInSecondSegment)
                         } else {
-                            recipeSegments[newSegmentIndex].lines.insert(line, at: 0)
+                            print("couldn't find line in last index")
+                            return
                         }
-                        
                     } else {
-                        // check if linePart comes before or after the segmentPart in the cases of RecipeParts
-                        let allCases = RecipeParts.allCases
-                        if let newIndex = allCases.firstIndex(of: newLinePart),
-                           let oldIndex = allCases.firstIndex(of: segmentPart) {
-                            if oldIndex > newIndex {
-                                recipeSegments.insert(RecipeSegment(part: newLinePart, lines: [line]), at: segmentIndex)
+                        print("couldn't find a last index of segment part")
+                        return
+                    }
+                }
+                    
+                    if newLinePart != .remove  {
+                        // find if the part already has lines
+                        if let newSegmentIndex = recipeSegments.firstIndex(where: { $0.part == newLinePart }) {
+                            // in front if the segment comes after the old segment, append if the new segment comes before the old segment
+                            if segmentIndex > newSegmentIndex {
+                                recipeSegments[newSegmentIndex].lines.append(line)
                             } else {
-                                recipeSegments.insert(RecipeSegment(part: newLinePart, lines: [line]), at: segmentIndex + 1)
+                                recipeSegments[newSegmentIndex].lines.insert(line, at: 0)
+                            }
+                        
+                        } else {
+                            // just add the line after or before the other lines of that segment.
+                            let allCases = RecipeParts.allCases
+                            if let newIndex = allCases.firstIndex(of: newLinePart),
+                               let oldIndex = allCases.firstIndex(of: segmentPart) {
+                                if oldIndex > newIndex {
+                                    recipeSegments.insert(RecipeSegment(part: newLinePart, lines: [line]), at: segmentIndex)
+                                } else {
+                                    recipeSegments.insert(RecipeSegment(part: newLinePart, lines: [line]), at: segmentIndex + 1)
+                                }
                             }
                         }
                     }
-        }
-            
-        }
+                }
     }
     
     func removeSegment(_ segment: RecipeSegment) {

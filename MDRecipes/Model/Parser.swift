@@ -219,7 +219,7 @@ struct Parser {
             while adaptivePart.count > 0 {
                 
                 // an array of the unsegmented lines of that part
-                var partLines = adaptivePart.map { lines[$0] }
+                let partLines = adaptivePart.map { lines[$0] }
                 // find an empty line if there is one
                 if let nextEmptyLineIndex = partLines.firstIndex(where: { $0.trimmingCharacters(in: .whitespacesAndNewlines) == "" }) {
                     if nextEmptyLineIndex > 0 {
