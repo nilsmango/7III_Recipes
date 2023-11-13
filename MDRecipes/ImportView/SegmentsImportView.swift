@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SegmentsImportView: View {
     @ObservedObject var importer: Importer
-
+    
+    @State private var showAlert = false
+    @State private var alertSegment = RecipeSegment(part: .unknown, lines: ["no lines"])
+    
     var body: some View {
         ScrollView {
             
@@ -17,12 +20,15 @@ struct SegmentsImportView: View {
             VStack() {
                 Text("Assign the Segments")
                 ForEach(importer.recipeSegments) { segment in
-                        SegmentView(importer: importer, segment: segment)
+                    SegmentView(importer: importer, segment: segment, showAlert: $showAlert, alertSegment: $alertSegment)
                     }
                 }
             .padding(.horizontal)
             .scrollContentBackground(.hidden)
         }
+        .overlay(
+            TitleAlertView(importer: importer, showAlert: $showAlert, alertSegment: alertSegment)
+        )
         .background(
             .gray
             .opacity(0.1)

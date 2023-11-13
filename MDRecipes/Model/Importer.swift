@@ -96,7 +96,19 @@ class Importer: ObservableObject {
         recipeSegments.removeAll(where:  { $0.id == segment.id })
     }
     
-    
+    func removeLineFromSegment(segmentPart: RecipeParts, line: String) {
+        // find the segment index
+        if let segmentIndex = recipeSegments.firstIndex(where: { $0.part == segmentPart }) {
+            // find the line
+            if let lineIndex = recipeSegments[segmentIndex].lines.firstIndex(where: { $0 == line }) {
+                // remove the line
+                recipeSegments[segmentIndex].lines.remove(at: lineIndex)
+                // add the line to the title lines we don't show
+                recipeSegments[segmentIndex].titleLineWeDontShow.append(line)
+            }
+        }
+        
+    }
     
 }
 

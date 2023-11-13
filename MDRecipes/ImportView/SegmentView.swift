@@ -17,7 +17,10 @@ struct SegmentView: View {
     // Edit Mode
     @State private var isWiggling = false
     @State private var paddingActive = false
-    @State private var showAlert = false
+    
+    // Title Alert
+    @Binding var showAlert: Bool
+    @Binding var alertSegment: RecipeSegment
     
     var body: some View {
             VStack {
@@ -61,11 +64,10 @@ struct SegmentView: View {
                                 .onChange(of: selectedPart) { [oldValue = selectedPart] newValue in
                                     // This is to check if it's not the change on appear from above
                                     if oldValue == segment.part {
-                                        // TODO: ask if first line is title Howto: if more than one line: with changing a state askForTitle with reAssignSegment - then show a question in the view here above! (maybe only if it was unknown?)
+                                        // reassigning segment and toggle if we have to show title alert
                                         if importer.reAssignSegment(oldValue: oldValue, newValue: newValue, id: segment.id) {
                                             print("need to check if title is first line")
-                                            // TODO: show a message that asks: is (first line) the title of this segment?
-                                            
+                                            alertSegment = RecipeSegment(part: newValue, lines: segment.lines)
                                             showAlert = true
                                         }
                                     }
@@ -117,9 +119,7 @@ struct SegmentView: View {
                 
             }
             .padding()
-            .overlay(
-                TitleAlertView(showAlert: $showAlert, firstLine: segment.lines.first ?? "Couldn't find line", segment: selectedPart.rawValue)
-            )
+            
         }
                     
                 
@@ -134,7 +134,7 @@ struct SegmentView: View {
 struct SegmentView_Previews: PreviewProvider {
     static var previews: some View {
 
-        SegmentView(importer: Importer(), segment: RecipeSegment(part: .cookTime, lines: ["Ingredients", "500 g sugar", "20 black peas"]))
+        SegmentView(importer: Importer(), segment: RecipeSegment(part: .cookTime, lines: ["Ingredients", "500 g sugar", "20 black peas"]), showAlert: .constant(false), alertSegment: .constant(RecipeSegment(part: .cookTime, lines: ["Ingredients", "500 g sugar", "20 black peas"])))
                 .frame(height: 500)
             
         

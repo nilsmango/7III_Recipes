@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct TitleAlertView: View {
+    @ObservedObject var importer: Importer
+    
     @Binding var showAlert: Bool
+    var alertSegment: RecipeSegment
+    
     @State private var showSearchStringQuestion = false
     
-    var firstLine: String
-    var segment: String
+    var firstLine: String { alertSegment.lines.first ?? "Couldn't find line" }
+    var segmentPart: String { alertSegment.part.rawValue.capitalized }
     
     var body: some View {
         if showAlert {
@@ -22,7 +26,7 @@ struct TitleAlertView: View {
                         if showSearchStringQuestion {
                             Text("Do you want to add \"\(firstLine)\" to the search strings we use to find the segments?")
                         } else {
-                            Text("The first line reads \"\(firstLine)\", is it part of the segment \"\(segment)\" or only the title?")
+                            Text("The first line reads \"\(firstLine)\", is it part of the segment \"\(segmentPart)\" or only the title?")
                         }
                     }
                     .foregroundColor(Color(.systemBackground))
@@ -32,14 +36,13 @@ struct TitleAlertView: View {
                     Group {
                         if showSearchStringQuestion {
                             Button {
-                                
+                                // TODO: add the firstLine to the search strings and cutoff strings of the segmentPart
                                 showAlert = false
                                 showSearchStringQuestion = false
                             } label: {
                                 Text("Yes")
                             }
                             Button {
-                                
                                 showAlert = false
                                 showSearchStringQuestion = false
                             } label: {
@@ -48,6 +51,8 @@ struct TitleAlertView: View {
                             
                         } else {
                             Button {
+                                // removing the firstLine from the segment
+                                importer.removeLineFromSegment(segmentPart: alertSegment.part, line: firstLine)
                                 showSearchStringQuestion = true
                             } label: {
                                 Text("It's only the title")
@@ -57,7 +62,7 @@ struct TitleAlertView: View {
                             Button {
                                 showAlert = false
                             } label: {
-                                Text("It's part of \"\(segment)\"")
+                                Text("It's part of \"\(segmentPart)\"")
                             }
                             
                         }
@@ -79,5 +84,5 @@ struct TitleAlertView: View {
 }
 
 #Preview {
-    TitleAlertView(showAlert: .constant(true), firstLine: "Ingredients", segment: "Ingredients")
+    TitleAlertView(importer: Importer(), showAlert: .constant(true), alertSegment: RecipeSegment(part: .ingredients, lines: ["100 g peas", "200 kg walrus"]))
 }
