@@ -22,6 +22,12 @@ struct CategoriesEditView: View {
     
     @FocusState private var isFieldFocused: Bool
     
+    private func removeNoCategoryIfItsSelected() {
+        if categories.contains("No Category") {
+            categories.removeAll(where: { $0 == "No Category"})
+        }
+    }
+    
     var body: some View {
         Section {
             FlexibleView(
@@ -36,9 +42,9 @@ struct CategoriesEditView: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
                     .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(categories.contains(category) ? .blue : .gray)
-                                .opacity(categories.contains(category) ? 1 : 0.2)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(categories.contains(category) ? .blue : .gray)
+                            .opacity(categories.contains(category) ? 1 : 0.2)
                         
                     )
                     .onTapGesture {
@@ -46,18 +52,21 @@ struct CategoriesEditView: View {
                             if categories.contains(category) {
                                 categories.removeAll(where: { $0 == category })
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
+                                if categories.isEmpty {
+                                    categories.append("No Category")
+                                }
                             } else {
                                 categories.append(category)
+                                if categories.contains("No Category") {
+                                    categories.removeAll(where: { $0 == "No Category"})
+                                }
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
                             }
                         }
-                        
-                        
                     }
                     .padding(.vertical, 6)
-                
             }
-            }
+        }
         .onAppear {
             allCategories = Array(Set(recipesCategories + categories)).sorted()
         }
@@ -70,6 +79,9 @@ struct CategoriesEditView: View {
                         isFieldFocused = true
                         withAnimation {
                             categories.append(newCategory)
+                            if categories.contains("No Category") {
+                                categories.removeAll(where: { $0 == "No Category"})
+                            }
                             newCategory = ""
                             allCategories = Array(Set(recipesCategories + categories)).sorted()
                         }
@@ -82,7 +94,6 @@ struct CategoriesEditView: View {
                         Image(systemName: "xmark.circle.fill")
                             .accessibilityLabel(Text("Delete"))
                             .foregroundColor(.secondary)
-                        
                     }
                 }
             }
