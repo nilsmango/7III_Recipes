@@ -21,24 +21,20 @@ struct NotesView: View {
     var body: some View {
         
         if editing == false {
-            ZStack(alignment: .leading) {
-                HStack {
-                    Spacer()
-                    Button {
-                        newNote = recipe.notes
-                        editing = true
-                        isFieldFocused = true
-                        
-                    } label: {
-                        Label(recipe.notes == "" ? "Add Notes" : "Edit Notes", systemImage: "square.and.pencil")
-                            .labelStyle(.iconOnly)
-                    }
-                    .buttonStyle(.bordered)
-                }
+            HStack {
                 Text(recipe.notes)
+                Spacer(minLength: 8)
+                Button {
+                    newNote = recipe.notes
+                    editing = true
+                    isFieldFocused = true
+                    
+                } label: {
+                    Label(recipe.notes == "" ? "Add Notes" : "Edit Notes", systemImage: "square.and.pencil")
+                        .labelStyle(.iconOnly)
+                }
+                .buttonStyle(.bordered)
             }
-            
-            
         } else {
             VStack {
                 ZStack {
@@ -47,7 +43,7 @@ struct NotesView: View {
                     Text(newNote)
                         .opacity(0)
                 }
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
                 HStack {
                     Button {
                         editing = false
@@ -64,18 +60,17 @@ struct NotesView: View {
                     }
                     .buttonStyle(.bordered)
                 }
-              
+                .padding(.bottom)
+                
             }
-            
         }
-        
     }
 }
 
 struct NotesView_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            NotesView(recipe: Recipe.sampleData[0], fileManager: RecipesManager())
+            NotesView(recipe: Recipe.sampleData[1], fileManager: RecipesManager())
         }
         
     }
