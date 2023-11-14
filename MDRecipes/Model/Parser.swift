@@ -148,15 +148,12 @@ struct Parser {
         }
         checkAndAppendSegmentsAndIndexes(recipePart: .servings, variablesIndex: servingsIndexes)
         
-        
         // Ingredients
         let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)
         // making sure we don't get an empty ingredients segment
         if ingredientsVariables.ingredients.count > 0 {
             checkAndAppendSegmentsAndIndexes(recipePart: .ingredients, variablesIndex: ingredientsVariables.indexes, firstLineIsTitle: true)
         }
-        
-        
         
         // Directions
         let directionsVariables = findDirections(searchStrings: directionsStrings, cutoff: directionsCutoff, in: lines)
@@ -314,7 +311,6 @@ struct Parser {
         tags = tags.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         tags = tags.map { checkingAndAddingHashtag(for: $0) }
         
-        
         // Rating
         let ratingLines = segments.first(where: { $0.part == .rating })?.lines ?? []
         let rating: String
@@ -379,7 +375,6 @@ struct Parser {
         // Directions
         let directionLines = segments.first(where:  { $0.part == .directions })?.lines ?? []
         let directions = directionsFromStrings(strings: directionLines)
-        
 
         // Nutrition
         let nutriLines = segments.first(where:  { $0.part == .nutrition })?.lines ?? []
@@ -392,8 +387,6 @@ struct Parser {
             nutrition = nutritionVariables.value ?? ""
         }
         
-        // MARK: until here I have checked the code
-        
         // Notes
         let noteLines = segments.first(where:  { $0.part == .notes })?.lines ?? []
         let notes = noteLines.joined(separator: "\n")
@@ -401,7 +394,6 @@ struct Parser {
                 .replacingOccurrences(of: "Tipps:", with: "")
                 .replacingOccurrences(of: "Notes:", with: "")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-        
         
         // Date
         let dateLines = segments.first(where:  { $0.part == .date })?.lines ?? []
@@ -472,7 +464,6 @@ struct Parser {
         checkAndAppendIndex(input: tagsVariables.index)
         
         
-        
         // Rating
         let rating: String
         let ratingVariables = findValue(for: ratingStrings, in: lines, anchored: false)
@@ -484,7 +475,6 @@ struct Parser {
             rating = ratingAlternatives.value
             checkAndAppendIndex(input: ratingAlternatives.index)
         }
-        
         
         // Times
         func calculateTimes(for keys: [String]) -> String {
@@ -557,7 +547,7 @@ struct Parser {
         
         // Notes
         let notesValues = findSection(in: lines, for: notesStrings, cutoffStrings: notesCutoff)
-        let notes: String
+        var notes: String
         if notesValues == (nil, nil) {
             let noteVariables = findValue(for: tipsStrings, in: lines)
             if noteVariables.index != nil && noteVariables.index! >= lines.count - 5 && noteVariables.index! > nutritionIndexes?.last ?? 0 {
@@ -578,7 +568,6 @@ struct Parser {
             let notesIndexes = notesValues.indexes
             notesIndexes?.forEach { checkAndAppendIndex(input: $0) }
         }
-        
         
         // Images
         let imageValues = findImages(in: lines)
@@ -608,10 +597,63 @@ struct Parser {
         // Language
         let language = findLanguage(in: lines)
         
+        // Unparsed parts
+        
+        // check what parts have not been parsed
+        let totalSet = Set(0..<lines.count)
+        let unparsedParts = Array(totalSet.subtracting(indexesFound)).sorted()
+        
+        // Create an array with the continuous unknown lines
+        var continuousUnparsedParts = [[Int]]()
+        
+        for lineNumber in unparsedParts {
+            let lastIndex = continuousUnparsedParts.count - 1
+            if lastIndex == -1 || continuousUnparsedParts[lastIndex].last! + 1 != lineNumber {
+                continuousUnparsedParts.append([lineNumber])
+            } else {
+                continuousUnparsedParts[lastIndex].append(lineNumber)
+            }
+        }
+        
+        // make the extra notes string
+        var unparsedString = String()
+        
+        for part in continuousUnparsedParts {
+            for index in part {
+                // only adding the line if there is no funky stuff
+                let lineString = lines[index].trimmingCharacters(in: .whitespacesAndNewlines)
+                if lineString != "" && lineString != "--" && lineString != "---" {
+                    unparsedString += "\n" + lineString
+                }
+            }
+            unparsedString += "\n"
+        }
+        
+        // check that unparsed string does not have more than one new lines and none in the beginning and end
+        while unparsedString.hasPrefix("\n") {
+            unparsedString.removeFirst()
+        }
+        while unparsedString.hasSuffix("\n") {
+            unparsedString.removeLast()
+        }
+        
+        unparsedString = unparsedString.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
+        
+        if unparsedString.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+            // find out the name of our app
+            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "MD Recipes"
+            
+            // make the note attachment and attach it to notes.
+            let preString = "\n\nAttached are the lines " + appName + " could not parse:\n"
+            let noteAppendix = preString + unparsedString
+            
+            notes += noteAppendix
+        }
+        
         return (Recipe(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: timesCooked, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, images: images, date: date, updated: updated, language: language), indexesFound)
     }
     
-    /// Creating a Markdown Recipe froma a Recipe struct.
+    /// Creating a Markdown Recipe from a Recipe struct.
     /// With German and English parsing
     static func makeMarkdownFromRecipe(recipe: Recipe) -> MarkdownFile {
         var lines: [String] = []
@@ -1471,12 +1513,12 @@ struct Parser {
     
     // find the images section in the markdown file
     private static func findImages(in lines: [String]) -> (images: [RecipeImage], indexes: [Int]?) {
-        if let imagesIndex = lines.firstIndex(where: { $0 == "## Images" || $0 == "## Bilder"}) {
+        if let imagesIndex = lines.firstIndex(where: { $0 == "## Image" || $0 == "## Images" || $0 == "## Bilder"}) {
             let imageLines = lines[imagesIndex+1..<lines.count]
             let imagesString = imageLines.joined(separator: "\n")
             let images = extractImages(from: imagesString)
             
-            return (images, Array(imagesIndex+1..<lines.count))
+            return (images, Array(imagesIndex..<lines.count))
         }
         return ([], nil)
     }
