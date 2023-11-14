@@ -26,6 +26,8 @@ struct ImportView: View {
     
     @State private var counter = 0
     
+    @State private var recipeLanguage: RecipeLanguage = .english
+    
     @State private var newRecipe = """
 
 What the fuck
@@ -76,7 +78,7 @@ Cooking can be dangerous
             }
             .fullScreenCover(isPresented: $showingSheet, content: {
                 NavigationView {
-                    SegmentsImportView(importer: importer)
+                    SegmentsImportView(importer: importer, recipeLanguage: $recipeLanguage)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Back") {
@@ -87,7 +89,7 @@ Cooking can be dangerous
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Continue") {
                                     
-                                    recipeData = Parser.makeDataFromSegments(segments: importer.recipeSegments)
+                                    recipeData = Parser.makeDataFromSegments(segments: importer.recipeSegments, language: recipeLanguage)
                                     
                                     showingSheet = false
                                     

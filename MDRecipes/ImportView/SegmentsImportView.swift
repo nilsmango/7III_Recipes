@@ -12,13 +12,30 @@ struct SegmentsImportView: View {
     
     @State private var showAlert = false
     @State private var alertSegment = RecipeSegment(part: .unknown, lines: ["no lines"])
+    @Binding var recipeLanguage: RecipeLanguage
     
     var body: some View {
         ScrollView {
-            
+            VStack {
                 
-            VStack() {
                 Text("Assign the Segments")
+                
+                HStack {
+                    Text("Recipe Language")
+                        .padding()
+                        .background {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(.orange)
+                                .opacity(0.2)
+                        }
+                    
+                    Spacer()
+                    
+                    LanguagePickerView(language: $recipeLanguage)
+                        .tint(.primary)
+                }
+                .padding()
+                
                 ForEach(importer.recipeSegments) { segment in
                     SegmentView(importer: importer, segment: segment, showAlert: $showAlert, alertSegment: $alertSegment)
                     }
@@ -34,14 +51,11 @@ struct SegmentsImportView: View {
             .opacity(0.1)
         )
         .background(ignoresSafeAreaEdges: .all)
-        
-        
     }
-    
 }
 
 struct SegmentsImportView_Previews: PreviewProvider {
     static var previews: some View {
-        SegmentsImportView(importer: Importer())
+        SegmentsImportView(importer: Importer(), recipeLanguage: .constant(.english))
     }
 }

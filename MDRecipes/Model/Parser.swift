@@ -259,7 +259,7 @@ struct Parser {
     }
     
     /// Creating a recipe.data from edited recipe segments in the Import Recipe from String
-    static func makeDataFromSegments(segments: [RecipeSegment]) -> Recipe.Data {
+    static func makeDataFromSegments(segments: [RecipeSegment], language: RecipeLanguage) -> Recipe.Data {
         
         // Helper that checks if the normal parsing for the Segment Lines does not give us the desired result and simply takes the Segment Lines as the value in that case
         func makingSureWeGotValue(value: String?, lines: [String], separator: String) -> String {
@@ -269,7 +269,6 @@ struct Parser {
                 return value!
             }
         }
-        
         
         // Title
         let titleLines = segments.first(where: { $0.part == .title })?.lines ?? ["Unknown"]
@@ -404,15 +403,6 @@ struct Parser {
         }
         
         let date = dateVariables.date ?? Date.now
-        
-        // TODO: fix this
-        // Language
-        let language: RecipeLanguage
-        if ingredientLines.contains("Zutaten") {
-            language = .german
-        } else {
-            language = .english
-        }
         
         return Recipe.Data(title: title, source: source, categories: categories, tags: tags, rating: rating, prepTime: prepTime, cookTime: cookTime, additionalTime: additionalTime, totalTime: totalTime, servings: servings, timesCooked: 0, ingredients: ingredients, directions: directions, nutrition: nutrition, notes: notes, dataImages: [], date: date, updated: Date.now, language: language)
     }

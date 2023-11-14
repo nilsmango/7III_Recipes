@@ -12,13 +12,11 @@ struct LanguagePickerView: View {
     
     var body: some View {
         
-            Picker("Recipe Language", selection: $language) {
-                            ForEach(RecipeLanguage.allCases) { language in
-                                Text(language.rawValue.capitalized)
-                            }
-                        }
-
-        
+        Picker("Recipe Language:", selection: $language) {
+            ForEach(RecipeLanguage.allCases) { language in
+                Text(language.rawValue.capitalized)
+            }
+        }
     }
 }
 
