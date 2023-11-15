@@ -1361,8 +1361,8 @@ struct Parser {
         let startsWithNumber = "^\\d+.*"
         let startsWithStepNumber = "^Step\\s+\\d+.*"
         
-        // TODO: make this work if no strings are in the first?
-        let testString = strings.first(where: { $0.trimmingCharacters(in: .whitespaces) != "" }) ?? ""
+        // finding the first line where we have a number and some text
+        let testString = strings.first(where: { $0.trimmingCharacters(in: .whitespaces) != "" && $0.filter { $0.isNumber } != "" }) ?? ""
         
         // "Starts with a number"
         if testString.range(of: startsWithNumber, options: .regularExpression) != nil {
