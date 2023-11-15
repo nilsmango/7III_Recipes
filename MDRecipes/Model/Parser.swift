@@ -1260,7 +1260,7 @@ struct Parser {
                 let cleanIngredient = convertFractionToDouble(ingredientString)
                 indexes.append(i)
                 
-                if cleanIngredient != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
+                if cleanIngredient.trimmingCharacters(in: .whitespaces) != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
                     ingredients.append(Ingredient(text: cleanIngredient))
                     
                 }
@@ -1280,7 +1280,7 @@ struct Parser {
             }
             let ingredientString = cleanUpIngredientString(string: rawIngredient)
             let cleanIngredient = convertFractionToDouble(ingredientString)
-            if cleanIngredient != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
+            if cleanIngredient.trimmingCharacters(in: .whitespaces) != "" && cleanIngredient != "Portionen" && cleanIngredient != "Anzahl Personen" {
                 ingredients.append(Ingredient(text: cleanIngredient))
             }
         }

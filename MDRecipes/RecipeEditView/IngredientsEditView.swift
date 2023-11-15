@@ -38,7 +38,9 @@ struct IngredientsEditView: View {
                     .focused($isFieldFocused)
                     .onSubmit {
                         withAnimation {
-                            ingredients.append(Ingredient(text: newIngredient))
+                            if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
+                                ingredients.append(Ingredient(text: newIngredient.trimmingCharacters(in: .whitespaces)))
+                            }
                             newIngredient = ""
                             isFieldFocused = true
                         }

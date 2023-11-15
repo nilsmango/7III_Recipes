@@ -26,7 +26,7 @@ struct IngredientView: View {
                 Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(selected ? .blue : .primary)
             
-            Text(Parser.stringMaker(of: ingredientString, selectedServings: chosenServings, recipeServings: recipeServings))
+            Text(Parser.stringMaker(of: ingredientString.trimmingCharacters(in: .whitespaces), selectedServings: chosenServings, recipeServings: recipeServings))
         }
         .onTapGesture {
             selected.toggle()
