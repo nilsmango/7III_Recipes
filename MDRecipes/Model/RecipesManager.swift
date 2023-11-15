@@ -32,7 +32,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 timers.remove(at: index)
             }
             if direction.hasTimer {
-                timers.append(DirectionTimer(targetDate: Date.now, timerInMinutes: direction.timerInMinutes, recipeTitle: recipe.title, step: direction.step, running: .stopped, id: direction.id))
+                timers.append(DirectionTimer(targetDate: Date.distantFuture, timerInMinutes: direction.timerInMinutes, recipeTitle: recipe.title, stepString: direction.text, step: direction.step, running: .stopped, id: direction.id))
             }
         }
     }
@@ -47,6 +47,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
+    /// How the "+" and "-" buttons affect the timer time of the button
     func timerStepper(timer: DirectionTimer, add: Bool) {
         if let index = timers.firstIndex(where: { $0.id == timer.id }) {
             let stepperValue: Double
@@ -180,12 +181,12 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         if let index = timers.firstIndex(where: { $0.id == timer.id }) {
             timers[index].running = .alarm
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                if self.timers[index].running == .alarm {
-                    self.timers[index].running = .stopped
-                }
-                
-            }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+//                if self.timers[index].running == .alarm {
+//                    self.timers[index].running = .stopped
+//                }
+//                
+//            }
         } else {
             print("Couldn't find timer")
         }

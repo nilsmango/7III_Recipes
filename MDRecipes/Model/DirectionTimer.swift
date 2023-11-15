@@ -13,7 +13,7 @@ struct DirectionTimer: Identifiable, Codable {
     var targetDate: Date
     var timerInMinutes: Double
     var recipeTitle: String
-    var stepName: String = ""
+    var stepString: String
     var step: Int
     var running: TimerStatus
     let id: UUID

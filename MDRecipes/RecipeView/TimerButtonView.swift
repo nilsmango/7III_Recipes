@@ -30,8 +30,8 @@ struct TimerButtonView: View {
                 if dirTimer.running == .stopped {
                     // add a notification for this timer
                     let content = UNMutableNotificationContent()
-                    content.title = "Timer from \(dirTimer.recipeTitle)"
-                    content.subtitle = (dirTimer.stepName != "" ? dirTimer.stepName : "Step \(dirTimer.step)") + " has reached 0!"
+                    content.title = "Recipe \(dirTimer.recipeTitle)"
+                    content.subtitle = "Time's up for \(dirTimer.stepString)"
                     content.sound = UNNotificationSound.default
                     
                     let targetDate = Date(timeIntervalSinceNow: TimeInterval(dirTimer.timerInMinutes * 60))
@@ -40,44 +40,40 @@ struct TimerButtonView: View {
                     
                     let request = UNNotificationRequest(identifier: dirTimer.recipeTitle + String(dirTimer.step), content: content, trigger: trigger)
                     
-                    print(request)
-                    
                     notificationCenter.add(request) { error in
                         if let error = error {
                             print("Error: \(error)")
                         }
                     }
                 } else {
+                    withAnimation(.linear(duration: 0.6)) {
+                        numberOfShakes = 0
+                    }
                     // remove notification for this timer
                     print("removing Notification \(dirTimer.recipeTitle + String(dirTimer.step))" )
                     notificationCenter.removePendingNotificationRequests(withIdentifiers: ["\(dirTimer.recipeTitle + String(dirTimer.step))"])
-                    
                 }
-               
             }) {
                 Image(systemName: "timer")
                 if dirTimer.running == .running {
-                    Text((dirTimer.stepName != "" ? dirTimer.stepName : "Step " + String(dirTimer.step)) + ": "  + dateToDateFormatted(from: currentDate, to: dirTimer.targetDate))
+                    Text("Step " + String(dirTimer.step) + ": "  + dateToDateFormatted(from: currentDate, to: dirTimer.targetDate))
                         .monospacedDigit()
-                        .onAppear {
-                            if currentDate >= dirTimer.targetDate {
-                                fileManager.toggleTimer(timer: dirTimer)
-                            }
-                        }
+                    
                         .onReceive(timer) { input in
                             currentDate = input
                             if currentDate >= dirTimer.targetDate {
                                 fileManager.alarm(for: dirTimer)
-                                withAnimation(.linear(duration: 4)) {
-                                    numberOfShakes = 35
+                                withAnimation(.linear(duration: 10)) {
+                                    numberOfShakes = 88
                                 }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 11) {
                                     numberOfShakes = 0
                                 }
                             }
                         }
-                        
+                    
                 } else if dirTimer.running == .stopped {
+                    
                     if dirTimer.timerInMinutes > 0.99 {
                         Text("\(Int(dirTimer.timerInMinutes)) min")
                     } else {
@@ -85,7 +81,7 @@ struct TimerButtonView: View {
                     }
                     
                 } else {
-                    Text((dirTimer.stepName != "" ? dirTimer.stepName : "Step " + String(dirTimer.step)) + ": 0:00")
+                    Text("Step " + String(dirTimer.step) + ": 0:00")
                         .monospacedDigit()
                 }
             }
@@ -108,27 +104,23 @@ struct TimerButtonView: View {
                     Image(systemName: "plus.circle")
                 }
                 .buttonStyle(.bordered)
-                
             }
-            
-            
         }
-        
         .onAppear {
             notificationCenter.requestAuthorization(options: [.alert, .sound]) { success, error in
-                        if success {
-//                            print("All set!")
-                        } else if let error = error {
-                            print(error.localizedDescription)
-                        }
-                    }
-                    notificationCenter.delegate = fileManager
-    }
+                if success {
+                    // print("All set!")
+                } else if let error = error {
+                    print(error.localizedDescription)
+                }
+            }
+            notificationCenter.delegate = fileManager
+        }
     }
 }
 
 struct TimerButtonView_Previews: PreviewProvider {
     static var previews: some View {
-        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", step: 2, running: .stopped, id: UUID()))
+        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", stepString: "Let her rip for 10 minutes", step: 2, running: .stopped, id: UUID()))
     }
 }
