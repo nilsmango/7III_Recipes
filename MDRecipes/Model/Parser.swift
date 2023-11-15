@@ -1327,6 +1327,33 @@ struct Parser {
     
     /// make Directions from an Array of Strings
     static func directionsFromStrings(strings: [String]) -> [Direction] {
+        
+        /// check if direction step is the same as the text step, change text step if not
+        func makeDirectionCorrectStepString() {
+            let step = directions.count + 1
+            
+            // check where numbers end in current string
+            var lastNumberIndex = 99999
+            for (index, char) in currentString.enumerated() {
+                if char.isNumber {
+                    continue
+                } else {
+                    if index != 0 {
+                        lastNumberIndex = index
+                    }
+                    break
+                }
+            }
+            if lastNumberIndex != 99999 {
+                let stringStep = Int(String(currentString.prefix(lastNumberIndex)))
+                if step != stringStep {
+                    currentString.removeFirst(lastNumberIndex)
+                    let stepAsChar = Character(String(step))
+                    currentString.insert(stepAsChar, at: currentString.startIndex)
+                }
+            }
+        }
+        
         var directions: [Direction] = []
         var currentString = ""
         
@@ -1334,7 +1361,7 @@ struct Parser {
         let startsWithNumber = "^\\d+.*"
         let startsWithStepNumber = "^Step\\s+\\d+.*"
         
-        // TODO: make this work if no strings are in the first
+        // TODO: make this work if no strings are in the first?
         let testString = strings.first(where: { $0.trimmingCharacters(in: .whitespaces) != "" }) ?? ""
         
         // "Starts with a number"
@@ -1351,8 +1378,14 @@ struct Parser {
                             let timerInMinutes = extractTimerInMinutes(from: currentString)
                             let hasTimer = timerInMinutes > 0.2 ? true : false
                             currentString = currentString.trimmingCharacters(in: .newlines)
-                            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-                            directions.append(direction)
+                            // only add the direction if it has any text beside the number + dot
+                            if currentString.dropFirst(2).trimmingCharacters(in: .whitespaces) != "" {
+                                
+                                makeDirectionCorrectStepString()
+                                
+                                let direction = Direction(step: directions.count + 1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                                directions.append(direction)
+                            }
                         }
                         // start a new string with the matched string
                         currentString = cleanLine.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1366,11 +1399,16 @@ struct Parser {
             let timerInMinutes = extractTimerInMinutes(from: currentString)
             let hasTimer = timerInMinutes > 0 ? true : false
             currentString = currentString.trimmingCharacters(in: .whitespacesAndNewlines)
-            let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
-            directions.append(direction)
+            // only add the direction if it has any text beside the number + dot
+            if currentString.dropFirst(2).trimmingCharacters(in: .whitespaces) != "" {
+                
+                makeDirectionCorrectStepString()
+                
+                let direction = Direction(step: directions.count+1, text: currentString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+                directions.append(direction)
+            }
             
-            
-            // "Starts with 'Step' and a number"
+        // "Starts with 'Step' and a number"
         } else if testString.range(of: startsWithStepNumber, options: .regularExpression) != nil {
             var currentString = ""
             for line in strings {
@@ -1386,8 +1424,10 @@ struct Parser {
                     // start a new current string
                     currentString = "\(directions.count + 1). "
                     
+                } else {
+                    currentString += line.trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
                 }
-                currentString += "\n" + line.trimmingCharacters(in: .whitespacesAndNewlines)
+                
             }
             // append the last current string to the directions array
             let timerInMinutes = extractTimerInMinutes(from: currentString)
@@ -1440,6 +1480,11 @@ struct Parser {
     
     
     private static func addPeriodToNumberedString(_ inputString: String) -> String {
+        // making sure it is not only a number with a dot
+        if inputString.dropFirst(2).trimmingCharacters(in: .whitespaces) == "" {
+            return inputString
+        }
+        
         let startsWithNumberPattern = #"^\d{1,2}"#
         let startsWithNumberAndDotPattern = #"^(\d+)\."#
         
