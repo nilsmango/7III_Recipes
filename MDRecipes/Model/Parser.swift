@@ -1490,7 +1490,7 @@ struct Parser {
         
         // starts with number and dot
         if inputString.range(of: startsWithNumberAndDotPattern, options: .regularExpression) != nil {
-            let newString = inputString.split(separator: ".", maxSplits: 2)
+            let newString = inputString.split(separator: ".", maxSplits: 1)
             let secondPart = newString.last!.trimmingCharacters(in: .whitespaces)
             let outputString = String(newString.first! + ". " + secondPart)
             return outputString
