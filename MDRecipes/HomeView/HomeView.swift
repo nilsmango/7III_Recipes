@@ -43,7 +43,7 @@ struct HomeView: View {
                                 
                             }
                             if randomRecipe != nil {
-                                NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!)) {
+                                NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
                                     RandomRecipeView()
                                     
                                 }
@@ -108,7 +108,7 @@ struct HomeView: View {
                             if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                                 Section {
                                     ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe)) {
+                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
                                             ListItemView(recipe: recipe)
                                         }
                                         

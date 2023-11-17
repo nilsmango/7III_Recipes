@@ -31,6 +31,11 @@ struct RecipeView: View {
     @State private var addImages = false
     @State private var dataImages = [RecipeImageData]()
     
+    // for navigating back to home view when we change the category to another category than the open one.
+    var categoryFolder: String
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var recipeMovedAlert: RecipeMovedAlert
+    
     var body: some View {
 //        NavigationStack {
             ZStack {
@@ -217,6 +222,13 @@ struct RecipeView: View {
                                     editViewIsPresented = false
                                     
                                     fileManager.updateEditedRecipe(recipe: recipe, data: data)
+                                    
+                                    // check if the recipe is still in the category folder
+                                    if !data.categories.contains(where: { $0 == categoryFolder }) && categoryFolder != "All" && categoryFolder != "" {
+                                        // show alert and go back to list
+                                        recipeMovedAlert = RecipeMovedAlert(showAlert: true, recipeName: data.title, movedToCategory: data.categories.first!)
+                                        self.presentationMode.wrappedValue.dismiss()
+                                    }
                                 }
                             }
                         }
@@ -231,6 +243,6 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe)
+        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe, categoryFolder: "No Category", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
     }
 }

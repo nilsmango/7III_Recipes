@@ -24,12 +24,13 @@ struct RecipesListView: View {
     
     @State private var saveDisabled = true
     
+    @State private var recipeMovedAlert = RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")
     
     var body: some View {
 //        NavigationStack {
             List {
                 ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                    NavigationLink(destination: RecipeView(fileManager: fileManager,recipe: recipe)) {
+                    NavigationLink(destination: RecipeView(fileManager: fileManager,recipe: recipe, categoryFolder: category, recipeMovedAlert: $recipeMovedAlert)) {
                         // TODO: show tags, how long it takes etc.
                         ListItemView(recipe: recipe)
                     }
@@ -250,6 +251,9 @@ struct RecipesListView: View {
                         }
                 }
             })
+            .overlay(
+                RecipeMovedAlertView(recipeMovedAlert: $recipeMovedAlert)
+            )
         }
 //    }
 }
