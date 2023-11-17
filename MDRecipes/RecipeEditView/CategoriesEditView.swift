@@ -74,6 +74,7 @@ struct CategoriesEditView: View {
             
             HStack {
                 TextField("Add a new category ...", text: $newCategory)
+                    .autocapitalization(.words)
                     .focused($isFieldFocused)
                     .onSubmit {
                         isFieldFocused = true
