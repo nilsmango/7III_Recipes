@@ -78,7 +78,7 @@ struct CategoriesEditView: View {
                     .onSubmit {
                         isFieldFocused = true
                         withAnimation {
-                            categories.append(newCategory)
+                            categories.append(newCategory.capitalized)
                             if categories.contains("No Category") {
                                 categories.removeAll(where: { $0 == "No Category"})
                             }
