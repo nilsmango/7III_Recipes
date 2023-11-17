@@ -14,7 +14,7 @@ struct RecipeMovedAlertView: View {
         if recipeMovedAlert.showAlert {
             HStack {
                 VStack {
-                    Text("The recipe \"\(recipeMovedAlert.recipeName)\" was moved to \"\(recipeMovedAlert.movedToCategory)\".")
+                    Text("The recipe \"\(recipeMovedAlert.recipeName)\" was moved to category \"\(recipeMovedAlert.movedToCategory)\".")
                         
                     .foregroundColor(Color(.systemBackground))
                     .fixedSize(horizontal: false, vertical: true)
