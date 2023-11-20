@@ -876,57 +876,81 @@ struct Parser {
     }
     
     /// calculate the time in minutes from a time string
-    static func calculateTimeInMinutes(input: String) -> Int  {
+    static func calculateTimeInMinutes(input: String) -> Int {
         let cleanedString = input.replacingOccurrences(of: " ", with: "")
         
-        var numberArr = [Int]()
-        var hours = 0
-        var minutes = 0
-        var seconds: Double = 0
+        var numberArr = [String]()
+        var hours = 0.0
+        var minutes = 0.0
+        var seconds = 0.0
+        var numberHasDecimal = false
         
         for (index, element) in cleanedString.enumerated() {
             let stringElement = String(element)
             //check if number or character
             if element.isNumber {
-                numberArr.append(Int(stringElement)!)
+                numberArr.append(stringElement)
+            }
+            else if element == "," || element == "." {
+                if numberHasDecimal == false {
+                    numberArr.append(".")
+                }
+                numberHasDecimal = true
             } else if element.isLetter {
                 // looking for s as well because of the german Stunden.
                 if stringElement.lowercased() == "h" || stringElement.lowercased() == "s" && cleanedString.last != element && cleanedString[cleanedString.index(cleanedString.startIndex, offsetBy: index+1)] != "e" {
                     if numberArr.count > 1 {
-                        var count = numberArr.count
-                        for number in numberArr {
-                            hours += number * Int(pow(10, Double(count - 1)))
-                            count = count - 1
+                        if numberHasDecimal {
+                            let decimalNumber = Double(numberArr.joined())!
+                            hours = decimalNumber
+                            numberHasDecimal = false
+                        } else {
+                            var count = numberArr.count
+                            for number in numberArr {
+                                hours += Double(number)! * Double(pow(10, Double(count - 1)))
+                                count = count - 1
+                            }
                         }
                         numberArr.removeAll()
                         
-                        
                     } else if numberArr.count == 1 {
-                        hours = numberArr.first ?? 0
+                        hours = Double(numberArr.first ?? "0") ?? 0
                         numberArr.removeAll()
                     }
                 } else if stringElement.lowercased() == "m" {
                     if numberArr.count > 1 {
+                        if numberHasDecimal {
+                            let decimalNumber = Double(numberArr.joined())!
+                            minutes = decimalNumber
+                            numberHasDecimal = false
+                        } else {
                         var count = numberArr.count
-                        for number in numberArr {
-                            minutes += number * Int(pow(10, Double(count - 1)))
-                            count = count - 1
+                            for number in numberArr {
+                                minutes += Double(number)! * Double(pow(10, Double(count - 1)))
+                                count = count - 1
+                            }
                         }
                         numberArr.removeAll()
                     } else {
-                        minutes = numberArr.first ?? 0
+                        minutes = Double(numberArr.first ?? "0") ?? 0
                         numberArr.removeAll()
                     }
                 } else if stringElement.lowercased() == "s" {
                     if numberArr.count > 1 {
-                        var count = numberArr.count
-                        for number in numberArr {
-                            seconds += Double(number) * pow(10, Double(count - 1))
-                            count = count - 1
+                        if numberHasDecimal {
+                            let decimalNumber = Double(numberArr.joined())!
+                            seconds = decimalNumber
+                            numberHasDecimal = false
+                        } else {
+                            var count = numberArr.count
+                            for number in numberArr {
+                                seconds += Double(number)! * pow(10, Double(count - 1))
+                                count = count - 1
+                            }
                         }
                         numberArr.removeAll()
                     } else {
-                        seconds = Double(numberArr.first ?? 0)
+                        seconds = Double(numberArr.first ?? "0") ?? 0
                         numberArr.removeAll()
                     }
                 } else {
@@ -935,7 +959,9 @@ struct Parser {
             }
         }
         
-        return hours * 60 + minutes + Int((seconds / 60).rounded())
+        let totalMinutes = (hours * 60 + minutes + (seconds / 60)).rounded()
+        
+        return Int(totalMinutes)
     }
     
     
