@@ -99,12 +99,12 @@ struct RecipeView: View {
                         }
                     }
                     Button {
-                        // emptying the dataImages array so we don't duplicate images.
-                        dataImages = []
+                        // updating data images with all the images in the recipe
+                        dataImages = recipe.data.dataImages
                         addImages = true
                         
                     } label: {
-                        Label("Add Images", systemImage: "camera")
+                        Label(recipe.images.count > 0 ? "Edit Images" : "Add Images", systemImage: "camera")
                     }
                     .buttonStyle(.bordered)
                 }
@@ -183,9 +183,10 @@ struct RecipeView: View {
                             addImages = false
                             
                             var newRecipeData = recipe.data
-                            // update recipeData with new images by appending them
+                            
 //                            DispatchQueue.main.async {
-                                newRecipeData.dataImages.append(contentsOf: dataImages)
+                            // update recipeData with updated images
+                                newRecipeData.dataImages = dataImages
                                 // update recipe
                                 fileManager.updateEditedRecipe(recipe: recipe, data: newRecipeData)
 //                            }

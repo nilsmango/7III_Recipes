@@ -495,19 +495,41 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     
-    /// Saving a images to disk and returns the RecipeImage
+    /// Saving a new images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
         let recipePhotosDirectory = documentsDirectory.appendingPathComponent("RecipePhotos")
-            
+        let fileManager = FileManager.default
         // Create the RecipePhotos directory if it doesn't exist
         do {
-            try FileManager.default.createDirectory(at: recipePhotosDirectory, withIntermediateDirectories: true, attributes: nil)
+            try fileManager.createDirectory(at: recipePhotosDirectory, withIntermediateDirectories: true, attributes: nil)
         } catch {
             print("Error creating RecipePhotos directory: \(error.localizedDescription)")
         }
         
-        let sanitizedCaptionReduced = String(Parser.sanitizeFileName(caption).prefix(4)) + String(Int.random(in: 10...99))
+        var sanitizedCaptionReduced = "-" + String(Parser.sanitizeFileName(caption).prefix(4)).replacingOccurrences(of: " ", with: "-")
+        if sanitizedCaptionReduced.replacingOccurrences(of: "-", with: "").isEmpty {
+            sanitizedCaptionReduced = ""
+        }
         let cleanRecipeName = recipeName.replacingOccurrences(of: " ", with: "-")
+        var fileName = "\(cleanRecipeName)\(sanitizedCaptionReduced).png"
+        
+        // check if file name already exists in the RecipePhotos directory and add +1 to the file name if it does
+        var filePath = recipePhotosDirectory.appendingPathComponent(fileName).path
+        if fileManager.fileExists(atPath: filePath) {
+            // change name of file name, update file path until we don't find the path
+            fileName = "\(cleanRecipeName)\(sanitizedCaptionReduced)2.png"
+            var fileNumber = 2
+            var foundFilePath = true
+            while foundFilePath == true {
+                filePath = recipePhotosDirectory.appendingPathComponent(fileName).path
+                if fileManager.fileExists(atPath: filePath) == false {
+                    foundFilePath = false
+                } else {
+                    fileNumber += 1
+                    fileName = "\(cleanRecipeName)\(sanitizedCaptionReduced)\(fileNumber).png"
+                }
+            }
+        }
         
         // Rotate the image if necessary
         var rotatedImage = image
@@ -520,7 +542,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // Save each selected image to the RecipePhotos directory
         if let data = rotatedImage.pngData() {
-            let fileName = "\(cleanRecipeName)-\(sanitizedCaptionReduced).png"
+            
             let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
             
             do {
