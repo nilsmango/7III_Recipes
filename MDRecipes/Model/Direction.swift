@@ -12,6 +12,7 @@ struct Direction: Identifiable, Codable {
     var text: String
     var hasTimer: Bool
     var timerInMinutes: Double
+    var done: Bool = false
     
     let id: UUID
     

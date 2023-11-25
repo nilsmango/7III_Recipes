@@ -16,6 +16,14 @@ struct RecipeView: View {
     
     @AppStorage("Servings") var selectedServings = 4
     
+    // custom bindings
+    var recipeIndex: Int? {
+        guard let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
+            fatalError("Can't find the stupid recipe in array")
+        }
+        return index
+    }
+    
     // confetti
     @State private var confettiStopper = false
     @State private var counter = 0
@@ -50,7 +58,7 @@ struct RecipeView: View {
                 
                 Section("Ingredients") {
                     ForEach(recipe.ingredients) { ingredient in
-                        IngredientView(fileManager: fileManager, ingredient: binding(for: ingredient), recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
+                        IngredientView(fileManager: fileManager, ingredient: bindingIngredient(for: ingredient), recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
                         
                     }
                 }
@@ -58,9 +66,9 @@ struct RecipeView: View {
                 Section("Directions") {
                     ForEach(recipe.directions) { direction in
                         if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
-                            DirectionTimerView(fileManager: fileManager, direction: direction, recipe: recipe, timer: fileManager.timers[timerManagerIndex])
+                            DirectionTimerView(fileManager: fileManager, direction: bindingDirection(for: direction), recipe: recipe, timer: fileManager.timers[timerManagerIndex])
                         } else {
-                            DirectionView(fileManager: fileManager, direction: direction, recipe: recipe)
+                            DirectionView(fileManager: fileManager, direction: bindingDirection(for: direction), recipe: recipe)
                         }
                     }
                 }
@@ -232,17 +240,23 @@ struct RecipeView: View {
     }
     //    }
     
-    // TODO: we should not each time have to find the recipeIndex, once should be enough. after that check ingredientview if there are things in there we don't need any more.
-    private func binding(for ingredient: Ingredient) -> Binding<Ingredient> {
-        // find index of recipe
-        guard let recipeIndex = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
-                fatalError("Can't find the stupid recipe in array")
-        }
-        // now find the ingredient
-        guard let ingredientIndex = fileManager.recipes[recipeIndex].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
+    // not the prettiest way, but way less complicated than making one generic function out of these two.
+    private func bindingIngredient(for ingredient: Ingredient) -> Binding<Ingredient> {
+        
+        // find the ingredient
+        guard let ingredientIndex = fileManager.recipes[recipeIndex!].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
             fatalError("Can't find the stupid ingredient in array")
         }
-        return $fileManager.recipes[recipeIndex].ingredients[ingredientIndex]
+        return $fileManager.recipes[recipeIndex!].ingredients[ingredientIndex]
+    }
+    
+    private func bindingDirection(for direction: Direction) -> Binding<Direction> {
+        
+        // find the direction
+        guard let directionIndex = fileManager.recipes[recipeIndex!].directions.firstIndex(where: { $0.id == direction.id }) else {
+            fatalError("Can't find the stupid direction in array")
+        }
+        return $fileManager.recipes[recipeIndex!].directions[directionIndex]
     }
 }
 

@@ -581,12 +581,34 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     
-    /// set the times Cooked of a recipe, update also the Markdown file
+    /// sets the times Cooked of a recipe and resets the steps done and ingredients selected, also updates the Markdown file
     func setTimesCooked(of recipe: Recipe, to count: Int) {
         var updatedRecipe = recipe
+        
+        // set times cooked
         updatedRecipe.timesCooked = count
+        
+        // reset directions done
+        for direction in updatedRecipe.directions {
+            // find direction and update it
+            if let directionIndex = updatedRecipe.directions.firstIndex(where: { $0.id == direction.id}) {
+                updatedRecipe.directions[directionIndex].done = false
+            }
+        }
+        
+        // reset ingredients selected
+        for ingredient in updatedRecipe.ingredients {
+            // find ingredient and update it
+            if let ingredientIndex = updatedRecipe.ingredients.firstIndex(where: { $0.id == ingredient.id}) {
+                updatedRecipe.ingredients[ingredientIndex].selected = false
+            }
+        }
+        
+        // update recipe
         updateRecipe(updatedRecipe: updatedRecipe)
     }
+    
+
     
     /// set the note section of a recipe, update the Markdown file too
     func updateNoteSection(of recipe: Recipe, to string: String) {
