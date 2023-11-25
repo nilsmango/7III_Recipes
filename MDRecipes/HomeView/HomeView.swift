@@ -19,6 +19,8 @@ struct HomeView: View {
     // Edit Things
     @State private var editViewPresented = false
     
+    @State private var newIngredient = ""
+    
     @State private var importViewPresented = false
     
     @State private var newRecipeData = Recipe.Data()
@@ -137,13 +139,14 @@ struct HomeView: View {
         
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
-                RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager)
+                RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager, newIngredient: $newIngredient)
                     .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Cancel") {
                                 editViewPresented = false
                                 
+                                newIngredient = ""
                                 // reseting newRecipeData
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     newRecipeData.timesCooked = 0
@@ -168,6 +171,8 @@ struct HomeView: View {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Save") {
                                 editViewPresented = false
+                                
+                                addNotSubmittedIngredient()
                                 
                                 // saving the new recipe
                                 fileManager.saveNewRecipe(newRecipeData: newRecipeData)
@@ -200,14 +205,14 @@ struct HomeView: View {
         })
         .fullScreenCover(isPresented: $importViewPresented, content: {
             NavigationView {
-                ImportView(fileManager: fileManager, recipeData: $newRecipeData, saveDisabled: $importSaveDisabled)
+                ImportView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $importSaveDisabled)
                     .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Cancel") {
                                 importSaveDisabled = true
                                 importViewPresented = false
-                                
+                                newIngredient = ""
                                 // reseting newRecipeData
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     newRecipeData.timesCooked = 0
@@ -233,7 +238,9 @@ struct HomeView: View {
                             Button("Save") {
                                 importSaveDisabled = true
                                 importViewPresented = false
-
+                                
+                                addNotSubmittedIngredient()
+                                   
                                 // saving the new recipe
                                 fileManager.saveNewRecipe(newRecipeData: newRecipeData)
 
@@ -266,6 +273,12 @@ struct HomeView: View {
                     }
             }
         })
+    }
+    private func addNotSubmittedIngredient() {
+        if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
+            newRecipeData.ingredients.append(Ingredient(text: newIngredient))
+            newIngredient = ""
+        }
     }
 }
 

@@ -11,20 +11,18 @@ import SwiftUI
 
 struct IngredientEditView: View {
 
-    @Binding var ingredient: String
-
-    @State private var selected = false
+    @Binding var ingredient: Ingredient
     
     var body: some View {
         HStack {
             
-            Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(selected ? .blue : .primary)
+            Image(systemName: ingredient.selected ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(ingredient.selected ? .blue : .primary)
                 .onTapGesture {
-                    selected.toggle()
+                    ingredient.selected.toggle()
                 }
             
-            TextField("Amount Unit Ingredient", text: $ingredient)
+            TextField("Amount Unit Ingredient", text: $ingredient.text)
         }
         
     }
@@ -34,6 +32,6 @@ struct IngredientEditView: View {
 
 struct IngredientEditView_Previews: PreviewProvider {
     static var previews: some View {
-        IngredientEditView(ingredient: .constant("10 kg carrots"))
+        IngredientEditView(ingredient: .constant(Ingredient(text: "10 kg carrots")))
     }
 }

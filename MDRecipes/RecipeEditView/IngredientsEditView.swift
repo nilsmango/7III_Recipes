@@ -10,16 +10,14 @@ import SwiftUI
 struct IngredientsEditView: View {
     @Binding var ingredients: [Ingredient]
     
-    @State private var newIngredient = ""
+    @Binding var newIngredient: String
     
     @FocusState private var isFieldFocused: Bool
-    
-    @State private var selected = false
-    
+        
     var body: some View {
         
         ForEach(ingredients) { ingredient in
-            IngredientEditView(ingredient: binding(ingredient: ingredient).text)
+            IngredientEditView(ingredient: binding(for: ingredient))
         }
         .onDelete { indices in
             ingredients.remove(atOffsets: indices)
@@ -29,22 +27,16 @@ struct IngredientsEditView: View {
         }
         
             HStack {
-                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(selected ? .blue : .primary)
-                    .onTapGesture {
-                        selected.toggle()
-                    }
+                Image(systemName: "circle")
+                    .foregroundColor(.primary)
                 TextField("10 kg carrots", text: $newIngredient)
                     .focused($isFieldFocused)
                     .onSubmit {
                         withAnimation {
-                            if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
-                                ingredients.append(Ingredient(text: newIngredient.trimmingCharacters(in: .whitespaces)))
-                            }
-                            newIngredient = ""
-                            isFieldFocused = true
+                            submittingTextField()
                         }
                     }
+                    
                 if !newIngredient.isEmpty {
                     Button {
                             newIngredient = ""
@@ -59,8 +51,15 @@ struct IngredientsEditView: View {
                 
         }
     }
+    private func submittingTextField() {
+        if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
+            ingredients.append(Ingredient(text: newIngredient.trimmingCharacters(in: .whitespaces)))
+        }
+        newIngredient = ""
+        isFieldFocused = true
+    }
     
-    private func binding(ingredient: Ingredient) -> Binding<Ingredient> {
+    private func binding(for ingredient: Ingredient) -> Binding<Ingredient> {
         guard let ingredientIndex = ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
             fatalError("Can't find the stupid ingredient in array")
         }
@@ -74,7 +73,7 @@ struct IngredientsEditView: View {
 struct IngredientsEditView_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            IngredientsEditView(ingredients: .constant(Recipe.sampleData[0].ingredients))
+            IngredientsEditView(ingredients: .constant(Recipe.sampleData[0].ingredients), newIngredient: .constant(""))
         }
         
     }

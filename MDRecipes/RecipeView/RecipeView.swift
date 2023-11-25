@@ -21,10 +21,9 @@ struct RecipeView: View {
     @State private var counter = 0
     private let numberArray = [5, 70, 20]
     
-    
-    
     // edit view
     @State private var editViewIsPresented = false
+    @State private var textFieldIngredient = ""
     // edit view data
     @State private var data: Recipe.Data = Recipe.Data()
     // image add view
@@ -51,7 +50,7 @@ struct RecipeView: View {
                 
                 Section("Ingredients") {
                     ForEach(recipe.ingredients) { ingredient in
-                        IngredientView(fileManager: fileManager, ingredientString: ingredient.text, recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
+                        IngredientView(fileManager: fileManager, ingredient: binding(for: ingredient), recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
                         
                     }
                 }
@@ -197,19 +196,25 @@ struct RecipeView: View {
         }
         .sheet(isPresented: $editViewIsPresented) {
             NavigationView {
-                RecipeEditView(recipeData: $data, fileManager: fileManager)
+                RecipeEditView(recipeData: $data, fileManager: fileManager, newIngredient: $textFieldIngredient)
                     .navigationTitle("Edit Recipe")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Cancel") {
                                 editViewIsPresented = false
+                                textFieldIngredient = ""
                             }
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Save") {
                                 
                                 editViewIsPresented = false
+                                
+                                if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
+                                    data.ingredients.append(Ingredient(text: textFieldIngredient))
+                                    textFieldIngredient = ""
+                                }
                                 
                                 fileManager.updateEditedRecipe(recipe: recipe, data: data)
                                 
@@ -226,6 +231,19 @@ struct RecipeView: View {
         }
     }
     //    }
+    
+    // TODO: we should not each time have to find the recipeIndex, once should be enough. after that check ingredientview if there are things in there we don't need any more.
+    private func binding(for ingredient: Ingredient) -> Binding<Ingredient> {
+        // find index of recipe
+        guard let recipeIndex = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
+                fatalError("Can't find the stupid recipe in array")
+        }
+        // now find the ingredient
+        guard let ingredientIndex = fileManager.recipes[recipeIndex].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
+            fatalError("Can't find the stupid ingredient in array")
+        }
+        return $fileManager.recipes[recipeIndex].ingredients[ingredientIndex]
+    }
 }
 
 struct RecipeView_Previews: PreviewProvider {

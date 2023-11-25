@@ -12,7 +12,7 @@ struct RecipeEditView: View {
     
     @ObservedObject var fileManager: RecipesManager
     
-    @State private var newIngredient = ""
+    @Binding var newIngredient: String
     
     var comingFromImportView: Bool = false
     
@@ -87,7 +87,7 @@ struct RecipeEditView: View {
             }
             
             Section("Ingredients") {
-                IngredientsEditView(ingredients: $recipeData.ingredients)
+                IngredientsEditView(ingredients: $recipeData.ingredients, newIngredient: $newIngredient)
             }
             
             Section("Directions") {
@@ -129,7 +129,7 @@ struct RecipeEditView: View {
 
 struct RecipeEditView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager())
+        RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager(), newIngredient: .constant(""))
     }
 }
 

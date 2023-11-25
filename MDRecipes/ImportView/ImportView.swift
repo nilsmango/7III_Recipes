@@ -17,6 +17,7 @@ struct ImportView: View {
     
     // edit view data
     @Binding var recipeData: Recipe.Data
+    @Binding var newIngredient: String
     
     // saving disabled
     @Binding var saveDisabled: Bool
@@ -102,7 +103,7 @@ Cooking can be dangerous
             })
             
         } else {
-            RecipeEditView(recipeData: $recipeData, fileManager: fileManager, comingFromImportView: true)
+            RecipeEditView(recipeData: $recipeData, fileManager: fileManager, newIngredient: $newIngredient, comingFromImportView: true)
                 
         }
                 
@@ -117,6 +118,6 @@ Cooking can be dangerous
 
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
-        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), saveDisabled: .constant(true))
+        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), newIngredient: .constant(""), saveDisabled: .constant(true))
     }
 }

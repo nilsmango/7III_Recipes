@@ -8,7 +8,9 @@
 import Foundation
 
 struct Ingredient: Identifiable, Codable {
+    
     var text: String
+    var selected: Bool = false
     
     let id: UUID
     
