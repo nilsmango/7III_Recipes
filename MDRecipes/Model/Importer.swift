@@ -13,7 +13,6 @@ class Importer: ObservableObject {
     
     /// reassigning segments returns true if we have more than one line and need to check if there is a title in there
     func reAssignSegment(oldValue: RecipeParts, newValue: RecipeParts, id: UUID) -> Bool {
-        print("Reassigning segment")
         // move the line to the new segment or remove it entirely
             if let oldSegmentIndex = recipeSegments.firstIndex(where: { $0.id == id }) {
                 // save the lines

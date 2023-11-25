@@ -11,7 +11,7 @@ struct RecipeImageView: View {
     let imagePath: String
     let caption: String
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             if let image = UIImage(contentsOfFile: imagePath) {
                         Image(uiImage: image)
                             .resizable()
