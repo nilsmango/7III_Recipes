@@ -374,7 +374,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                                updated: Date.now,
                                language: data.language)
         
-        
         recipes[index].update(from: newRecipeData)
         
         // update the Markdown File on disk from updated recipe

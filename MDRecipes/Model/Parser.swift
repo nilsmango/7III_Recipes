@@ -1168,13 +1168,19 @@ struct Parser {
             let timerInMinutes = extractTimerInMinutes(from: line)
             let hasTimer = timerInMinutes > 0 ? true : false
             let cleanString = line.trimmingCharacters(in: .newlines)
-            let direction = Direction(step: newDirections.count+1, text: cleanString, hasTimer: hasTimer, timerInMinutes: timerInMinutes)
+            // find the old id
+            var newOldID: UUID
+            if let oldDirection = directions.first(where: { $0.text == line}) {
+                newOldID = oldDirection.id
+            } else {
+                newOldID = UUID()
+            }
+            let direction = Direction(step: newDirections.count+1, text: cleanString, hasTimer: hasTimer, timerInMinutes: timerInMinutes, id: newOldID)
             newDirections.append(direction)
         }
         
         return newDirections
     }
-    
     
     
     // MARK: RECIPE to MARKDOWN and vice versa
@@ -1503,6 +1509,8 @@ struct Parser {
         
         return updatedDirections
     }
+    
+    
     
     
     private static func addPeriodToNumberedString(_ inputString: String) -> String {

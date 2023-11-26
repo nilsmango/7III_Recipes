@@ -77,9 +77,11 @@ struct DirectionsEditView: View {
                                 showDirectionsEdit = false
                                 
                                 // update the directions of this recipe.data
+                                // TODO: try it with reparsing or edit this one? we need to find the the recipe we are in if it's not a new one and then line for line bind old ID's to new directions
                                 let newDirections = Parser.makingDirectionsFromString(directionsString: directionsString)
                                 
                                 directions = newDirections
+//                                directions = Parser.makeNewDirectionsWithOldID(newDirections: newDirections, oldDirections: directions)
                                 
                             }
                         }

@@ -59,7 +59,6 @@ struct IngredientView: View {
                                     textFieldIngredient = ""
                                 }
                                 // update the ingredients of this recipe
-//                                fileManager.updatingDirectionsOfRecipe(directionsString: directionsString, of: recipe)
                                 fileManager.updatingIngredientsOfRecipe(ingredients: ingredients, of: recipe)
                                 
                                 

@@ -245,7 +245,9 @@ struct RecipeView: View {
         
         // find the ingredient
         guard let ingredientIndex = fileManager.recipes[recipeIndex!].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
-            fatalError("Can't find the stupid ingredient in array")
+//            fatalError("Can't find the stupid ingredient in array")
+            // a little hack: make fake binding when the model is slower than the ui
+            return Binding(get: { Ingredient(text: "Wow") }, set: { _ in })
         }
         return $fileManager.recipes[recipeIndex!].ingredients[ingredientIndex]
     }
@@ -254,7 +256,9 @@ struct RecipeView: View {
         
         // find the direction
         guard let directionIndex = fileManager.recipes[recipeIndex!].directions.firstIndex(where: { $0.id == direction.id }) else {
-            fatalError("Can't find the stupid direction in array")
+//            fatalError("Can't find the stupid direction in array")
+            // a little hack: make fake binding when the model is slower than the ui
+            return Binding(get: { Direction(step: 200, text: "nope", hasTimer: false, timerInMinutes: 0.0) }, set: { _ in })
         }
         return $fileManager.recipes[recipeIndex!].directions[directionIndex]
     }

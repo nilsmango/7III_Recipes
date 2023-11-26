@@ -22,7 +22,7 @@ struct TitleEditView: View {
     
     /// checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
     private var invalidTitle: Bool {
-        ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle || Parser.sanitizeFileName(title.trimmingCharacters(in: .whitespaces)) == ""
+        ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
     }
     
     let comingFromImportView: Bool
@@ -50,12 +50,10 @@ struct TitleEditView: View {
                     title = newTitle
                     
                 } else {
-                    if title.trimmingCharacters(in: .whitespaces) == "" {
-                        title = "Recipe No. \(versionNumber)"
-                    } else {
-                        // adding a funny version number to the title if there is no number in the last character
-                        title = title + " No. \(versionNumber)"
-                    }
+                    
+                    // adding a funny version number to the title if there is no number in the last character
+                    title = title + " No. \(versionNumber)"
+                    
                 }
                 // check if new title is unique, else try again.
                 if !invalidTitle {
