@@ -18,10 +18,11 @@ struct RecipeView: View {
     
     // custom bindings
     var recipeIndex: Int? {
-        guard let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) else {
-            fatalError("Can't find the stupid recipe in array")
+        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+            return index
+        } else {
+            return nil
         }
-        return index
     }
     
     // confetti
@@ -146,6 +147,17 @@ struct RecipeView: View {
                     } label: {
                         Label("Edit Recipe", systemImage: "square.and.pencil")
                     }
+                    Button(role: .destructive, action: {
+                        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+                            let indexSet = IndexSet(integer: index)
+                            fileManager.delete(at: indexSet)
+                            // dismissing the view
+                            dismiss()
+                        }
+                    }, label: {
+                        Label("Delete Recipe", systemImage: "trash")
+                    })
+                    
                     Button {
                         let newTitle = fileManager.duplicateRecipe(recipe: recipe)
                         data = recipe.data
@@ -157,16 +169,7 @@ struct RecipeView: View {
                         Label("Duplicate Recipe", systemImage: "doc.badge.plus")
                     }
                     
-                    Button(role: .destructive, action: {
-                        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
-                            let indexSet = IndexSet(integer: index)
-                            fileManager.delete(at: indexSet)
-                            // dismissing the view
-                            dismiss()
-                        }
-                    }, label: {
-                        Label("Delete Recipe", systemImage: "trash")
-                    })
+                    
                 } label: {
                     Label("Edit", systemImage: "ellipsis.circle")
                 }
@@ -244,7 +247,7 @@ struct RecipeView: View {
     private func bindingIngredient(for ingredient: Ingredient) -> Binding<Ingredient> {
         
         // find the ingredient
-        guard let ingredientIndex = fileManager.recipes[recipeIndex!].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
+        guard let ingredientIndex = fileManager.recipes[recipeIndex ?? 0].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
 //            fatalError("Can't find the stupid ingredient in array")
             // a little hack: make fake binding when the model is slower than the ui
             return Binding(get: { Ingredient(text: "Wow") }, set: { _ in })
@@ -255,7 +258,7 @@ struct RecipeView: View {
     private func bindingDirection(for direction: Direction) -> Binding<Direction> {
         
         // find the direction
-        guard let directionIndex = fileManager.recipes[recipeIndex!].directions.firstIndex(where: { $0.id == direction.id }) else {
+        guard let directionIndex = fileManager.recipes[recipeIndex ?? 0].directions.firstIndex(where: { $0.id == direction.id }) else {
 //            fatalError("Can't find the stupid direction in array")
             // a little hack: make fake binding when the model is slower than the ui
             return Binding(get: { Direction(step: 200, text: "nope", hasTimer: false, timerInMinutes: 0.0) }, set: { _ in })
