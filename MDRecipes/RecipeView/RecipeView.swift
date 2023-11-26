@@ -147,16 +147,6 @@ struct RecipeView: View {
                     } label: {
                         Label("Edit Recipe", systemImage: "square.and.pencil")
                     }
-                    Button(role: .destructive, action: {
-                        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
-                            let indexSet = IndexSet(integer: index)
-                            fileManager.delete(at: indexSet)
-                            // dismissing the view
-                            dismiss()
-                        }
-                    }, label: {
-                        Label("Delete Recipe", systemImage: "trash")
-                    })
                     
                     Button {
                         let newTitle = fileManager.duplicateRecipe(recipe: recipe)
@@ -169,6 +159,16 @@ struct RecipeView: View {
                         Label("Duplicate Recipe", systemImage: "doc.badge.plus")
                     }
                     
+                    Button(role: .destructive, action: {
+                        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+                            let indexSet = IndexSet(integer: index)
+                            fileManager.delete(at: indexSet)
+                            // dismissing the view
+                            dismiss()
+                        }
+                    }, label: {
+                        Label("Delete Recipe", systemImage: "trash")
+                    })
                     
                 } label: {
                     Label("Edit", systemImage: "ellipsis.circle")
