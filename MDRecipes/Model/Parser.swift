@@ -1283,7 +1283,7 @@ struct Parser {
             // now making the ingredients into a checklist, also removing any solo "-"
             for i in ingredientIndex+1..<nextTitleIndex {
                 let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
-                var rawString = line.replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                var rawString = line.replacingOccurrences(of: "- [ ]", with: "").replacingOccurrences(of: "- [x]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                 if rawString.first == "-" {
                     rawString.removeFirst()
                     rawString = rawString.trimmingCharacters(in: .whitespaces)
@@ -1305,7 +1305,7 @@ struct Parser {
     private static func findIngredientsInSegment(segments: [String]) -> [Ingredient] {
         var ingredients = [Ingredient]()
         for ingredientLine in segments {
-            var rawIngredient = ingredientLine.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "- [ ]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            var rawIngredient = ingredientLine.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "- [ ]", with: "").replacingOccurrences(of: "- [x]", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
             if rawIngredient.first == "-" {
                 rawIngredient.removeFirst()
                 rawIngredient = rawIngredient.trimmingCharacters(in: .whitespaces)
