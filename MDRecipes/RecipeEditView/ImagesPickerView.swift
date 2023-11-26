@@ -25,7 +25,29 @@ struct ImagesPickerView: View {
         Section("Images") {
             
                 ForEach(dataImages) { image in
-                    ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
+                    ZStack {
+                        
+                        
+                        ImageDetailView(image: Image(uiImage: image.image), caption: dataBinding(for: image).caption)
+                        VStack {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    dataImages.removeAll(where: { $0.id == image.id })
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                        .labelStyle(.iconOnly)
+                                        
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(.red)
+                                .padding()
+                                
+                            }
+                            Spacer()
+                        }
+                    }
+                    
                 }
                 .onDelete { indexSet in
                     dataImages.remove(atOffsets: indexSet)
