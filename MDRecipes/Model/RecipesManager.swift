@@ -84,8 +84,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
       func saveTimersAndTrashToDisk() {
           // New file URL to save the trash and timers to the same spot as the rest.
-          let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
-          let trashFileURL = documentsDirectory.appendingPathComponent("trash.data")
+          let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
+          let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
           
           DispatchQueue.global(qos: .background).async { [weak self] in
               guard let timers = self?.timers else { fatalError("Self out of scope!") }
@@ -112,15 +112,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
           
       func loadTimersAndTrashFromDisk() {
           // New file URL to save the trash and timers to the same spot as the rest.
-          let timersFileURL = documentsDirectory.appendingPathComponent("timers.data")
-          let trashFileURL = documentsDirectory.appendingPathComponent("trash.data")
+          let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
+          let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
           
           DispatchQueue.global(qos: .background).async { [weak self] in
               guard let timersData = try? Data(contentsOf: timersFileURL) else {
                   return
               }
               guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: timersData) else {
-                  fatalError("Couldn't decode saved timers data")
+                  print("Trouble with loading the json timer file")
+                  return
               }
               
               DispatchQueue.main.async {
@@ -228,18 +229,13 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     @Published var recipes = [Recipe]()
     
-    // TODO: make this the files directory
     /// The document directory
-    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-
-    
+    let recipesDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
     func loadMarkdownFiles() {
-        // TODO: Change that to something that makes more sense.
-        
         do {
-            let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil)
+            let directoryContents = try FileManager.default.contentsOfDirectory(at: recipesDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
             for markdownFile in markdownFiles {
                 let content = try String(contentsOf: markdownFile)
@@ -267,7 +263,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func saveRecipeAsMarkdownFile(recipe: Recipe) {
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
         
-        let fileURL = documentsDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+        let fileURL = recipesDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
         do {
             try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
@@ -284,7 +280,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     private func deleteMarkdownFile(recipeTitle: String) {
         let sanitizedTitle = Parser.sanitizeFileName(recipeTitle)
         let fileName = "\(sanitizedTitle).md"
-        let fileURL = documentsDirectory.appendingPathComponent(fileName)
+        let fileURL = recipesDirectory.appendingPathComponent(fileName)
         do {
             try FileManager.default.removeItem(at: fileURL)
         } catch {
@@ -510,7 +506,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// Saving a new images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
-        let recipePhotosDirectory = documentsDirectory.appendingPathComponent("RecipePhotos")
+        let recipePhotosDirectory = recipesDirectory.appendingPathComponent("RecipePhotos")
         let fileManager = FileManager.default
         // Create the RecipePhotos directory if it doesn't exist
         do {
