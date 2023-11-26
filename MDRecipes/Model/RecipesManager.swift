@@ -293,9 +293,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// deleting both Recipe and the corresponding Markdown File
-    func delete(at indexSet: IndexSet) {
+    func delete(at indexSet: IndexSet, filteringCategory: String = "") {
+        
         // find the id for later removing the markdown
-        let idsToDelete = indexSet.map { recipes[$0].id }
+        let idsToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: [])[$0].id }
         
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
@@ -310,9 +311,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // Delete the Markdown files
         recipeTitles.forEach(deleteMarkdownFile)
         
-        
         // Remove the timer of the recipes
-        var recipesToDelete = indexSet.map { recipes[$0] }
+        var recipesToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: [])[$0] }
         recipesToDelete.forEach(removeTimers)
         
         // Update the updated date in the deleted recipes to the trash array
@@ -322,9 +322,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         trash.append(contentsOf: recipesToDelete)
         
-        
         // Remove the Recipe from the Recipes Arrays
-        recipes.remove(atOffsets: indexSet)
+        recipes.removeAll(where: { idsToDelete.contains($0.id) })
         
     }
     

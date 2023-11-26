@@ -40,7 +40,7 @@ struct RecipesListView: View {
                     
                 }
                 .onDelete { indexSet in
-                    fileManager.delete(at: indexSet)
+                    fileManager.delete(at: indexSet, filteringCategory: category)
                 }
                 .onMove { indexSet, newPlace in
                     fileManager.move(from: indexSet, to: newPlace)
