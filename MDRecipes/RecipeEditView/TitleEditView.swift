@@ -22,7 +22,7 @@ struct TitleEditView: View {
     
     /// checking if title and also sanitized title is not in all titles and if title is not the oldTitle if we are editing the recipe
     private var invalidTitle: Bool {
-        ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle
+        ( titles.contains(title) || saneTitles.contains(Parser.sanitizeFileName(title)) ) && title != oldTitle || Parser.sanitizeFileName(title.trimmingCharacters(in: .whitespaces)) == ""
     }
     
     let comingFromImportView: Bool
@@ -39,13 +39,23 @@ struct TitleEditView: View {
             for versionNumber in (2...200) {
                 // if last character is a number then increase that number
                 if let lastNumber = Int(String(title.last ?? "r")) {
-                    let incrementedLastDigit = lastNumber + 1
-                    let newTitle = String(title.dropLast()) + String(incrementedLastDigit)
+                    let incrementedLastDigit: String
+                    if lastNumber == 9 {
+                        incrementedLastDigit = "b0"
+                    } else {
+                        incrementedLastDigit = String(lastNumber + 1)
+                    }
+                    
+                    let newTitle = String(title.dropLast()) + incrementedLastDigit
                     title = newTitle
                     
                 } else {
-                    // adding a funny version number to the title if there is no number in the last character
-                    title = title + " No. \(versionNumber)"
+                    if title.trimmingCharacters(in: .whitespaces) == "" {
+                        title = "Recipe No. \(versionNumber)"
+                    } else {
+                        // adding a funny version number to the title if there is no number in the last character
+                        title = title + " No. \(versionNumber)"
+                    }
                 }
                 // check if new title is unique, else try again.
                 if !invalidTitle {

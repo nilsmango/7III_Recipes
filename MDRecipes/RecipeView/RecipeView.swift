@@ -231,7 +231,7 @@ struct RecipeView: View {
                                     // show alert and go back to list
                                     recipeMovedAlert = RecipeMovedAlert(showAlert: true, recipeName: data.title, movedToCategory: data.categories.first!)
                                     self.presentationMode.wrappedValue.dismiss()
-                                }
+                                }                                
                             }
                         }
                     }

@@ -228,6 +228,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     @Published var recipes = [Recipe]()
     
+    // TODO: make this the files directory
     /// The document directory
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 
@@ -296,7 +297,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // find the id for later removing the markdown
         let idsToDelete = indexSet.map { recipes[$0].id }
         
-        
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
         
@@ -341,8 +341,20 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             categories = ["No Category"]
         }
         
+        // check if title was changed, delete markdown file if it was, also check if new title is unique
+        var newTitle = data.title
+        
+        if recipe.title != data.title {
+            deleteMarkdownFile(recipeTitle: recipe.title)
+            
+            // change title if already in the recipes or if ""!
+            while recipes.contains(where: { $0.title == newTitle }) || newTitle.trimmingCharacters(in: .whitespaces) == "" {
+                newTitle += "2"
+            }
+        }
+        
         // update recipe in the recipes array
-        let newRecipeData = Recipe.Data(title: data.title,
+        let newRecipeData = Recipe.Data(title: newTitle,
                                source: data.source,
                                categories: categories,
                                tags: data.tags,
@@ -365,12 +377,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         recipes[index].update(from: newRecipeData)
         
-        // check if title was changed, delete markdown file if it was
-        if recipe.title != data.title {
-            deleteMarkdownFile(recipeTitle: recipe.title)
-        }
-        
-        
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
         
@@ -389,7 +395,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             categories = ["No Category"]
         }
         
-        let newRecipe = Recipe(title: newRecipeData.title,
+        // check if new title is unique and not empty
+        var newTitle = newRecipeData.title
+        
+        // change title if already in the recipes or if ""!
+        while recipes.contains(where: { $0.title == newTitle }) || newTitle.trimmingCharacters(in: .whitespaces) == "" {
+            newTitle += "2"
+        }
+        
+        
+        let newRecipe = Recipe(title: newTitle,
                                source: newRecipeData.source,
                                categories: categories,
                                tags: newRecipeData.tags,
@@ -422,7 +437,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// make a duplication of the recipe
     func duplicateRecipe(recipe: Recipe) -> String {
-        let newTitle = recipe.title + " Variation \(Int.random(in: 0...9))\(randomLetter())\(randomLetter())"
+        let newTitle = recipe.title + " Variation \(Int.random(in: 0...99))\(randomLetter())\(randomLetter())"
         if let index = recipes.firstIndex(where: { $0.id == recipe.id }) {
             // change the OG recipe to a version
             var recipeVersion = recipe
