@@ -66,7 +66,7 @@ struct SegmentView: View {
                                     if oldValue == segment.part {
                                         // reassigning segment and toggle if we have to show title alert
                                         if importer.reAssignSegment(oldValue: oldValue, newValue: newValue, id: segment.id) {
-                                            print("need to check if title is first line")
+                                            
                                             alertSegment = RecipeSegment(part: newValue, lines: segment.lines)
                                             showAlert = true
                                         }
@@ -99,8 +99,6 @@ struct SegmentView: View {
 
                         }
                     }
-                    
-                    
                 }
                 
                 if isWiggling {
@@ -121,22 +119,11 @@ struct SegmentView: View {
             .padding()
             
         }
-                    
-                
-            
-        
-        
-        
-    
-        
 }
 
 struct SegmentView_Previews: PreviewProvider {
     static var previews: some View {
-
         SegmentView(importer: Importer(), segment: RecipeSegment(part: .cookTime, lines: ["Ingredients", "500 g sugar", "20 black peas"]), showAlert: .constant(false), alertSegment: .constant(RecipeSegment(part: .cookTime, lines: ["Ingredients", "500 g sugar", "20 black peas"])))
                 .frame(height: 500)
-            
-        
     }
 }

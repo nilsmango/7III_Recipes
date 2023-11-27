@@ -77,6 +77,9 @@ Cooking can be dangerous
                     }
                 }
             }
+            .onAppear {
+                saveDisabled = true
+            }
             .fullScreenCover(isPresented: $showingSheet, content: {
                 NavigationView {
                     SegmentsImportView(importer: importer, recipeLanguage: $recipeLanguage)

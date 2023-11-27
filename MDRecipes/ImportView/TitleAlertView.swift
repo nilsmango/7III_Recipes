@@ -78,6 +78,7 @@ struct TitleAlertView: View {
                 }
             }
             .padding()
+            .frame(width: UIScreen.main.bounds.width * 0.8)
         }
         
     }

@@ -14,11 +14,12 @@ struct RecipeMovedAlertView: View {
         if recipeMovedAlert.showAlert {
             HStack {
                 VStack {
+                    
                     Text("The recipe \"\(recipeMovedAlert.recipeName)\" was moved to category \"\(recipeMovedAlert.movedToCategory)\".")
                         
                     .foregroundColor(Color(.systemBackground))
                     .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.center)
+                    .multilineTextAlignment(.leading)
                     
                             Button {
                                 
@@ -38,6 +39,7 @@ struct RecipeMovedAlertView: View {
                 }
             }
             .padding()
+            .frame(width: UIScreen.main.bounds.width * 0.8)
         }
         
     }
