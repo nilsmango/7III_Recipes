@@ -239,7 +239,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
             for markdownFile in markdownFiles {
                 let content = try String(contentsOf: markdownFile)
-                self.recipes.append(Parser.makeRecipeFromString(string: content).recipe)
+                if content.hasPrefix("---\ntype: 7III Recipe") {
+                    self.recipes.append(Parser.makeRecipeFromString(string: content).recipe)
+                }
             }
         } catch {
             print("Error loading Markdown files: \(error.localizedDescription)")

@@ -649,6 +649,7 @@ struct Parser {
         var lines: [String] = []
         // yaml header
         lines.append("---")
+        lines.append("type: 7III Recipe")
         lines.append("date: \(formatDate(recipe.date))")
         lines.append("updated: \(formatDate(recipe.updated))")
         lines.append("---")
