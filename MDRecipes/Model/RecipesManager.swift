@@ -775,7 +775,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// get a random recipe
     func randomRecipe() -> Recipe? {
-        if recipes.count > 2 {
+        if recipes.count > 1 {
             return recipes.randomElement()
         } else {
             return nil

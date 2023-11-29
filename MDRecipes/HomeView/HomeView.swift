@@ -33,42 +33,53 @@ struct HomeView: View {
         NavigationStack {
             if searchText.isEmpty {
                 ScrollView {
+                    
+
                     VStack(alignment: .leading) {
-                        Text("Recipes")
-                            .fontWeight(.bold)
-                            .fontDesign(.rounded)
-                            .padding([.horizontal, .top])
-                        LazyVGrid(columns: columns) {
-                            NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
-                                FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
-                            }
-                            
-                            ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
-                                    FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
+                        let allRecipes = fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count
+                        
+                        if allRecipes > 0 {
+                            Text("7III Recipes")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .fontDesign(.rounded)
+                                .padding([.horizontal, .top])
+                            LazyVGrid(columns: columns) {
+                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
+                                    FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
+                                }
+                                
+                                ForEach(fileManager.getAllCategories(), id: \.self) { category in
+                                    NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
+                                        FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
+                                        
+                                    }
                                     
+                                }
+                                if randomRecipe != nil {
+                                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                        RandomRecipeView()
+                                        
+                                    }
                                 }
                                 
                             }
-                            if randomRecipe != nil {
-                                NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
-                                    RandomRecipeView()
-                                    
-                                }
+                            
+                            .padding([.horizontal])
+                            
+                            let allTags = fileManager.getAllTags()
+                            if allTags.count > 0 {
+                                Text("Tags")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .fontDesign(.rounded)
+                                    .padding([.horizontal, .top])
+                                
+                                FlexiTagsView(fileManager: fileManager, strings: allTags)
+                                    .padding(.horizontal)
                             }
                             
                         }
-                        
-                        .padding([.horizontal])
-                                                
-                        Text("Tags")
-                            .fontWeight(.bold)
-                            .fontDesign(.rounded)
-                            .padding([.horizontal, .top])
-
-                        FlexiTagsView(fileManager: fileManager, strings: fileManager.getAllTags())
-                            .padding(.horizontal)
-                        
                         HStack {
                             Spacer()
                             

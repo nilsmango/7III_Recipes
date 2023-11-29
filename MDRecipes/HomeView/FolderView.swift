@@ -25,13 +25,10 @@ struct FolderView: View {
                 .foregroundColor(.blue)
                 .font(.title)
                 
-                
-//                .padding()
                 HStack {
                     Text(categoryFolder)
                     Spacer()
                 }
-//                .font(.title2)
                 .foregroundColor(.primary)
                 .padding(.top, 1)
                 
@@ -41,11 +38,6 @@ struct FolderView: View {
             .padding()
             
         }
-        
-//        .padding()
-//        .frame(width: 140, height: 90)
-        
-        
     }
 }
 

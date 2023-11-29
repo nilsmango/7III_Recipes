@@ -19,6 +19,7 @@ struct SegmentsImportView: View {
             VStack(alignment: .leading) {
                 
                 Text("Assign the Segments")
+                    .font(.title3)
                     .fontWeight(.bold)
                     .fontDesign(.rounded)
                     .padding([.horizontal, .top])

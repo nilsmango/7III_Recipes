@@ -22,14 +22,11 @@ struct RandomRecipeView: View {
                         .opacity(0)
                 }
                 .font(.title)
-                
-                
-//                .padding()
+
                 HStack {
                     Text("Random Recipe")
                     Spacer()
                 }
-//                .font(.title2)
                 .foregroundColor(.primary)
                 .padding(.top, 1)
                 
@@ -40,8 +37,6 @@ struct RandomRecipeView: View {
             
         }
         
-//        .padding()
-//        .frame(width: 140, height: 90)
         
         
     }

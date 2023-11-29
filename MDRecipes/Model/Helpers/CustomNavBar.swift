@@ -18,6 +18,13 @@ struct CustomNavBar: ViewModifier {
         let font = UIFont.init(descriptor: descriptor, size: 0)
         
         UINavigationBar.appearance().largeTitleTextAttributes = [.font : font]
+        
+        let smallDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title3)
+            .withDesign(design)!.withSymbolicTraits(.traitBold)!
+        
+        let smallFont = UIFont.init(descriptor: smallDescriptor, size: 0)
+        
+        UINavigationBar.appearance().titleTextAttributes = [.font : smallFont]
     }
 
     func body(content: Content) -> some View {
