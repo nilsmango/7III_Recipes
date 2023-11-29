@@ -655,6 +655,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             }
         }
         // second stage: filtering the result by the ingredients
+        // TODO: this would need some more work
         
         if ingredients.isEmpty == false {
             
@@ -699,7 +700,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 }
             }
         }
-        
         
         return filteredRecipes
     }
@@ -775,7 +775,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// get a random recipe
     func randomRecipe() -> Recipe? {
-        recipes.randomElement()
+        if recipes.count > 2 {
+            return recipes.randomElement()
+        } else {
+            return nil
+        }
     }
     
     

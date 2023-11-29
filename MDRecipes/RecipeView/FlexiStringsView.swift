@@ -16,10 +16,9 @@ struct FlexiStringsView: View {
             spacing: 5,
             alignment: .leading
         ) { string in
-
                 Text(string)
                     .foregroundColor(.white)
-                    .fontWeight(.bold)
+                    .fontWeight(.semibold)
                     .fontDesign(.rounded)
                     .padding(8)
                     .background(
@@ -27,10 +26,7 @@ struct FlexiStringsView: View {
                             .fill(.blue)
                         
                     )
-//            }
-            
-                
-        }
+            }
     }
 }
 

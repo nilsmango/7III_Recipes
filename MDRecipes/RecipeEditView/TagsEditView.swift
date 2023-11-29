@@ -50,37 +50,22 @@ struct TagsEditView: View {
                 spacing: 5,
                 alignment: .leading
             ) { tag in
-                Text(tag)
-                    .foregroundColor(tags.contains(tag) ? .white : .gray)
-                    .fontWeight(.bold)
-                    .fontDesign(.rounded)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(tags.contains(tag) ? .blue : .gray)
-                            .opacity(tags.contains(tag) ? 1 : 0.2)
-                        
-                    )
+                SelectionButtonLabel(string: tag, chosenStrings: $tags, allStrings: recipesTags)
                     .onTapGesture {
-                        withAnimation {
                             if tags.contains(tag) {
                                 tags.removeAll(where: { $0 == tag })
                                 updateAllTags()
                             } else {
-                                tags.append(tag)
-                                updateAllTags()
+                                    tags.append(tag)
+                                    updateAllTags()
                             }
-                        }
                     }
-                    .padding(.vertical, 6)
             }
         }
         .onAppear {
             allTags = Array(Set(recipesTags + tags)).sorted()
         }
         Section {
-            
             HStack {
                 TextField("Add a new tag ...", text: $newTag)
                     .focused($isFieldFocused)

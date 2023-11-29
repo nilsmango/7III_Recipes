@@ -28,14 +28,12 @@ struct TrashList: View {
                     .buttonStyle(.borderedProminent)
 
                 }
-                
             }
         }
+        .navigationTitle("Trash")
     }
 }
 
-struct TrashList_Previews: PreviewProvider {
-    static var previews: some View {
-        TrashList(fileManager: RecipesManager())
-    }
+#Preview {
+    TrashList(fileManager: RecipesManager())
 }

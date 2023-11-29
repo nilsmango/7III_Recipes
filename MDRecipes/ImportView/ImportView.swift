@@ -58,7 +58,7 @@ Cooking can be dangerous
     var body: some View {
         if counter < 1 || showingSheet {
             List {
-                Section(header: Text("Paste Recipe here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
+                Section(header: Text("Paste Recipe Text here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
                     TextEditor(text: $newRecipe)
                         .frame(minHeight: 370)
                     

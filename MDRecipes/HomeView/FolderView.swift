@@ -14,7 +14,7 @@ struct FolderView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .foregroundColor(.white)
+                .foregroundColor(Color("FolderBG"))
 //                .shadow(radius: 2)
             VStack {
                 HStack {
@@ -22,6 +22,7 @@ struct FolderView: View {
                     Spacer()
                     Text(categoryNumber)
                 }
+                .foregroundColor(.blue)
                 .font(.title)
                 
                 
@@ -31,7 +32,7 @@ struct FolderView: View {
                     Spacer()
                 }
 //                .font(.title2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary)
                 .padding(.top, 1)
                 
             }
@@ -48,9 +49,8 @@ struct FolderView: View {
     }
 }
 
-struct FolderView_Previews: PreviewProvider {
-    static var previews: some View {
-        FolderView(categoryFolder: "Desert", categoryNumber: "10")
-            .background(.gray)
-    }
+#Preview {
+    FolderView(categoryFolder: "Desert", categoryNumber: "10")
+        .background(.gray)
+    
 }

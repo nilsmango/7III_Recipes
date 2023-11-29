@@ -27,11 +27,17 @@ struct HomeView: View {
     
     @State private var importSaveDisabled = true
     
+    @State private var showNewRecipeButtons = false
+    
     var body: some View {
         NavigationStack {
             if searchText.isEmpty {
                 ScrollView {
-                    VStack {
+                    VStack(alignment: .leading) {
+                        Text("Recipes")
+                            .fontWeight(.bold)
+                            .fontDesign(.rounded)
+                            .padding([.horizontal, .top])
                         LazyVGrid(columns: columns) {
                             NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
                                 FolderView(categoryFolder: "All", categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count))
@@ -53,30 +59,76 @@ struct HomeView: View {
                             
                         }
                         
-                        .padding()
-                      
-                    // TODO: make this great
-                        
+                        .padding([.horizontal])
+                                                
                         Text("Tags")
-                        FlexiStringsView(strings: fileManager.getAllTags())
-                        Text("Ingredients")
+                            .fontWeight(.bold)
+                            .fontDesign(.rounded)
+                            .padding([.horizontal, .top])
+
+                        FlexiTagsView(fileManager: fileManager, strings: fileManager.getAllTags())
+                            .padding(.horizontal)
                         
-                        
-                        Text("Irgndwie Tags und ingredients here, wenn clickt dann zu einer speziellen liste mit ausgewählten tags oder eben ingredients, wo man einzelne tags oder ingredients dazuklicken kann wie TagsEditView - die neue liste hier unten hinzufügen bei else")
-                        
-                        Text("New Recipe Button auch irgendwo hier unten, als erstes!(?)")
-                        Text("Alles wie in erinnerungen app")
-                        NavigationLink("Trash", destination: TrashList(fileManager: fileManager))
-                        
+                        HStack {
+                            Spacer()
+                            
+                            if showNewRecipeButtons {
+                                Button(action: {
+                                    editViewPresented = true
+                                    showNewRecipeButtons = false
+                                }) {
+                                    Label("Write New", systemImage: "square.and.pencil")
+                                        .fontWeight(.bold)
+                                        .fontDesign(.rounded)
+                                        .padding()
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .foregroundColor(Color("FolderBG"))
+                                        )
+                                }
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    importViewPresented = true
+                                    showNewRecipeButtons = false
+                                }) {
+                                    Label("From Text", systemImage: "square.and.arrow.down")
+                                        .fontWeight(.bold)
+                                        .fontDesign(.rounded)
+                                        .padding()
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .foregroundColor(Color("FolderBG"))
+                                        )
+                                }
+                            } else {
+                                Button(action: {
+                                    showNewRecipeButtons = true
+                                }) {
+                                    Label("Add new Recipe", systemImage: "plus.circle.fill")
+                                        .fontWeight(.bold)
+                                        .fontDesign(.rounded)
+                                        .padding()
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .foregroundColor(Color("FolderBG"))
+                                        )
+                                }
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding()
                         
                     }
                 }
                 
                 .background(
                     .gray
-                    .opacity(0.1)
+                        .opacity(0.1)
                 )
-//                .navigationTitle("Categories")
+                //                .navigationTitle("Categories")
                 .toolbar {
                     Menu {
                         Button(action: {  } ) {
@@ -91,12 +143,13 @@ struct HomeView: View {
                             editViewPresented = true
                         }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
                         
-                        
-                        
                         Button {
                             importViewPresented = true
                         } label: {
                             Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
+                        }
+                        NavigationLink(destination: TrashList(fileManager: fileManager)) {
+                            Label("Show Trash", systemImage: "trash")
                         }
                     } label: {
                         Label("Options", systemImage: "ellipsis.circle")
@@ -106,32 +159,30 @@ struct HomeView: View {
                 
             } else {
                 List {
-                          ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                            if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
-                                Section {
-                                    ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                        NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
-                                            ListItemView(recipe: recipe)
-                                        }
-                                        
+                    ForEach(fileManager.getAllCategories(), id: \.self) { category in
+                        if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
+                            Section {
+                                ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
+                                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                        ListItemView(recipe: recipe)
                                     }
-                                
-                                } header: {
-                                    Text(category)
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                        .fontDesign(.rounded)
                                 }
+                            } header: {
+                                Text(category)
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .fontDesign(.rounded)
                             }
-                            
+                        }
+                        
                         
                     }
                     
                 }
                 
             }
-    
-                
+            
+            
         }
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
@@ -240,10 +291,10 @@ struct HomeView: View {
                                 importViewPresented = false
                                 
                                 addNotSubmittedIngredient()
-                                   
+                                
                                 // saving the new recipe
                                 fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-
+                                
                                 // reseting newRecipeData
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     newRecipeData.timesCooked = 0
@@ -265,7 +316,7 @@ struct HomeView: View {
                                     
                                     
                                 }
-
+                                
                             }
                             .disabled(importSaveDisabled)
                             
@@ -282,12 +333,11 @@ struct HomeView: View {
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-            let fileManager = RecipesManager()
-            fileManager.recipes = Recipe.sampleData
-            
-        return HomeView(fileManager: fileManager)
-        }
-    }
+#Preview {
+    let fileManager = RecipesManager()
+    fileManager.recipes = Recipe.sampleData
+    
+    return HomeView(fileManager: fileManager)
+}
+
 

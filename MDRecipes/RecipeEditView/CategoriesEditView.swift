@@ -35,20 +35,8 @@ struct CategoriesEditView: View {
                 spacing: 5,
                 alignment: .leading
             ) { category in
-                Text(category)
-                    .foregroundColor(categories.contains(category) ? .white : .gray)
-                    .fontWeight(.bold)
-                    .fontDesign(.rounded)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(categories.contains(category) ? .blue : .gray)
-                            .opacity(categories.contains(category) ? 1 : 0.2)
-                        
-                    )
+                SelectionButtonLabel(string: category, chosenStrings: $categories, allStrings: recipesCategories)
                     .onTapGesture {
-                        withAnimation {
                             if categories.contains(category) {
                                 categories.removeAll(where: { $0 == category })
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
@@ -63,8 +51,6 @@ struct CategoriesEditView: View {
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
                             }
                         }
-                    }
-                    .padding(.vertical, 6)
             }
         }
         .onAppear {
