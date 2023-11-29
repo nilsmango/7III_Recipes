@@ -119,8 +119,6 @@ Cooking can be dangerous
     }
 }
 
-struct ImportView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
         ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), newIngredient: .constant(""), saveDisabled: .constant(true))
-    }
 }

@@ -52,7 +52,7 @@ struct TagsOrIngredientsListView: View {
             }
         }
         }
-        .navigationTitle(Text(chosenStrings.count < 2 ? chosenStrings.first ?? "Tags" : chosenStrings.first! + " +"))
+        .navigationTitle(Text(chosenStrings.count < 2 ? chosenStrings.first ?? "Filter by Tags" : chosenStrings.first! + " +"))
     }
 }
 

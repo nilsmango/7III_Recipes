@@ -16,9 +16,12 @@ struct SegmentsImportView: View {
     
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(alignment: .leading) {
                 
                 Text("Assign the Segments")
+                    .fontWeight(.bold)
+                    .fontDesign(.rounded)
+                    .padding([.horizontal, .top])
                 
                 HStack {
                     Text("Recipe Language")
@@ -54,8 +57,6 @@ struct SegmentsImportView: View {
     }
 }
 
-struct SegmentsImportView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
         SegmentsImportView(importer: Importer(), recipeLanguage: .constant(.english))
-    }
 }

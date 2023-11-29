@@ -29,7 +29,7 @@ struct TitleAlertView: View {
                             Text("The first line reads \"\(firstLine)\", is it part of the segment \"\(segmentPart)\" or only the title?")
                         }
                     }
-                    .foregroundColor(Color(.systemBackground))
+                    .foregroundColor(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.center)
                     
@@ -53,7 +53,10 @@ struct TitleAlertView: View {
                             Button {
                                 // removing the firstLine from the segment
                                 importer.removeLineFromSegment(segmentPart: alertSegment.part, line: firstLine)
-                                showSearchStringQuestion = true
+                                
+                                // TODO: implement adding string to the search and cutoff strings.
+//                                showSearchStringQuestion = true
+                                showAlert = false
                             } label: {
                                 Text("It's only the title")
                             }
@@ -64,17 +67,16 @@ struct TitleAlertView: View {
                             } label: {
                                 Text("It's part of \"\(segmentPart)\"")
                             }
-                            
                         }
                     }
                     .buttonStyle(.bordered)
-                    .tint(Color(.systemBackground))
+                    .tint(.primary)
                 }
                 .padding()
                 .background {
                     RoundedRectangle(cornerRadius: 10)
-//                        .foregroundColor(.gray)
-                        .background(.ultraThinMaterial)
+                        .foregroundColor(Color("LightGray"))
+//                        .background(.ultraThinMaterial)
                 }
             }
             .padding()

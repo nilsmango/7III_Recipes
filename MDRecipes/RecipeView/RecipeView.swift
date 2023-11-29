@@ -232,7 +232,8 @@ struct RecipeView: View {
                                 // check if the recipe is still in the category folder
                                 if !data.categories.contains(where: { $0 == categoryFolder }) && categoryFolder != "All" && categoryFolder != "" {
                                     // show alert and go back to list
-                                    recipeMovedAlert = RecipeMovedAlert(showAlert: true, recipeName: data.title, movedToCategory: data.categories.first!)
+                                        recipeMovedAlert = RecipeMovedAlert(showAlert: true, recipeName: data.title, movedToCategory: data.categories.first!)
+                                    
                                     self.presentationMode.wrappedValue.dismiss()
                                 }                                
                             }

@@ -130,34 +130,8 @@ struct HomeView: View {
                 )
                 //                .navigationTitle("Categories")
                 .toolbar {
-                    Menu {
-                        Button(action: {  } ) {
-                            Label("About", systemImage: "info.circle")
-                        }
-                        Button(action: {
-                            // TODO: Add donation thing
-                        } ) {
-                            Label("Tip us 1 USD!", systemImage: "heart")
-                        }
-                        Button(action: {
-                            editViewPresented = true
-                        }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
-                        
-                        Button {
-                            importViewPresented = true
-                        } label: {
-                            Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
-                        }
-                        if !fileManager.trash.isEmpty {
-                            NavigationLink(destination: TrashList(fileManager: fileManager)) {
-                                Label("Show Trash", systemImage: "trash")
-                            }
-                        }
-                        
-                    } label: {
-                        Label("Options", systemImage: "ellipsis.circle")
-                            .labelStyle(.iconOnly)
-                    }
+                    
+                    ToolbarOptionsView(fileManager: fileManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, sortingSelection: .constant(.standard), isHomeView: true)
                 }
                 
             } else {
@@ -190,6 +164,8 @@ struct HomeView: View {
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
         .background(ignoresSafeAreaEdges: .all)
+        // making the font rounded
+        .customNavBar()
         
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
@@ -260,7 +236,7 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $importViewPresented, content: {
             NavigationView {
                 ImportView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $importSaveDisabled)
-                    .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
+                    .navigationTitle(newRecipeData.title == "" ? "Import from Text" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Cancel") {

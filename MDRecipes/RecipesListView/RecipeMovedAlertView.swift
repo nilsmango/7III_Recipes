@@ -13,29 +13,26 @@ struct RecipeMovedAlertView: View {
     var body: some View {
         if recipeMovedAlert.showAlert {
             HStack {
-                VStack {
                     
                     Text("The recipe \"\(recipeMovedAlert.recipeName)\" was moved to category \"\(recipeMovedAlert.movedToCategory)\".")
                         
-                    .foregroundColor(Color(.systemBackground))
+                        .foregroundColor(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
                     
-                            Button {
-                                
-                                recipeMovedAlert.showAlert = false
-                            } label: {
-                                Text("OK")
-                            }
-                      
-                    .buttonStyle(.bordered)
-                    .tint(Color(.systemBackground))
-                }
                 .padding()
                 .background {
                     RoundedRectangle(cornerRadius: 10)
-//                        .foregroundColor(.gray)
-                        .background(.ultraThinMaterial)
+                        .foregroundColor(Color("LightGray"))
+//                        .background(.ultraThinMaterial)
+                }
+                .onTapGesture {
+                    recipeMovedAlert.showAlert = false
+                }
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        recipeMovedAlert.showAlert = false
+                    }
                 }
             }
             .padding()
