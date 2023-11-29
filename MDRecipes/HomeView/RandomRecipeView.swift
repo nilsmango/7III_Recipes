@@ -12,7 +12,7 @@ struct RandomRecipeView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .foregroundColor(.white)
+                .foregroundColor(Color("FolderBG"))
 //                .shadow(radius: 2)
             VStack {
                 HStack {
@@ -30,7 +30,7 @@ struct RandomRecipeView: View {
                     Spacer()
                 }
 //                .font(.title2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary)
                 .padding(.top, 1)
                 
             }

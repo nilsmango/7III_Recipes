@@ -148,9 +148,12 @@ struct HomeView: View {
                         } label: {
                             Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
                         }
-                        NavigationLink(destination: TrashList(fileManager: fileManager)) {
-                            Label("Show Trash", systemImage: "trash")
+                        if !fileManager.trash.isEmpty {
+                            NavigationLink(destination: TrashList(fileManager: fileManager)) {
+                                Label("Show Trash", systemImage: "trash")
+                            }
                         }
+                        
                     } label: {
                         Label("Options", systemImage: "ellipsis.circle")
                             .labelStyle(.iconOnly)
