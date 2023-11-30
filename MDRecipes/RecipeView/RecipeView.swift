@@ -150,9 +150,16 @@ struct RecipeView: View {
                     
                     Button {
                         let newTitle = fileManager.duplicateRecipe(recipe: recipe)
+                        
                         data = recipe.data
+                        
                         // making sure the edit view has the right title
                         data.title = newTitle
+                        
+                        // removing the images for the new recipe
+                        data.oldImages = []
+                        data.dataImages = []
+                        
                         editViewIsPresented = true
                         
                     } label: {

@@ -17,9 +17,10 @@ struct MDRecipesApp: App {
         WindowGroup {
             HomeView(fileManager: fileManager)
                 .onAppear {
-                    fileManager.loadMarkdownFiles()
-                    // loading all the timers afresh
+                    // 1. loading all the timers and trash from disk
                     fileManager.loadTimersAndTrashFromDisk()
+                    // 2. loading the recipes from markdown
+                    fileManager.loadMarkdownFiles()
                 }
                 .onChange(of: scenePhase) { phase in
                     if phase == .inactive {

@@ -28,6 +28,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func loadTimers(for recipe: Recipe) {
         let directions = recipe.directions
         for direction in directions {
+            // remove old timers
             if let index = timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
                 timers.remove(at: index)
             }
@@ -193,9 +194,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    
-    
-    
     // MARK: TRASH
     // The trash gets written to a json file like the timers. Above.
     
@@ -223,8 +221,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     
-    // TODO: save the trash array Recipes to the filemanager + Recipe Trash, + loadTrash from there as well.
-    
     // MARK: RECIPES
     
     @Published var recipes = [Recipe]()
@@ -240,7 +236,21 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             for markdownFile in markdownFiles {
                 let content = try String(contentsOf: markdownFile)
                 if content.hasPrefix("---\ntype: 7III Recipe") {
-                    self.recipes.append(Parser.makeRecipeFromString(string: content).recipe)
+                    let newRecipe = Parser.makeRecipeFromString(string: content).recipe
+                    self.recipes.append(newRecipe)
+                    
+                    // also add new timers if they are not already saved
+                    let directions = newRecipe.directions
+                    for direction in directions {
+                        // stop if the timers are already loaded
+                        if let index = timers.firstIndex(where: { $0.recipeTitle == newRecipe.title && $0.step == direction.step }) {
+                            break
+                        } else {
+                            if direction.hasTimer {
+                                timers.append(DirectionTimer(targetDate: Date.distantFuture, timerInMinutes: direction.timerInMinutes, recipeTitle: newRecipe.title, stepString: direction.text, step: direction.step, running: .stopped, id: direction.id))
+                            }
+                        }
+                    }
                 }
             }
         } catch {
@@ -261,8 +271,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    // TODO: make this private once I don't use fake recipes any more
-    func saveRecipeAsMarkdownFile(recipe: Recipe) {
+    private func saveRecipeAsMarkdownFile(recipe: Recipe) {
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
         
         let fileURL = recipesDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
@@ -271,11 +280,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         } catch {
             print("Error saving updated Markdown file for recipe \(recipe.title): \(error.localizedDescription)")
         }
-    }
-    
-    // TODO: delete this once we don't use fake recipes any more
-    func createMarkdownFile(name: String, content: String) {
-        recipes.append(Parser.makeRecipeFromString(string: content).recipe)
     }
     
     /// deleting only the markdown file of a recipe
