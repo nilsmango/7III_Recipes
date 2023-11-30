@@ -32,7 +32,8 @@ struct TimerButtonView: View {
                     let content = UNMutableNotificationContent()
                     content.title = "Recipe \(dirTimer.recipeTitle)"
                     content.subtitle = "Time's up for \(dirTimer.stepString)"
-                    content.sound = UNNotificationSound.default
+
+                    content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "Kitchen Timer Normal.caf"))
                     
                     let targetDate = Date(timeIntervalSinceNow: TimeInterval(dirTimer.timerInMinutes * 60))
                     let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: targetDate)
@@ -63,10 +64,10 @@ struct TimerButtonView: View {
                             currentDate = input
                             if currentDate >= dirTimer.targetDate {
                                 fileManager.alarm(for: dirTimer)
-                                withAnimation(.linear(duration: 10)) {
-                                    numberOfShakes = 88
+                                withAnimation(.linear(duration: 4)) {
+                                    numberOfShakes = 33
                                 }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 11) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                     numberOfShakes = 0
                                 }
                             }

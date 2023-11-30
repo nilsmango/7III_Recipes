@@ -12,6 +12,7 @@
 		7824BC3E2B172DD100211579 /* SelectionButtonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */; };
 		7824BC402B177CF400211579 /* ToolbarOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3F2B177CF400211579 /* ToolbarOptionsView.swift */; };
 		7824BC432B179FE800211579 /* CustomNavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC422B179FE800211579 /* CustomNavBar.swift */; };
+		7824BC472B189F6000211579 /* Kitchen Timer Normal.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7824BC452B189F6000211579 /* Kitchen Timer Normal.caf */; };
 		782821FF29F177F4006128CA /* RandomRecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782821FE29F177F4006128CA /* RandomRecipeView.swift */; };
 		782AB9E529CE0A9600EC23FC /* ScrollingListExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9E429CE0A9600EC23FC /* ScrollingListExperiment.swift */; };
 		782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AB9E629CE2F0E00EC23FC /* Recipe.swift */; };
@@ -98,6 +99,7 @@
 		7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionButtonLabel.swift; sourceTree = "<group>"; };
 		7824BC3F2B177CF400211579 /* ToolbarOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarOptionsView.swift; sourceTree = "<group>"; };
 		7824BC422B179FE800211579 /* CustomNavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBar.swift; sourceTree = "<group>"; };
+		7824BC452B189F6000211579 /* Kitchen Timer Normal.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Kitchen Timer Normal.caf"; sourceTree = "<group>"; };
 		782821FE29F177F4006128CA /* RandomRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomRecipeView.swift; sourceTree = "<group>"; };
 		782AB9E429CE0A9600EC23FC /* ScrollingListExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingListExperiment.swift; sourceTree = "<group>"; };
 		782AB9E629CE2F0E00EC23FC /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
@@ -199,6 +201,14 @@
 				7824BC3F2B177CF400211579 /* ToolbarOptionsView.swift */,
 			);
 			path = ToolbarOptions;
+			sourceTree = "<group>";
+		};
+		7824BC442B189F4D00211579 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				7824BC452B189F6000211579 /* Kitchen Timer Normal.caf */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		782C65C929D5711200A95C18 /* RecipeEditView */ = {
@@ -305,6 +315,7 @@
 				786F9A2329CC46A400CAA48B /* Experiments */,
 				782EB6BB29C3A3C50086D2E7 /* Model */,
 				782EB6B029C3A3A30086D2E7 /* Assets.xcassets */,
+				7824BC442B189F4D00211579 /* Sounds */,
 				782EB6B229C3A3A30086D2E7 /* MDRecipes.entitlements */,
 				782EB6B329C3A3A30086D2E7 /* Preview Content */,
 			);
@@ -472,6 +483,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7824BC472B189F6000211579 /* Kitchen Timer Normal.caf in Resources */,
 				782EB6B529C3A3A30086D2E7 /* Preview Assets.xcassets in Resources */,
 				782EB6B129C3A3A30086D2E7 /* Assets.xcassets in Resources */,
 			);
