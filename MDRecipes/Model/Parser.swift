@@ -612,7 +612,7 @@ struct Parser {
             for index in part {
                 // only adding the line if there is no funky stuff
                 let lineString = lines[index].trimmingCharacters(in: .whitespacesAndNewlines)
-                if lineString != "" && lineString != "--" && lineString != "---" {
+                if lineString != "" && lineString != "--" && lineString != "---" && lineString != "type: 7III Recipes" {
                     unparsedString += "\n" + lineString
                 }
             }
@@ -634,7 +634,13 @@ struct Parser {
             let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "MD Recipes"
             
             // make the note attachment and attach it to notes.
-            let preString = "\n\nAttached are the lines " + appName + " could not parse:\n"
+            let prefix: String
+            if notes.isEmpty {
+                prefix = ""
+            } else {
+                prefix = "\n\n"
+            }
+            let preString = prefix + "Attached are the lines " + appName + " could not parse:\n"
             let noteAppendix = preString + unparsedString
             
             notes += noteAppendix
