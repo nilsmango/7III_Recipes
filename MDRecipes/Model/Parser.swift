@@ -16,10 +16,10 @@ struct Parser {
     static let categoriesStrings = ["Categories", "Kategorien"]
     static let tagStrings = ["Tags"]
     static let ratingStrings = ["Rating", "Bewertung"]
-    static let prepTimeStrings = ["Prep time", "Vorbereitungszeit", "Arbeitszeit", "Vor- und Zubereitung"]
+    static let prepTimeStrings = ["Prep", "Vorbereitungszeit", "Arbeitszeit", "Vor- und Zubereitung"]
     static let cookTimeStrings = ["Cook time", "Cooking time", "Active Time", "Kochzeit", "Backzeit", "Koch-/Backzeit"]
     static let additionalTimeStrings = ["Additional time", "Zusätzliche Zeit"]
-    static let totalTimeStrings = ["Total Time", "Gesamtzeit", "Zubereitungszeit"]
+    static let totalTimeStrings = ["Total", "Gesamtzeit", "Zubereitungszeit"]
     static let servingsStrings = ["Servings", "Serves", "Yields", "Portionen", "Zutaten für", "Zutaten (für", "persons", "for", "Feeds"]
     
     static let ingredientsStrings = ["## Ingredients", "## Zutaten", "Ingredients", "INGREDIENTS", "Zutaten"]
