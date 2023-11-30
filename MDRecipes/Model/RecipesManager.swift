@@ -574,17 +574,22 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// restore recipe from trash
     func restoreRecipe(recipe: Recipe) {
+        var recipeToRestore = recipe
+        // check if title is still unique otherwise change it until it is
+        while recipes.contains(where: { $0.title == recipeToRestore.title }) {
+            recipeToRestore.title += "2"
+        }
         // save the new recipe in the recipes Array
-        recipes.append(recipe)
+        recipes.append(recipeToRestore)
         
         // save the recipe as a Markdown File on disk
-        saveRecipeAsMarkdownFile(recipe: recipe)
+        saveRecipeAsMarkdownFile(recipe: recipeToRestore)
         
         // update the timers
-        loadTimers(for: recipe)
+        loadTimers(for: recipeToRestore)
         
         // remove recipe from trash
-        if let index = trash.firstIndex(where: { $0.id == recipe.id }) {
+        if let index = trash.firstIndex(where: { $0.id == recipeToRestore.id }) {
                 trash.remove(at: index)
             }
     }
