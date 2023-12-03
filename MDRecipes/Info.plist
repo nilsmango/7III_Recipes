@@ -4,5 +4,14 @@
 <dict>
 	<key>UIFileSharingEnabled</key>
 	<true/>
+	<key>UILaunchImageFile</key>
+	<string></string>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>AppLogo</string>
+		<key>UIColorName</key>
+		<string>SplashBG</string>
+	</dict>
 </dict>
 </plist>

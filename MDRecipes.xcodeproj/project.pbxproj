@@ -71,6 +71,7 @@
 		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
 		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
 		78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */; };
+		78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */; };
 		78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D1520729D827990023DB08 /* DirectionTimerView.swift */; };
 		78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */; };
 		78D6D20B29EC3FDA004FED05 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20A29EC3FDA004FED05 /* NotesView.swift */; };
@@ -162,6 +163,7 @@
 		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
 		78C22AF229F12E8800CEA2BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButtonView.swift; sourceTree = "<group>"; };
+		78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewAnimation.swift; sourceTree = "<group>"; };
 		78D1520729D827990023DB08 /* DirectionTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimerView.swift; sourceTree = "<group>"; };
 		78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRatingEditView.swift; sourceTree = "<group>"; };
 		78D6D20A29EC3FDA004FED05 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782821FE29F177F4006128CA /* RandomRecipeView.swift */,
 				7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */,
+				78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */,
 			);
 			path = HomeView;
 			sourceTree = "<group>";
@@ -542,6 +545,7 @@
 				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
 				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				783B4B8829E0073B00551888 /* SegmentView.swift in Sources */,
+				78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
 				78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */,
 				784AFE192B07CDD300A14417 /* RecipeMovedAlert.swift in Sources */,

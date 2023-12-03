@@ -126,6 +126,7 @@ struct HomeView: View {
                                                 .foregroundColor(Color("FolderBG"))
                                         )
                                 }
+                                
                             }
                             
                             Spacer()

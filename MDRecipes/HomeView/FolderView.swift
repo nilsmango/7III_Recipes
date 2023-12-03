@@ -22,7 +22,7 @@ struct FolderView: View {
                     Spacer()
                     Text(categoryNumber)
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(.accentColor)
                 .font(.title)
                 
                 HStack {

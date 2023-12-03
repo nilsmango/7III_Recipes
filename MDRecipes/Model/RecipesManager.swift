@@ -243,7 +243,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                     let directions = newRecipe.directions
                     for direction in directions {
                         // stop if the timers are already loaded
-                        if let index = timers.firstIndex(where: { $0.recipeTitle == newRecipe.title && $0.step == direction.step }) {
+                        if timers.firstIndex(where: { $0.recipeTitle == newRecipe.title && $0.step == direction.step }) != nil {
                             break
                         } else {
                             if direction.hasTimer {

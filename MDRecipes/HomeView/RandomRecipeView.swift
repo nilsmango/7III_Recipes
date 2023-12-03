@@ -22,6 +22,7 @@ struct RandomRecipeView: View {
                         .opacity(0)
                 }
                 .font(.title)
+                .foregroundColor(.accentColor)
 
                 HStack {
                     Text("Random Recipe")
@@ -42,9 +43,7 @@ struct RandomRecipeView: View {
     }
 }
 
-struct RandomRecipeView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
         RandomRecipeView()
             .background(.gray)
-    }
 }
