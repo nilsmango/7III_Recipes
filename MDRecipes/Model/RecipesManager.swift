@@ -229,7 +229,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     let recipesDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
-    func loadMarkdownFiles() {
+    func loadMarkdownFiles(completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: recipesDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
@@ -253,8 +253,12 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                     }
                 }
             }
+            
+            completion(.success(()))
+            
         } catch {
-            print("Error loading Markdown files: \(error.localizedDescription)")
+            let error = NSError(domain: "7III Recipes", code: 73, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+            completion(.failure(error))
         }
     }
     

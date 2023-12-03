@@ -21,16 +21,19 @@ struct SplashViewAnimation: View {
     
     @State private var rotation: [Double] = Array(repeating: 0.0, count: 5)
 
-
+    @Binding var loading: Bool
+    
+    @Binding var showSplash: Bool
+    
     var body: some View {
         ZStack {
             Color("SplashBG")
-
+            
             Image("AppLogo")
-                .resizable()
-                .renderingMode(.original)
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 85)
+//                .resizable()
+//                .renderingMode(.original)
+//                .aspectRatio(contentMode: .fit)
+//                .frame(width: 85)
                 .rotationEffect(.degrees(rotationAmount))
                 .offset(logoOffset)
                 .onAppear {
@@ -48,16 +51,39 @@ struct SplashViewAnimation: View {
                     .rotationEffect(.degrees(rotation[index]))
                     .offset(imageOffsets[index])
                     .onAppear {
-                        withAnimation(Animation.linear(duration: Double.random(in: 0.05...6.0)).repeatForever(autoreverses: false)) {
+                        withAnimation(Animation.linear(duration: Double.random(in: 0.8...8.0)).repeatForever(autoreverses: false)) {
                             let randomDirection = Bool.random() ? -1 : 1
                             rotation[index] = Double(randomDirection * 360)
                         }
-                        withAnimation(Animation.linear(duration: Double.random(in: 10...40.0)).delay(Double.random(in: 0...18.0))) {
+                        withAnimation(Animation.linear(duration: Double.random(in: 10...50.0)).delay(Double.random(in: 0...6.0))) {
                             imageOffsets[index] = CGSize(width: imageOffsets[index].width * -1.0, height: CGFloat.random(in: -2...2) * screenHeight)
                         }
                     }
-                
             }
+            
+            VStack {
+                Spacer()
+                Spacer()
+                Text(loading ? "Loading Recipes ..." : "Loading Complete!")
+                    .foregroundStyle(.blue)
+                    .fontWeight(.bold)
+                    .fontDesign(.rounded)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundColor(.white)
+                    )
+                Spacer()
+            }
+        }
+        .onChange(of: loading) { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7.3) {
+                showSplash = false
+            }
+            
+        }
+        .onTapGesture {
+            showSplash = false
         }
         .ignoresSafeArea(.all)
     }
@@ -65,5 +91,5 @@ struct SplashViewAnimation: View {
 }
 
 #Preview {
-    SplashViewAnimation()
+    SplashViewAnimation(loading: .constant(true), showSplash: .constant(false))
 }
