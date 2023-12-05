@@ -52,6 +52,10 @@ struct TagsOrIngredientsListView: View {
             }
         }
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
         .navigationTitle(Text(chosenStrings.count < 2 ? chosenStrings.first ?? "Filter by Tags" : chosenStrings.first! + " +"))
     }
 }

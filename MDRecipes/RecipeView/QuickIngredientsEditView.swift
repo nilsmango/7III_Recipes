@@ -23,6 +23,10 @@ struct QuickIngredientsEditView: View {
             }
             
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
     }
 }
 

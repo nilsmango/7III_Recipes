@@ -12,6 +12,7 @@ struct BackgroundAnimation: View {
     let screenWidth = UIScreen.main.bounds.width
     
     let backgroundColor: Color
+    var withLogo: Bool = true
     
     @State var logoOffset = CGSize(width: 0, height: 0)
     
@@ -28,22 +29,25 @@ struct BackgroundAnimation: View {
         ZStack {
             backgroundColor
             
-            Image("AppLogo")
-//                .resizable()
-//                .renderingMode(.original)
-//                .aspectRatio(contentMode: .fit)
-//                .frame(width: 85)
-                .rotationEffect(.degrees(rotationAmount))
-                .offset(logoOffset)
-                .onAppear {
-                    withAnimation(Animation.easeIn(duration: 50).repeatForever(autoreverses: false).delay(0)) {
-                        let randomDirection = Bool.random() ? -1 : 1
-                        rotationAmount = Double(randomDirection * 360)
+            if withLogo {
+                Image("AppLogo")
+    //                .resizable()
+    //                .renderingMode(.original)
+    //                .aspectRatio(contentMode: .fit)
+    //                .frame(width: 85)
+                    .rotationEffect(.degrees(rotationAmount))
+                    .offset(logoOffset)
+                    .onAppear {
+                        withAnimation(Animation.easeIn(duration: 50).repeatForever(autoreverses: false).delay(0)) {
+                            let randomDirection = Bool.random() ? -1 : 1
+                            rotationAmount = Double(randomDirection * 360)
+                        }
+                        withAnimation(Animation.easeIn(duration: 80)) {
+                            logoOffset = CGSize(width: (Bool.random() ? -2 : 2) * screenWidth, height: (Bool.random() ? -2 : 2)  * screenHeight)
+                        }
                     }
-                    withAnimation(Animation.easeIn(duration: 80)) {
-                        logoOffset = CGSize(width: (Bool.random() ? -2 : 2) * screenWidth, height: (Bool.random() ? -2 : 2)  * screenHeight)
-                    }
-                }
+            }
+            
             
             ForEach(0..<fallingImages.count, id: \.self) { index in
                 fallingImages[index]

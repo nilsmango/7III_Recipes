@@ -20,9 +20,8 @@ struct ToolbarOptionsView: View {
     
     var body: some View {
         Menu {
-            Button(action: {  
-                // TODO: Add about
-            }) {
+            
+            NavigationLink(destination: AboutView()) {
                 Label("About", systemImage: "info.circle")
             }
             Button(action: {

@@ -30,6 +30,10 @@ struct TrashList: View {
                 }
             }
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
         .navigationTitle("Trash")
     }
 }

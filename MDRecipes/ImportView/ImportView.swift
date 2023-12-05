@@ -77,6 +77,10 @@ Cooking can be dangerous
                     }
                 }
             }
+            .background(
+                .gray
+                    .opacity(0.1)
+            )
             .onAppear {
                 saveDisabled = true
             }

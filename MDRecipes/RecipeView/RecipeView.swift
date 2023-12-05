@@ -137,6 +137,10 @@ struct RecipeView: View {
             // ZStack Layer
             ConfettiCannon(counter: $counter, num: numberArray, colors: [.blue, .red, .yellow, .purple, .green, .black])
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
         .navigationTitle(recipe.title)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -275,8 +279,6 @@ struct RecipeView: View {
     }
 }
 
-struct RecipeView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
         RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe, categoryFolder: "No Category", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
-    }
 }

@@ -47,6 +47,10 @@ struct RecipesListView: View {
                 sortingSelection = .standard
             }
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
         .navigationTitle(Text(category.isEmpty ? "All" : category))
         
         .toolbar {

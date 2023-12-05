@@ -34,7 +34,6 @@ struct HomeView: View {
             if searchText.isEmpty {
                 ScrollView {
                     
-
                     VStack(alignment: .leading) {
                         let allRecipes = fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count
                         

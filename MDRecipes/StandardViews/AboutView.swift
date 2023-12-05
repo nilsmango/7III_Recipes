@@ -9,7 +9,16 @@ import SwiftUI
 
 struct AboutView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            Text("This is about us. Add instructions for saving recipes and recovering or finding the recipes in the On my iPhone folder.")
+        }
+        
+        .background {
+            BackgroundAnimation(backgroundColor: Color(.gray).opacity(0.1))
+        }
+        .navigationTitle("About")
+        
+        
     }
 }
 

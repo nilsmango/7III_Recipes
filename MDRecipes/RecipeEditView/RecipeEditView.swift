@@ -119,6 +119,10 @@ struct RecipeEditView: View {
                 ImagesPickerView(dataImages: $recipeData.dataImages)
             }
         }
+        .background(
+            .gray
+                .opacity(0.1)
+        )
         .listStyle(.insetGrouped)
     }
 }
@@ -127,9 +131,7 @@ struct RecipeEditView: View {
 //
 //}
 
-struct RecipeEditView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
         RecipeEditView(recipeData: .constant(Recipe.sampleData[0].data), fileManager: RecipesManager(), newIngredient: .constant(""))
-    }
 }
 
