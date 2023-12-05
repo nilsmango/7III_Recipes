@@ -46,6 +46,8 @@
 		78623AD729D9FB6700B9CF65 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78623AD629D9FB6700B9CF65 /* ImportView.swift */; };
 		78623AD929DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78623AD829DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift */; };
 		7864173829C4770B00D67DE0 /* FilterTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864173729C4770B00D67DE0 /* FilterTesting.swift */; };
+		7865CFDC2B1F0B9D007CB7D6 /* BackgroundAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865CFDB2B1F0B9D007CB7D6 /* BackgroundAnimation.swift */; };
+		7865CFDE2B1F0DC2007CB7D6 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */; };
 		78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1B29CAF2D800CAA48B /* RoundedCross.swift */; };
 		78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A1C29CAF2D800CAA48B /* ConfettiSwiftUI.swift */; };
 		786C03292AF981EE00B021E3 /* TitleAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C03282AF981EE00B021E3 /* TitleAlertView.swift */; };
@@ -137,6 +139,8 @@
 		78623AD629D9FB6700B9CF65 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		78623AD829DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertFractionsIntoDoubles.swift; sourceTree = "<group>"; };
 		7864173729C4770B00D67DE0 /* FilterTesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterTesting.swift; sourceTree = "<group>"; };
+		7865CFDB2B1F0B9D007CB7D6 /* BackgroundAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAnimation.swift; sourceTree = "<group>"; };
+		7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		786C03282AF981EE00B021E3 /* TitleAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleAlertView.swift; sourceTree = "<group>"; };
 		786F99F329C4EF2900CAA48B /* WHStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHStack.swift; sourceTree = "<group>"; };
 		786F99F529C4F05700CAA48B /* ViewArrayBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewArrayBuilder.swift; sourceTree = "<group>"; };
@@ -255,7 +259,7 @@
 			path = RecipeView;
 			sourceTree = "<group>";
 		};
-		782C65D329D58F0000A95C18 /* HomeView */ = {
+		782C65D329D58F0000A95C18 /* StandardViews */ = {
 			isa = PBXGroup;
 			children = (
 				78C59E8D2B1CAC3A00C44F5F /* StartView.swift */,
@@ -263,9 +267,11 @@
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782821FE29F177F4006128CA /* RandomRecipeView.swift */,
 				7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */,
+				7865CFDB2B1F0B9D007CB7D6 /* BackgroundAnimation.swift */,
 				78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */,
+				7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */,
 			);
-			path = HomeView;
+			path = StandardViews;
 			sourceTree = "<group>";
 		};
 		782C65D429D58F3200A95C18 /* FlexibleView */ = {
@@ -310,7 +316,7 @@
 			children = (
 				78C22AF229F12E8800CEA2BE /* Info.plist */,
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
-				782C65D329D58F0000A95C18 /* HomeView */,
+				782C65D329D58F0000A95C18 /* StandardViews */,
 				7824BC412B1780B100211579 /* ToolbarOptions */,
 				78623AD229D9AF6600B9CF65 /* Trash */,
 				782C65D529D58F7B00A95C18 /* RecipesListView */,
@@ -516,10 +522,12 @@
 				78623AD729D9FB6700B9CF65 /* ImportView.swift in Sources */,
 				786F9A1429CA381F00CAA48B /* IngredientView.swift in Sources */,
 				782821FF29F177F4006128CA /* RandomRecipeView.swift in Sources */,
+				7865CFDC2B1F0B9D007CB7D6 /* BackgroundAnimation.swift in Sources */,
 				7824BC3E2B172DD100211579 /* SelectionButtonLabel.swift in Sources */,
 				783B4B8E29E148E600551888 /* Importer.swift in Sources */,
 				783B4B8029DDA7C700551888 /* DirectionsEditTextView.swift in Sources */,
 				782C65DF29D7501800A95C18 /* ServingsView.swift in Sources */,
+				7865CFDE2B1F0DC2007CB7D6 /* AboutView.swift in Sources */,
 				78F0A95129D21DC500E59F56 /* DirectionView.swift in Sources */,
 				78F553D829D4B496001C9F56 /* CategoriesEditView.swift in Sources */,
 				786F99F829C4F0A100CAA48B /* WrapStack.swift in Sources */,

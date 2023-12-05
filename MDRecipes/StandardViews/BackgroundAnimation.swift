@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-struct SplashViewAnimation: View {
+struct BackgroundAnimation: View {
     let screenHeight = UIScreen.main.bounds.height
     let screenWidth = UIScreen.main.bounds.width
+    
+    let backgroundColor: Color
     
     @State var logoOffset = CGSize(width: 0, height: 0)
     
@@ -21,13 +23,10 @@ struct SplashViewAnimation: View {
     
     @State private var rotation: [Double] = Array(repeating: 0.0, count: 5)
 
-    @Binding var loading: Bool
-    
-    @Binding var showSplash: Bool
     
     var body: some View {
         ZStack {
-            Color("SplashBG")
+            backgroundColor
             
             Image("AppLogo")
 //                .resizable()
@@ -60,36 +59,14 @@ struct SplashViewAnimation: View {
                         }
                     }
             }
-            
-            VStack {
-                Spacer()
-                Spacer()
-                Text(loading ? "Loading Recipes ..." : "Loading Complete!")
-                    .foregroundStyle(.blue)
-                    .fontWeight(.bold)
-                    .fontDesign(.rounded)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .foregroundColor(.white)
-                    )
-                Spacer()
-            }
         }
-        .onChange(of: loading) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7.3) {
-                showSplash = false
-            }
-            
-        }
-        .onTapGesture {
-            showSplash = false
-        }
+        
         .ignoresSafeArea(.all)
+        .frame(width: screenWidth)
     }
  
 }
 
 #Preview {
-    SplashViewAnimation(loading: .constant(true), showSplash: .constant(false))
+    BackgroundAnimation(backgroundColor: Color("SplashBG"))
 }
