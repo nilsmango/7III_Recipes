@@ -136,8 +136,8 @@ struct HomeView: View {
                 }
                 
                 .background(
-                    .gray
-                        .opacity(0.1)
+                    .gray.opacity(0.1)
+//                    BackgroundAnimation(backgroundColor: .gray.opacity(0.1), withLogo: false, foregroundColor: .blue)
                 )
                 //                .navigationTitle("Categories")
                 .toolbar {

@@ -10,7 +10,6 @@ import SwiftUI
 @main
 struct MDRecipesApp: App {
 
-    
     var body: some Scene {
         WindowGroup {
             StartView()

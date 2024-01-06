@@ -267,9 +267,8 @@
 				786F9A0D29C8E18300CAA48B /* FolderView.swift */,
 				782821FE29F177F4006128CA /* RandomRecipeView.swift */,
 				7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */,
-				7865CFDB2B1F0B9D007CB7D6 /* BackgroundAnimation.swift */,
-				78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */,
 				7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */,
+				785C4AE22B49E02700EB07F8 /* Animation */,
 			);
 			path = StandardViews;
 			sourceTree = "<group>";
@@ -362,6 +361,15 @@
 				786F99FB29C4F0D100CAA48B /* WrapStack */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		785C4AE22B49E02700EB07F8 /* Animation */ = {
+			isa = PBXGroup;
+			children = (
+				7865CFDB2B1F0B9D007CB7D6 /* BackgroundAnimation.swift */,
+				78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */,
+			);
+			path = Animation;
 			sourceTree = "<group>";
 		};
 		78623AD229D9AF6600B9CF65 /* Trash */ = {

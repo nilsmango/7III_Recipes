@@ -13,6 +13,7 @@ struct BackgroundAnimation: View {
     
     let backgroundColor: Color
     var withLogo: Bool = true
+    var foregroundColor: Color = .white
     
     @State var logoOffset = CGSize(width: 0, height: 0)
     
@@ -35,6 +36,7 @@ struct BackgroundAnimation: View {
     //                .renderingMode(.original)
     //                .aspectRatio(contentMode: .fit)
     //                .frame(width: 85)
+                    .colorMultiply(foregroundColor)
                     .rotationEffect(.degrees(rotationAmount))
                     .offset(logoOffset)
                     .onAppear {
@@ -51,6 +53,7 @@ struct BackgroundAnimation: View {
             
             ForEach(0..<fallingImages.count, id: \.self) { index in
                 fallingImages[index]
+                    .colorMultiply(foregroundColor)
                     .rotationEffect(.degrees(rotation[index]))
                     .offset(imageOffsets[index])
                     .onAppear {
