@@ -24,6 +24,11 @@ struct ToolbarOptionsView: View {
             NavigationLink(destination: AboutView()) {
                 Label("About", systemImage: "info.circle")
             }
+            
+            NavigationLink(destination: PrivacyView()) {
+                Label("Privacy Notice", systemImage: "doc.text.magnifyingglass")
+            }
+            
             Button(action: {
                 // TODO: Add donation thing
             }) {

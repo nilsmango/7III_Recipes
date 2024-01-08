@@ -76,6 +76,7 @@
 		78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */; };
 		78C59E8E2B1CAC3A00C44F5F /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8D2B1CAC3A00C44F5F /* StartView.swift */; };
 		78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D1520729D827990023DB08 /* DirectionTimerView.swift */; };
+		78D378E42B4C57FD0047F5CB /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D378E32B4C57FD0047F5CB /* PrivacyView.swift */; };
 		78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */; };
 		78D6D20B29EC3FDA004FED05 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20A29EC3FDA004FED05 /* NotesView.swift */; };
 		78D6D20F29ED2FFC004FED05 /* TimerButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D20E29ED2FFC004FED05 /* TimerButtonView.swift */; };
@@ -171,6 +172,7 @@
 		78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewAnimation.swift; sourceTree = "<group>"; };
 		78C59E8D2B1CAC3A00C44F5F /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
 		78D1520729D827990023DB08 /* DirectionTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimerView.swift; sourceTree = "<group>"; };
+		78D378E32B4C57FD0047F5CB /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
 		78D6D20829EC3B23004FED05 /* RecipeRatingEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRatingEditView.swift; sourceTree = "<group>"; };
 		78D6D20A29EC3FDA004FED05 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
 		78D6D20E29ED2FFC004FED05 /* TimerButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerButtonView.swift; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				782821FE29F177F4006128CA /* RandomRecipeView.swift */,
 				7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */,
 				7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */,
+				78D378E32B4C57FD0047F5CB /* PrivacyView.swift */,
 				785C4AE22B49E02700EB07F8 /* Animation */,
 			);
 			path = StandardViews;
@@ -473,7 +476,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					782EB6A829C3A3A20086D2E7 = {
 						CreatedOnToolsVersion = 14.2;
@@ -560,6 +563,7 @@
 				782EB6BF29C3A4650086D2E7 /* RecipesManager.swift in Sources */,
 				78F3186029E5442B00DE31BE /* ImageDetailView.swift in Sources */,
 				786C03292AF981EE00B021E3 /* TitleAlertView.swift in Sources */,
+				78D378E42B4C57FD0047F5CB /* PrivacyView.swift in Sources */,
 				786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */,
 				782AB9ED29CE39C800EC23FC /* Direction.swift in Sources */,
 				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
@@ -611,6 +615,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -671,6 +676,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
