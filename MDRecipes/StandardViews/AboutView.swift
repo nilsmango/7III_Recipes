@@ -12,6 +12,8 @@ struct AboutView: View {
         List {
             Text("""
                 7III Recipes is a cookbook app that utilizes markdown files in the background to save and retrieve recipes. This ensures that you never lose your recipes and always maintain complete control over them.
+                
+                If you have any questions, or bugs to report, or if you want to see a feature, send us an [email](recipes@project7iii.com)!
 
                 This app uses some parts of [ConfettiSwiftUI](https://github.com/simibac/ConfettiSwiftUI):
 
