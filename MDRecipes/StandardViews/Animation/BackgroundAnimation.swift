@@ -61,7 +61,7 @@ struct BackgroundAnimation: View {
                             let randomDirection = Bool.random() ? -1 : 1
                             rotation[index] = Double(randomDirection * 360)
                         }
-                        withAnimation(Animation.linear(duration: Double.random(in: 10...50.0)).delay(Double.random(in: 0...6.0))) {
+                        withAnimation(Animation.linear(duration: Double.random(in: 10...50.0)).delay(Double.random(in: 0.0...5.0))) {
                             imageOffsets[index] = CGSize(width: imageOffsets[index].width * -1.0, height: CGFloat.random(in: -2...2) * screenHeight)
                         }
                     }
