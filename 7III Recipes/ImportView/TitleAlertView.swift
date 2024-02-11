@@ -75,7 +75,7 @@ struct TitleAlertView: View {
                 .padding()
                 .background {
                     RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(Color("LightGray"))
+                        .foregroundColor(Color("CustomLightGray"))
 //                        .background(.ultraThinMaterial)
                 }
             }

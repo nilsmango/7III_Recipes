@@ -83,6 +83,7 @@
 		78D6D21129ED38FB004FED05 /* DateToDateFormatted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D21029ED38FB004FED05 /* DateToDateFormatted.swift */; };
 		78D6D21329ED4BE6004FED05 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D21229ED4BE6004FED05 /* ShakeEffect.swift */; };
 		78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DCB73629D1B53B00D02A2C /* RecipeView.swift */; };
+		78ED4A632B79241300171F27 /* MarkdownFileDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */; };
 		78F0A94D29D1EF0A00E59F56 /* String+Pluralize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */; };
 		78F0A94F29D1EF3D00E59F56 /* Inflector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94E29D1EF3D00E59F56 /* Inflector.swift */; };
 		78F0A95129D21DC500E59F56 /* DirectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A95029D21DC500E59F56 /* DirectionView.swift */; };
@@ -119,7 +120,7 @@
 		782EB6A929C3A3A20086D2E7 /* 7III Recipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "7III Recipes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDRecipesApp.swift; sourceTree = "<group>"; };
 		782EB6B029C3A3A30086D2E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		782EB6B229C3A3A30086D2E7 /* MDRecipes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MDRecipes.entitlements; sourceTree = "<group>"; };
+		782EB6B229C3A3A30086D2E7 /* 7III Recipes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "7III Recipes.entitlements"; sourceTree = "<group>"; };
 		782EB6B429C3A3A30086D2E7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		782EB6BC29C3A3F70086D2E7 /* MarkdownFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFile.swift; sourceTree = "<group>"; };
 		782EB6BE29C3A4650086D2E7 /* RecipesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesManager.swift; sourceTree = "<group>"; };
@@ -179,6 +180,7 @@
 		78D6D21029ED38FB004FED05 /* DateToDateFormatted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateToDateFormatted.swift; sourceTree = "<group>"; };
 		78D6D21229ED4BE6004FED05 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
 		78DCB73629D1B53B00D02A2C /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
+		78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFileDocument.swift; sourceTree = "<group>"; };
 		78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Pluralize.swift"; sourceTree = "<group>"; };
 		78F0A94E29D1EF3D00E59F56 /* Inflector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inflector.swift; sourceTree = "<group>"; };
 		78F0A95029D21DC500E59F56 /* DirectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionView.swift; sourceTree = "<group>"; };
@@ -300,7 +302,7 @@
 		782EB6A029C3A3A20086D2E7 = {
 			isa = PBXGroup;
 			children = (
-				782EB6AB29C3A3A20086D2E7 /* MDRecipes */,
+				782EB6AB29C3A3A20086D2E7 /* 7III Recipes */,
 				782EB6AA29C3A3A20086D2E7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -313,7 +315,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		782EB6AB29C3A3A20086D2E7 /* MDRecipes */ = {
+		782EB6AB29C3A3A20086D2E7 /* 7III Recipes */ = {
 			isa = PBXGroup;
 			children = (
 				78C22AF229F12E8800CEA2BE /* Info.plist */,
@@ -330,10 +332,10 @@
 				782EB6BB29C3A3C50086D2E7 /* Model */,
 				782EB6B029C3A3A30086D2E7 /* Assets.xcassets */,
 				7824BC442B189F4D00211579 /* Sounds */,
-				782EB6B229C3A3A30086D2E7 /* MDRecipes.entitlements */,
+				782EB6B229C3A3A30086D2E7 /* 7III Recipes.entitlements */,
 				782EB6B329C3A3A30086D2E7 /* Preview Content */,
 			);
-			path = MDRecipes;
+			path = "7III Recipes";
 			sourceTree = "<group>";
 		};
 		782EB6B329C3A3A30086D2E7 /* Preview Content */ = {
@@ -347,9 +349,9 @@
 		782EB6BB29C3A3C50086D2E7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				782EB6BE29C3A4650086D2E7 /* RecipesManager.swift */,
 				782EB6BC29C3A3F70086D2E7 /* MarkdownFile.swift */,
 				782AB9E629CE2F0E00EC23FC /* Recipe.swift */,
-				782EB6BE29C3A4650086D2E7 /* RecipesManager.swift */,
 				783B4B8D29E148E600551888 /* Importer.swift */,
 				786F9A1729CAE74D00CAA48B /* Parser.swift */,
 				782AB9EC29CE39C800EC23FC /* Direction.swift */,
@@ -359,6 +361,7 @@
 				78F3186129E5598F00DE31BE /* RecipeImage.swift */,
 				78F3186729E5B3D200DE31BE /* RecipeImageData.swift */,
 				786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */,
+				78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */,
 				786F9A1929CAF2D800CAA48B /* ConfettiSwiftUI */,
 				786F99FE29C84E4800CAA48B /* Helpers */,
 				786F99FB29C4F0D100CAA48B /* WrapStack */,
@@ -483,7 +486,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 782EB6A429C3A3A20086D2E7 /* Build configuration list for PBXProject "MDRecipes" */;
+			buildConfigurationList = 782EB6A429C3A3A20086D2E7 /* Build configuration list for PBXProject "7III Recipes" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -590,6 +593,7 @@
 				78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */,
 				78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */,
 				78F553D629D4B226001C9F56 /* TagsEditView.swift in Sources */,
+				78ED4A632B79241300171F27 /* MarkdownFileDocument.swift in Sources */,
 				783B4B8429DEB41200551888 /* QuickIngredientsEditView.swift in Sources */,
 				783B4B8A29E00DE000551888 /* RecipeSegment.swift in Sources */,
 				786F9A0A29C86D9D00CAA48B /* Enums.swift in Sources */,
@@ -731,16 +735,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = MDRecipes/MDRecipes.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "7III Recipes/7III Recipes.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"MDRecipes/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"7III Recipes/Preview Content\"";
 				DEVELOPMENT_TEAM = XDR8Y54N77;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MDRecipes/Info.plist;
+				INFOPLIST_FILE = "7III Recipes/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to the camera to take photos for your recipes.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -758,7 +763,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.project7III.MDRecipes;
+				PRODUCT_BUNDLE_IDENTIFIER = com.project7III.7IIIRecipes;
 				PRODUCT_NAME = "7III Recipes";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -774,16 +779,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = MDRecipes/MDRecipes.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "7III Recipes/7III Recipes.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"MDRecipes/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"7III Recipes/Preview Content\"";
 				DEVELOPMENT_TEAM = XDR8Y54N77;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MDRecipes/Info.plist;
+				INFOPLIST_FILE = "7III Recipes/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to the camera to take photos for your recipes.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -801,7 +807,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.project7III.MDRecipes;
+				PRODUCT_BUNDLE_IDENTIFIER = com.project7III.7IIIRecipes;
 				PRODUCT_NAME = "7III Recipes";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -815,7 +821,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		782EB6A429C3A3A20086D2E7 /* Build configuration list for PBXProject "MDRecipes" */ = {
+		782EB6A429C3A3A20086D2E7 /* Build configuration list for PBXProject "7III Recipes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				782EB6B629C3A3A30086D2E7 /* Debug */,

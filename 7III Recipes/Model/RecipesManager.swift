@@ -11,6 +11,9 @@ import SwiftUI
 
 class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
+    // MARK: Import
+    @Published var showImportView = false
+    
     // MARK: Notifications
     
     // This method will be called when the app is in the foreground

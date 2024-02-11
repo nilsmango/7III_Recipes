@@ -32,7 +32,7 @@ import SwiftUI
         }
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(active ? .blue : Color("LightGray"))
+                .fill(active ? .blue : Color("CustomLightGray"))
         )
         
     }

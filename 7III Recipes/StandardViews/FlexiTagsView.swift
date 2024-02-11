@@ -27,7 +27,7 @@ struct FlexiTagsView: View {
                     .padding(8)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(Color("LightGray"))
+                            .fill(Color("CustomLightGray"))
                     )
             }
         }
