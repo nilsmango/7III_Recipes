@@ -1826,11 +1826,9 @@ struct Parser {
         
         // Search for the pattern in the string
         let range = NSRange(location: 0, length: string.count)
-        if let match = regex.firstMatch(in: string, options: [], range: range) {
-            // If a match is found, return true
+        if regex.firstMatch(in: string, options: [], range: range) != nil {
             return true
         } else {
-            // If no match is found, return false
             return false
         }
     }
