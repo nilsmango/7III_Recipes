@@ -612,7 +612,7 @@ struct Parser {
             for index in part {
                 // only adding the line if there is no funky stuff
                 let lineString = lines[index].trimmingCharacters(in: .whitespacesAndNewlines)
-                if lineString != "" && lineString != "--" && lineString != "---" && lineString != "type: 7III Recipes" {
+                if lineString != "" && lineString != "--" && lineString != "---" && lineString != "type: 7III Recipe" {
                     unparsedString += "\n" + lineString
                 }
             }
