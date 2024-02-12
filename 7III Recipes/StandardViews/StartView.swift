@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartView: View {
-    @StateObject private var fileManager = RecipesManager()
+    @ObservedObject var fileManager: RecipesManager
         
     @Environment(\.scenePhase) private var scenePhase
     
@@ -51,5 +51,5 @@ struct StartView: View {
 }
 
 #Preview {
-    StartView()
+    StartView(fileManager: RecipesManager())
 }

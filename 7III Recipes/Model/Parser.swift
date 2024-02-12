@@ -1517,9 +1517,7 @@ struct Parser {
         return updatedDirections
     }
     
-    
-    
-    
+
     private static func addPeriodToNumberedString(_ inputString: String) -> String {
         // making sure it is not only a number with a dot
         if inputString.dropFirst(2).trimmingCharacters(in: .whitespaces) == "" {
@@ -1813,6 +1811,27 @@ struct Parser {
             return "Delete"
         case .unknown:
             return "???"
+        }
+    }
+    
+    /// find the recipe header in a recipe string
+    static func isThere7iiiRecipeHeader(in string: String) -> Bool {
+        // Define the pattern to match against
+        let pattern = "type: 7III Recipe"
+        
+        // Create a regular expression object
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            return false // Return false if there's an issue creating the regex
+        }
+        
+        // Search for the pattern in the string
+        let range = NSRange(location: 0, length: string.count)
+        if let match = regex.firstMatch(in: string, options: [], range: range) {
+            // If a match is found, return true
+            return true
+        } else {
+            // If no match is found, return false
+            return false
         }
     }
     

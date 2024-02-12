@@ -60,7 +60,7 @@ struct ImagesPickerView: View {
         
                 Section {
                     PhotosPicker(selection: $selectedItems, matching: .any(of: [.panoramas, .screenshots, .images])) {
-                        Label("Select Photos from Library", systemImage: "photo.stack")
+                        Label("Select Images from Library", systemImage: "photo.stack")
                     }
                     
                     CameraButtonView(showCamera: $showCamera, dataImages: $dataImages)
@@ -82,7 +82,7 @@ struct ImagesPickerView: View {
         } else {
             Section("Add Images") {
                 PhotosPicker(selection: $selectedItems, matching: .any(of: [.panoramas, .screenshots, .images])) {
-                    Label("Select Photos from Library", systemImage: "photo.stack")
+                    Label("Select Images from Library", systemImage: "photo.stack")
                 }
                 
                 CameraButtonView(showCamera: $showCamera, dataImages: $dataImages)

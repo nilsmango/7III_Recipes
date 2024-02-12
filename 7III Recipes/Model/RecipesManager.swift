@@ -519,7 +519,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// Saving a new images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
-        let recipePhotosDirectory = recipesDirectory.appendingPathComponent("RecipePhotos")
+        let recipePhotosDirectory = recipesDirectory.appendingPathComponent("RecipeImages")
         let fileManager = FileManager.default
         // Create the RecipePhotos directory if it doesn't exist
         do {

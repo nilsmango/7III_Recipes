@@ -22,8 +22,6 @@ struct RecipeEditView: View {
     
     
     var body: some View {
-        //        ScrollView {
-        //            VStack {
         
         List {
             Section("Name & Co.") {

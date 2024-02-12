@@ -83,7 +83,10 @@
 		78D6D21129ED38FB004FED05 /* DateToDateFormatted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D21029ED38FB004FED05 /* DateToDateFormatted.swift */; };
 		78D6D21329ED4BE6004FED05 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D6D21229ED4BE6004FED05 /* ShakeEffect.swift */; };
 		78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DCB73629D1B53B00D02A2C /* RecipeView.swift */; };
-		78ED4A632B79241300171F27 /* MarkdownFileDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */; };
+		78ED4A652B796A7300171F27 /* ZipFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A642B796A7300171F27 /* ZipFunctions.swift */; };
+		78ED4A682B796AAF00171F27 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 78ED4A672B796AAF00171F27 /* ZIPFoundation */; };
+		78ED4A6A2B796FB600171F27 /* StartViewSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A692B796FB600171F27 /* StartViewSwitcher.swift */; };
+		78ED4A6D2B7A425D00171F27 /* AlertOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */; };
 		78F0A94D29D1EF0A00E59F56 /* String+Pluralize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */; };
 		78F0A94F29D1EF3D00E59F56 /* Inflector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A94E29D1EF3D00E59F56 /* Inflector.swift */; };
 		78F0A95129D21DC500E59F56 /* DirectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A95029D21DC500E59F56 /* DirectionView.swift */; };
@@ -180,7 +183,9 @@
 		78D6D21029ED38FB004FED05 /* DateToDateFormatted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateToDateFormatted.swift; sourceTree = "<group>"; };
 		78D6D21229ED4BE6004FED05 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
 		78DCB73629D1B53B00D02A2C /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
-		78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFileDocument.swift; sourceTree = "<group>"; };
+		78ED4A642B796A7300171F27 /* ZipFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipFunctions.swift; sourceTree = "<group>"; };
+		78ED4A692B796FB600171F27 /* StartViewSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewSwitcher.swift; sourceTree = "<group>"; };
+		78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOverlay.swift; sourceTree = "<group>"; };
 		78F0A94C29D1EF0A00E59F56 /* String+Pluralize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Pluralize.swift"; sourceTree = "<group>"; };
 		78F0A94E29D1EF3D00E59F56 /* Inflector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inflector.swift; sourceTree = "<group>"; };
 		78F0A95029D21DC500E59F56 /* DirectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionView.swift; sourceTree = "<group>"; };
@@ -201,6 +206,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78ED4A682B796AAF00171F27 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,6 +326,7 @@
 			children = (
 				78C22AF229F12E8800CEA2BE /* Info.plist */,
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
+				78ED4A6B2B7A424D00171F27 /* Alerts */,
 				782C65D329D58F0000A95C18 /* StandardViews */,
 				7824BC412B1780B100211579 /* ToolbarOptions */,
 				78623AD229D9AF6600B9CF65 /* Trash */,
@@ -358,10 +365,11 @@
 				784AFE182B07CDD300A14417 /* RecipeMovedAlert.swift */,
 				783B4B8929E00DE000551888 /* RecipeSegment.swift */,
 				782C65DA29D6D58000A95C18 /* Ingredient.swift */,
+				78ED4A692B796FB600171F27 /* StartViewSwitcher.swift */,
 				78F3186129E5598F00DE31BE /* RecipeImage.swift */,
 				78F3186729E5B3D200DE31BE /* RecipeImageData.swift */,
 				786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */,
-				78ED4A622B79241300171F27 /* MarkdownFileDocument.swift */,
+				78ED4A642B796A7300171F27 /* ZipFunctions.swift */,
 				786F9A1929CAF2D800CAA48B /* ConfettiSwiftUI */,
 				786F99FE29C84E4800CAA48B /* Helpers */,
 				786F99FB29C4F0D100CAA48B /* WrapStack */,
@@ -451,6 +459,14 @@
 			path = Experiments;
 			sourceTree = "<group>";
 		};
+		78ED4A6B2B7A424D00171F27 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -467,6 +483,9 @@
 			dependencies = (
 			);
 			name = "7III Recipes";
+			packageProductDependencies = (
+				78ED4A672B796AAF00171F27 /* ZIPFoundation */,
+			);
 			productName = MDRecipes;
 			productReference = 782EB6A929C3A3A20086D2E7 /* 7III Recipes.app */;
 			productType = "com.apple.product-type.application";
@@ -495,6 +514,9 @@
 				Base,
 			);
 			mainGroup = 782EB6A029C3A3A20086D2E7;
+			packageReferences = (
+				78ED4A662B796AAF00171F27 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			productRefGroup = 782EB6AA29C3A3A20086D2E7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -584,6 +606,7 @@
 				782EB6C529C460FF0086D2E7 /* ListItemView.swift in Sources */,
 				786F99F429C4EF2900CAA48B /* WHStack.swift in Sources */,
 				78F0A94F29D1EF3D00E59F56 /* Inflector.swift in Sources */,
+				78ED4A6D2B7A425D00171F27 /* AlertOverlay.swift in Sources */,
 				782EB6AD29C3A3A20086D2E7 /* MDRecipesApp.swift in Sources */,
 				783B4B8629DFF67B00551888 /* SegmentsImportView.swift in Sources */,
 				78D6D21329ED4BE6004FED05 /* ShakeEffect.swift in Sources */,
@@ -593,15 +616,16 @@
 				78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */,
 				78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */,
 				78F553D629D4B226001C9F56 /* TagsEditView.swift in Sources */,
-				78ED4A632B79241300171F27 /* MarkdownFileDocument.swift in Sources */,
 				783B4B8429DEB41200551888 /* QuickIngredientsEditView.swift in Sources */,
 				783B4B8A29E00DE000551888 /* RecipeSegment.swift in Sources */,
 				786F9A0A29C86D9D00CAA48B /* Enums.swift in Sources */,
 				78676B0D29D36003002205B5 /* RoundedCross.swift in Sources */,
 				78F553DA29D4B545001C9F56 /* DirectionsEditView.swift in Sources */,
+				78ED4A6A2B796FB600171F27 /* StartViewSwitcher.swift in Sources */,
 				7824BC3A2B16862400211579 /* TagsOrIngredientsListView.swift in Sources */,
 				782C65DB29D6D58000A95C18 /* Ingredient.swift in Sources */,
 				78676B0E29D36008002205B5 /* ConfettiSwiftUI.swift in Sources */,
+				78ED4A652B796A7300171F27 /* ZipFunctions.swift in Sources */,
 				78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */,
 				78D6D21129ED38FB004FED05 /* DateToDateFormatted.swift in Sources */,
 				783B4B8C29E04CD100551888 /* SegmentStackView.swift in Sources */,
@@ -840,6 +864,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		78ED4A662B796AAF00171F27 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.18;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		78ED4A672B796AAF00171F27 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 78ED4A662B796AAF00171F27 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 782EB6A129C3A3A20086D2E7 /* Project object */;
 }
