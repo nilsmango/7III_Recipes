@@ -233,6 +233,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
     func loadMarkdownFiles(completion: @escaping (Result<Void, Error>) -> Void) {
+        // empty the recipes if we have still some in the array (this is to not load everything twice
+        recipes = []
         do {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: recipesDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
