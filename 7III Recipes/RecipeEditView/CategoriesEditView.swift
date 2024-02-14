@@ -23,8 +23,8 @@ struct CategoriesEditView: View {
     @FocusState private var isFieldFocused: Bool
     
     private func removeNoCategoryIfItsSelected() {
-        if categories.contains("No Category") {
-            categories.removeAll(where: { $0 == "No Category"})
+        if categories.contains(Constants.noCategoryFolder) {
+            categories.removeAll(where: { $0 == Constants.noCategoryFolder})
         }
     }
     
@@ -41,12 +41,12 @@ struct CategoriesEditView: View {
                                 categories.removeAll(where: { $0 == category })
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
                                 if categories.isEmpty {
-                                    categories.append("No Category")
+                                    categories.append(Constants.noCategoryFolder)
                                 }
                             } else {
                                 categories.append(category)
-                                if categories.contains("No Category") {
-                                    categories.removeAll(where: { $0 == "No Category"})
+                                if categories.contains(Constants.noCategoryFolder) {
+                                    categories.removeAll(where: { $0 == Constants.noCategoryFolder})
                                 }
                                 allCategories = Array(Set(recipesCategories + categories)).sorted()
                             }
@@ -66,8 +66,8 @@ struct CategoriesEditView: View {
                         isFieldFocused = true
                         withAnimation {
                             categories.append(newCategory.capitalized)
-                            if categories.contains("No Category") {
-                                categories.removeAll(where: { $0 == "No Category"})
+                            if categories.contains(Constants.noCategoryFolder) {
+                                categories.removeAll(where: { $0 == Constants.noCategoryFolder})
                             }
                             newCategory = ""
                             allCategories = Array(Set(recipesCategories + categories)).sorted()

@@ -19,6 +19,8 @@ struct MDRecipesApp: App {
     @State private var recipeData = Recipe.Data()
     @State private var textFieldIngredient = ""
     
+    @State private var showZipImportAlert = false
+    @State private var fileURL = ""
     
     var body: some Scene {
         WindowGroup {
@@ -31,12 +33,31 @@ struct MDRecipesApp: App {
                             title: Text("Not a 7III Recipe"),
                             message: Text("Couldn't find a 7III Recipe header in this file."),
                             primaryButton: .destructive(Text("Cancel")) {
-                                startViewSwitcher = .normal
+                                // don't do anything.
                             },
                             secondaryButton: .default(Text("Try Anyway")) {
                                 let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                 recipeData = recipeStruct.recipe.data
                                 startViewSwitcher = .singleFile
+                            }
+                        )
+                    }
+                    .alert(isPresented: $showZipImportAlert) {
+                        Alert(
+                            title: Text("Import Recipes?"),
+                            message: Text("Do you want to try to import the recipes in the zip archive?"),
+                            primaryButton: .default(Text("Yes")) {
+                                // TODO: Handle Zip archive
+                                // Might use startViewSwitcher = .multiFile to show how many etc?
+                                do {
+                                    try fileManager.unzipAndCopyRecipesToDisk(url: fileURL)
+                                } catch {
+                                    print("Error: \(error)")
+                                    // TODO: Add error overly here.
+                                }
+                            },
+                            secondaryButton: .destructive(Text("No Thanks")) {
+                                // don't do anything.
                             }
                         )
                     }
@@ -59,9 +80,10 @@ struct MDRecipesApp: App {
                                 }
                                                                 
                             } else if fileExtension == "zip" {
-                                // Handle Zip archive
-                                // try handleZipFile(url: url)
-                                print("zip!")
+                                // ask if user wants to import
+                                showZipImportAlert = true
+                                fileURL = url.path
+                                
                             } else {
                                 // Handle other file types as needed
                                 print("Unsupported file type")
@@ -72,6 +94,7 @@ struct MDRecipesApp: App {
                             print("Error opening URL: \(error.localizedDescription)")
                         }
                     }
+                
             case .singleFile:
                 NavigationView {
                     RecipeEditView(recipeData: $recipeData, fileManager: fileManager, newIngredient: $textFieldIngredient)
@@ -105,7 +128,6 @@ struct MDRecipesApp: App {
             case .multiFile:
                 Text("multifile")
             }
-            
         }
     }
 }

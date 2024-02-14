@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import SwiftUI
+import ZIPFoundation
 
 class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
@@ -348,7 +349,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // ad no category to all recipes without a category
         var categories = data.categories
         if categories.isEmpty {
-            categories = ["No Category"]
+            categories = [Constants.noCategoryFolder]
         }
         
         // check if title was changed, delete markdown file if it was, also check if new title is unique
@@ -401,7 +402,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // ad no category to all recipes without a category
         var categories = newRecipeData.categories
         if categories.isEmpty {
-            categories = ["No Category"]
+            categories = [Constants.noCategoryFolder]
         }
         
         // check if new title is unique and not empty
@@ -521,7 +522,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// Saving a new images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
-        let recipePhotosDirectory = recipesDirectory.appendingPathComponent("RecipeImages")
+        let recipePhotosDirectory = recipesDirectory.appendingPathComponent(Constants.imageFolder)
         let fileManager = FileManager.default
         // Create the RecipePhotos directory if it doesn't exist
         do {
@@ -740,14 +741,13 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         categories.sort()
         // put "No Category" at the end of the index
-        if let index = categories.firstIndex(where: { $0 == "No Category" }) {
+        if let index = categories.firstIndex(where: { $0 == Constants.noCategoryFolder }) {
             categories.remove(at: index)
-            categories.append("No Category")
+            categories.append(Constants.noCategoryFolder)
         }
         
         return categories
     }
-
     
     /// get a list of tags from the recipes
     func getAllTags() -> [String] {
@@ -859,6 +859,68 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
         
+    }
+    
+    
+    // MARK: Import ZIP recipes
+    
+    /// unzips and copies all the recipes into the recipes folder
+    func unzipAndCopyRecipesToDisk(url: String) throws {
+        let fileManager = FileManager.default
+        
+        let copyDirectory = recipesDirectory.appendingPathComponent("copyFolder")
+        // Create the Copy directory if it doesn't exist
+        do {
+            try fileManager.createDirectory(at: copyDirectory, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("Error creating RecipePhotos directory: \(error.localizedDescription)")
+        }
+        
+        // Unzip the archive
+        try fileManager.unzipItem(at: URL(fileURLWithPath: url), to: copyDirectory)
+        
+        // Merge contents of the unzipped archive with the destination folder
+        try mergeContents(from: copyDirectory, into: recipesDirectory)
+        
+        
+    }
+    
+    func mergeContents(from sourceURL: URL, into destinationURL: URL) throws {
+        let fileManager = FileManager.default
+        
+        let contents = try fileManager.contentsOfDirectory(atPath: sourceURL.path)
+        
+        for item in contents {
+            let sourceItemURL = sourceURL.appendingPathComponent(item)
+            let destinationItemURL = destinationURL.appendingPathComponent(item)
+            
+            var isDirectory: ObjCBool = false
+            
+            if fileManager.fileExists(atPath: sourceItemURL.path, isDirectory: &isDirectory) {
+                if isDirectory.boolValue {
+                    // If it's a directory, recursively merge its contents
+                    try mergeContents(from: sourceItemURL, into: destinationItemURL)
+                } else {
+                    // If it's a file, handle conflicts by renaming the destination file
+                    var count = 2
+                    var finalDestinationURL = destinationItemURL
+                    
+                    while fileManager.fileExists(atPath: finalDestinationURL.path) {
+                        let fileName = destinationItemURL.deletingPathExtension().lastPathComponent
+                        let fileExtension = destinationItemURL.pathExtension
+                        let newFileName = "\(fileName)\(count).\(fileExtension)"
+                        finalDestinationURL = destinationItemURL.deletingLastPathComponent().appendingPathComponent(newFileName)
+                        count += 1
+                    }
+                    
+                    // Copy the file to the destination with a unique name
+                    try fileManager.copyItem(at: sourceItemURL, to: finalDestinationURL)
+                }
+            }
+        }
+        
+        // Cleanup: Remove the copy folder
+        try FileManager.default.removeItem(at: sourceURL)
     }
     
 }

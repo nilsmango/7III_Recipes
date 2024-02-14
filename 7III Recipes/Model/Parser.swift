@@ -443,8 +443,8 @@ struct Parser {
         
         // Categories
         let categoriesVariables = findValue(for: categoriesStrings, in: lines, anchored: false)
-        var categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? ["No Category"]
-        if categories == [] || categories == [""] { categories = ["No Category"] }
+        var categories = categoriesVariables.value?.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines).capitalized }.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? [Constants.noCategoryFolder]
+        if categories == [] || categories == [""] { categories = [Constants.noCategoryFolder] }
         checkAndAppendIndex(input: categoriesVariables.index)
         
         // Tags
@@ -612,7 +612,7 @@ struct Parser {
             for index in part {
                 // only adding the line if there is no funky stuff
                 let lineString = lines[index].trimmingCharacters(in: .whitespacesAndNewlines)
-                if lineString != "" && lineString != "--" && lineString != "---" && lineString != "type: 7III Recipe" {
+                if lineString != "" && lineString != "--" && lineString != "---" && lineString != Constants.recipesType {
                     unparsedString += "\n" + lineString
                 }
             }
@@ -631,7 +631,7 @@ struct Parser {
         
         if unparsedString.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
             // find out the name of our app
-            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "MD Recipes"
+            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "7III Recipes"
             
             // make the note attachment and attach it to notes.
             let prefix: String
@@ -655,7 +655,7 @@ struct Parser {
         var lines: [String] = []
         // yaml header
         lines.append("---")
-        lines.append("type: 7III Recipe")
+        lines.append(Constants.recipesType)
         lines.append("date: \(formatDate(recipe.date))")
         lines.append("updated: \(formatDate(recipe.updated))")
         lines.append("---")
@@ -1817,7 +1817,7 @@ struct Parser {
     /// find the recipe header in a recipe string
     static func isThere7iiiRecipeHeader(in string: String) -> Bool {
         // Define the pattern to match against
-        let pattern = "type: 7III Recipe"
+        let pattern = Constants.recipesType
         
         // Create a regular expression object
         guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
