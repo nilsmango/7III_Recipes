@@ -86,7 +86,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     
     
-    // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
+    /// Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
     func saveTimersAndTrashToDisk() {
         // New file URL to save the trash and timers to the same spot as the rest.
         let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
@@ -866,9 +866,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// unzips and copies all the recipes into the recipes folder
     func unzipAndCopyRecipesToDisk(url: String) throws {
+        print(url)
         let fileManager = FileManager.default
         
-        let copyDirectory = recipesDirectory.appendingPathComponent("copyFolder")
+        let copyDirectory = recipesDirectory.appendingPathComponent(Constants.copyFolder)
         // Create the Copy directory if it doesn't exist
         do {
             try fileManager.createDirectory(at: copyDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -882,12 +883,34 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // delete the original zip archive
         try fileManager.removeItem(at: URL(fileURLWithPath: url))
         
-        // Merge contents of the unzipped archive with the destination folder
-        try mergeContents(from: copyDirectory, into: recipesDirectory)
+        // check if the copyDirectory contains only a folder or files.
+        let contents = try fileManager.contentsOfDirectory(atPath: copyDirectory.path)
+        print(contents)
+        if let content = contents.first(where: { url.hasSuffix($0 + ".zip") }) {
+                print("found the folder")
+                let sourceItemURL = copyDirectory.appendingPathComponent(content)
+                
+                var isDirectory: ObjCBool = false
+                if fileManager.fileExists(atPath: sourceItemURL.path, isDirectory: &isDirectory) {
+                    if isDirectory.boolValue {
+                        // go one in
+                        print("Merging from: \(sourceItemURL)")
+                        try mergeContents(from: sourceItemURL, into: recipesDirectory)
+                    } else {
+                        // Merge contents of the unzipped archive with the destination folder
+                        try mergeContents(from: copyDirectory, into: recipesDirectory)
+                    }
+                }
+        } else {
+            // Merge contents of the unzipped archive with the destination folder
+            try mergeContents(from: copyDirectory, into: recipesDirectory)
+        }
         
+        // Cleanup: Remove the copy folder
+        try fileManager.removeItem(at: copyDirectory)
     }
     
-    /// import a folder of recipes
+    /// imports a folder of recipes
     func importFolderOfRecipes(url: String) throws {
         try mergeContents(from: URL(fileURLWithPath: url), into: recipesDirectory)
         
@@ -895,7 +918,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         try removeItemInInbox(at: URL(fileURLWithPath: url))
     }
     
-    /// merging two directories and deletes the source afterwords.
+    /// merges two directories and deletes the source afterwords.
     private func mergeContents(from sourceURL: URL, into destinationURL: URL) throws {
         let fileManager = FileManager.default
         
@@ -931,11 +954,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             }
         }
         
-        // Cleanup: Remove the copy folder
-        try FileManager.default.removeItem(at: sourceURL)
+        
     }
     
-    /// removing an item at url
+    /// removes an item at the url
     func removeItem(at url: URL) throws {
         do {
             try FileManager.default.removeItem(at: url)
@@ -944,16 +966,31 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    /// removing an item if it is in an inbox folder
+    /// removes an item if it is in an inbox folder
     func removeItemInInbox(at url: URL) throws {
         let path = url.path
-        print(path)
         if path.contains("/Inbox/") {
-            print("removing the thing")
             try removeItem(at: url)
         }
     }
     
+    /// removes the Inbox folder items and the copy folder
+    func removeInboxAndCopyFolder() throws {
+        let fileManager = FileManager.default
+        let inboxURL = recipesDirectory.appendingPathComponent("Inbox")
+        if fileManager.fileExists(atPath: inboxURL.path) {
+            let contents = try fileManager.contentsOfDirectory(atPath: inboxURL.path)
+            for item in contents {
+                let itemURL = inboxURL.appendingPathComponent(item)
+                try removeItem(at: itemURL)
+            }
+        }
+        
+        let copyFolderURL = recipesDirectory.appendingPathComponent(Constants.copyFolder)
+        if fileManager.fileExists(atPath: copyFolderURL.path) {
+            try removeItem(at: copyFolderURL)
+        }
+    }
 }
 
 

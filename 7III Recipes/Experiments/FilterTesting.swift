@@ -32,9 +32,9 @@ struct FilterTesting: View {
         NavigationStack {
             List {
                 
-//                ForEach(fileManager.getAllCategories(), id: \.self) { categorySection in
+//                ForEach(recipesManager.getAllCategories(), id: \.self) { categorySection in
 //                    Section(categorySection) {
-//                        ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: [categorySection], tags: activeTags)) { recipe in
+//                        ForEach(recipesManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: [categorySection], tags: activeTags)) { recipe in
 //                            NavigationLink(destination: RecipeView(recipe: recipe)) {
 //                                ListItemView(recipe: recipe)
 //                            }
@@ -44,7 +44,7 @@ struct FilterTesting: View {
                 
                 
                 ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: activeIngredients, categories: activeCategories, tags: activeTags)) { recipe in
-//                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, timerManager: timerManager)) {
+//                    NavigationLink(destination: RecipeView(recipesManager: recipesManager, recipe: recipe, timerManager: timerManager)) {
 //                        ListItemView(recipe: recipe)
 //                    }
                 }
@@ -57,7 +57,7 @@ struct FilterTesting: View {
             
 //            Text("Categories")
 //            FlexibleView(
-//                data: fileManager.getAllCategories(),
+//                data: recipesManager.getAllCategories(),
 //              spacing: 5,
 //                alignment: .leading
 //            ) { category in

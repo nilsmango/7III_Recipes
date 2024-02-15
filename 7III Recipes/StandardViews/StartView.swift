@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartView: View {
-    @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var recipesManager: RecipesManager
         
     @Environment(\.scenePhase) private var scenePhase
     
@@ -22,9 +22,9 @@ struct StartView: View {
                 .onAppear {
                     DispatchQueue.main.async {
                         // 1. loading all the timers and trash from disk
-                        fileManager.loadTimersAndTrashFromDisk()
+                        recipesManager.loadTimersAndTrashFromDisk()
                         // 2. loading the recipes from markdown
-                        fileManager.loadMarkdownFiles { result in
+                        recipesManager.loadMarkdownFiles { result in
                             switch result {
                             case .success:
                                     loading = false
@@ -36,11 +36,11 @@ struct StartView: View {
                 }
             
         } else {
-            HomeView(fileManager: fileManager)
+            HomeView(recipesManager: recipesManager)
                 .onChange(of: scenePhase) { phase in
                     if phase == .inactive {
                         // saving our timer status to disk
-                        fileManager.saveTimersAndTrashToDisk()
+                        recipesManager.saveTimersAndTrashToDisk()
                     }
                 }
         }
@@ -51,5 +51,5 @@ struct StartView: View {
 }
 
 #Preview {
-    StartView(fileManager: RecipesManager())
+    StartView(recipesManager: RecipesManager())
 }

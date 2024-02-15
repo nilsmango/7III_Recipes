@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct MDRecipesApp: App {
-    @StateObject private var fileManager = RecipesManager()
+    @StateObject private var recipesManager = RecipesManager()
     
     @State private var startViewSwitcher: StartViewSwitcher = .normal
     
@@ -27,7 +27,7 @@ struct MDRecipesApp: App {
             // TODO: maybe add the import things as sheets
             switch startViewSwitcher {
             case .normal:
-                StartView(fileManager: fileManager)
+                StartView(recipesManager: recipesManager)
                     .alert(isPresented: $showSingleHeaderAlert) {
                         Alert(
                             title: Text("Not a 7III Recipe"),
@@ -35,7 +35,7 @@ struct MDRecipesApp: App {
                             primaryButton: .destructive(Text("Cancel")) {
                                 // remove the file if it is in the inbox folder
                                 do {
-                                    try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                    try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
                                 } catch {
                                     print("Error: \(error)")
                                 }
@@ -55,7 +55,7 @@ struct MDRecipesApp: App {
                                 // Handle Zip Archive
                                 startViewSwitcher = .multiFile
                                 do {
-                                    try fileManager.unzipAndCopyRecipesToDisk(url: fileURL)
+                                    try recipesManager.unzipAndCopyRecipesToDisk(url: fileURL)
                                 } catch {
                                     print("Error: \(error)")
                                     // TODO: Add error overly here.
@@ -66,6 +66,15 @@ struct MDRecipesApp: App {
                                 // don't do anything.
                             }
                         )
+                    }
+                    .onAppear {
+                        do {
+                            try recipesManager.removeInboxAndCopyFolder()
+                        } catch {
+                            print("Error removing Inbox folder: \(error)")
+                            // TODO: Add error overly here.
+                        }
+                        
                     }
                 
                     .onOpenURL { url in
@@ -97,7 +106,7 @@ struct MDRecipesApp: App {
                             } else {
                                 // Normal folder
                                 do {
-                                    try fileManager.importFolderOfRecipes(url: url.path)
+                                    try recipesManager.importFolderOfRecipes(url: url.path)
                                 } catch {
                                     print("Error: \(error)")
                                 }
@@ -111,7 +120,7 @@ struct MDRecipesApp: App {
                 
             case .singleFile:
                 NavigationView {
-                    RecipeEditView(recipeData: $recipeData, fileManager: fileManager, newIngredient: $textFieldIngredient)
+                    RecipeEditView(recipeData: $recipeData, fileManager: recipesManager, newIngredient: $textFieldIngredient)
                         .navigationTitle("Import Recipe")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
@@ -121,7 +130,7 @@ struct MDRecipesApp: App {
                                     textFieldIngredient = ""
                                     // remove the file if it is in the inbox folder
                                     do {
-                                        try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                        try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
                                     } catch {
                                         print("Error: \(error)")
                                     }
@@ -138,13 +147,13 @@ struct MDRecipesApp: App {
                                     }
                                     
                                     // saving the new recipe
-                                    fileManager.saveNewRecipe(newRecipeData: recipeData)
+                                    recipesManager.saveNewRecipe(newRecipeData: recipeData)
                                     
                                     startViewSwitcher = .normal
                                     
                                     // remove the file if it is in the inbox folder
                                     do {
-                                        try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                        try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
                                     } catch {
                                         print("Error: \(error)")
                                     }

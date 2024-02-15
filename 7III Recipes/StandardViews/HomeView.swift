@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {    
-    @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var recipesManager: RecipesManager
     
     @State var searchText = ""
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
-    private var randomRecipe: Recipe? { fileManager.randomRecipe() }
+    private var randomRecipe: Recipe? { recipesManager.randomRecipe() }
     
     // Edit Things
     @State private var editViewPresented = false
@@ -35,7 +35,7 @@ struct HomeView: View {
                 ScrollView {
                     
                     VStack(alignment: .leading) {
-                        let allRecipes = fileManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count
+                        let allRecipes = recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count
                         
                         if allRecipes > 0 {
                             Text("7III Recipes")
@@ -44,19 +44,19 @@ struct HomeView: View {
                                 .fontDesign(.rounded)
                                 .padding([.horizontal, .top])
                             LazyVGrid(columns: columns) {
-                                NavigationLink(destination: RecipesListView(fileManager: fileManager, category: "")) {
+                                NavigationLink(destination: RecipesListView(fileManager: recipesManager, category: "")) {
                                     FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
                                 }
                                 
-                                ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                                    NavigationLink(destination: RecipesListView(fileManager: fileManager, category: category)) {
-                                        FolderView(categoryFolder: category, categoryNumber: String(fileManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
+                                ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+                                    NavigationLink(destination: RecipesListView(fileManager: recipesManager, category: category)) {
+                                        FolderView(categoryFolder: category, categoryNumber: String(recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                         
                                     }
                                     
                                 }
                                 if randomRecipe != nil {
-                                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
                                         RandomRecipeView()
                                         
                                     }
@@ -66,7 +66,7 @@ struct HomeView: View {
                             
                             .padding([.horizontal])
                             
-                            let allTags = fileManager.getAllTags()
+                            let allTags = recipesManager.getAllTags()
                             if allTags.count > 0 {
                                 Text("Tags")
                                     .font(.title3)
@@ -74,7 +74,7 @@ struct HomeView: View {
                                     .fontDesign(.rounded)
                                     .padding([.horizontal, .top])
                                 
-                                FlexiTagsView(fileManager: fileManager, strings: allTags)
+                                FlexiTagsView(fileManager: recipesManager, strings: allTags)
                                     .padding(.horizontal)
                             }
                             
@@ -142,16 +142,16 @@ struct HomeView: View {
                 //                .navigationTitle("Categories")
                 .toolbar {
                     
-                    ToolbarOptionsView(fileManager: fileManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, sortingSelection: .constant(.standard), isHomeView: true)
+                    ToolbarOptionsView(fileManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, sortingSelection: .constant(.standard), isHomeView: true)
                 }
                 
             } else {
                 List {
-                    ForEach(fileManager.getAllCategories(), id: \.self) { category in
-                        if !fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
+                    ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+                        if !recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                             Section {
-                                ForEach(fileManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                    NavigationLink(destination: RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                ForEach(recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
+                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
                                         ListItemView(recipe: recipe)
                                     }
                                 }
@@ -180,7 +180,7 @@ struct HomeView: View {
         
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
-                RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager, newIngredient: $newIngredient)
+                RecipeEditView(recipeData: $newRecipeData, fileManager: recipesManager, newIngredient: $newIngredient)
                     .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
@@ -216,7 +216,7 @@ struct HomeView: View {
                                 addNotSubmittedIngredient()
                                 
                                 // saving the new recipe
-                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+                                recipesManager.saveNewRecipe(newRecipeData: newRecipeData)
                                 
                                 // reseting newRecipeData
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -246,7 +246,7 @@ struct HomeView: View {
         })
         .fullScreenCover(isPresented: $importViewPresented, content: {
             NavigationView {
-                ImportView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $importSaveDisabled)
+                ImportView(fileManager: recipesManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $importSaveDisabled)
                     .navigationTitle(newRecipeData.title == "" ? "Import from Text" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
@@ -283,7 +283,7 @@ struct HomeView: View {
                                 addNotSubmittedIngredient()
                                 
                                 // saving the new recipe
-                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
+                                recipesManager.saveNewRecipe(newRecipeData: newRecipeData)
                                 
                                 // reseting newRecipeData
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -327,7 +327,7 @@ struct HomeView: View {
     let fileManager = RecipesManager()
     fileManager.recipes = Recipe.sampleData
     
-    return HomeView(fileManager: fileManager)
+    return HomeView(recipesManager: fileManager)
 }
 
 

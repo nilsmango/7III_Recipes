@@ -11,4 +11,5 @@ struct Constants {
     static let imageFolder = "RecipeImages"
     static let noCategoryFolder = "No Category"
     static let recipesType = "type: 7III Recipe"
+    static let copyFolder = "copyFolder"
 }
