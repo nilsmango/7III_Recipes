@@ -873,19 +873,30 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         do {
             try fileManager.createDirectory(at: copyDirectory, withIntermediateDirectories: true, attributes: nil)
         } catch {
-            print("Error creating RecipePhotos directory: \(error.localizedDescription)")
+            print("Error creating CopyFolder directory: \(error.localizedDescription)")
         }
         
         // Unzip the archive
         try fileManager.unzipItem(at: URL(fileURLWithPath: url), to: copyDirectory)
         
+        // delete the original zip archive
+        try fileManager.removeItem(at: URL(fileURLWithPath: url))
+        
         // Merge contents of the unzipped archive with the destination folder
         try mergeContents(from: copyDirectory, into: recipesDirectory)
-        
-        
+                
     }
     
-    func mergeContents(from sourceURL: URL, into destinationURL: URL) throws {
+    /// import a folder of recipes
+    func importFolderOfRecipes(url: String) throws {
+        try mergeContents(from: URL(fileURLWithPath: url), into: recipesDirectory)
+        
+        // delete the original folders
+        try FileManager.default.removeItem(at: URL(fileURLWithPath: url))
+    }
+    
+    /// merging two directories and deletes the source afterwords.
+    private func mergeContents(from sourceURL: URL, into destinationURL: URL) throws {
         let fileManager = FileManager.default
         
         let contents = try fileManager.contentsOfDirectory(atPath: sourceURL.path)
@@ -902,6 +913,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                     try mergeContents(from: sourceItemURL, into: destinationItemURL)
                 } else {
                     // If it's a file, handle conflicts by renaming the destination file
+                    // TODO: if it's an .md file then check if there is a 7III Recipes header.
                     var count = 2
                     var finalDestinationURL = destinationItemURL
                     
@@ -914,13 +926,22 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                     }
                     
                     // Copy the file to the destination with a unique name
-                    try fileManager.copyItem(at: sourceItemURL, to: finalDestinationURL)
+                    try fileManager.moveItem(at: sourceItemURL, to: finalDestinationURL)
                 }
             }
         }
         
         // Cleanup: Remove the copy folder
         try FileManager.default.removeItem(at: sourceURL)
+    }
+    
+    /// removing an item at url
+    func removeItem(at url: URL) throws {
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            print("Error removing item at url \(url): \(error.localizedDescription)")
+        }
     }
     
 }

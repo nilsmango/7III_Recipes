@@ -20,6 +20,9 @@ struct ToolbarOptionsView: View {
     
     var body: some View {
         Menu {
+            NavigationLink(destination: ExportView(fileManager: fileManager)) {
+                Label("Export Recipes", systemImage: "square.and.arrow.up")
+            }
             
             NavigationLink(destination: AboutView()) {
                 Label("About", systemImage: "info.circle")

@@ -78,6 +78,8 @@ struct MDRecipesApp: App {
                                     recipeData = recipeStruct.recipe.data
                                     startViewSwitcher = .singleFile
                                 }
+                                // remove the file
+                                try fileManager.removeItem(at: url)
                                                                 
                             } else if fileExtension == "zip" {
                                 // ask if user wants to import
@@ -85,8 +87,12 @@ struct MDRecipesApp: App {
                                 fileURL = url.path
                                 
                             } else {
-                                // Handle other file types as needed
-                                print("Unsupported file type")
+                                // Normal folder
+                                do {
+                                    try fileManager.importFolderOfRecipes(url: url.path)
+                                } catch {
+                                    print("Error: \(error)")
+                                }
                             }
                             
                         }

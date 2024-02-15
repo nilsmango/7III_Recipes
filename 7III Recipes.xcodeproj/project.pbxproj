@@ -72,6 +72,7 @@
 		786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */; };
 		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
 		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
+		78C1C44B2B7D1FED009EBBBF /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C1C44A2B7D1FED009EBBBF /* ExportView.swift */; };
 		78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */; };
 		78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */; };
 		78C59E8E2B1CAC3A00C44F5F /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8D2B1CAC3A00C44F5F /* StartView.swift */; };
@@ -171,6 +172,7 @@
 		786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimer.swift; sourceTree = "<group>"; };
 		786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTimerView.swift; sourceTree = "<group>"; };
 		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
+		78C1C44A2B7D1FED009EBBBF /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		78C22AF229F12E8800CEA2BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButtonView.swift; sourceTree = "<group>"; };
 		78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewAnimation.swift; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */,
 				7865CFDD2B1F0DC2007CB7D6 /* AboutView.swift */,
 				78D378E32B4C57FD0047F5CB /* PrivacyView.swift */,
+				78C1C44A2B7D1FED009EBBBF /* ExportView.swift */,
 				785C4AE22B49E02700EB07F8 /* Animation */,
 			);
 			path = StandardViews;
@@ -612,6 +615,7 @@
 				78D6D21329ED4BE6004FED05 /* ShakeEffect.swift in Sources */,
 				786F9A2B29CC589600CAA48B /* TimerListButton.swift in Sources */,
 				786F9A0029C84E5C00CAA48B /* View+readSize.swift in Sources */,
+				78C1C44B2B7D1FED009EBBBF /* ExportView.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
 				78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */,
 				78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */,
