@@ -33,7 +33,12 @@ struct MDRecipesApp: App {
                             title: Text("Not a 7III Recipe"),
                             message: Text("Couldn't find a 7III Recipe header in this file."),
                             primaryButton: .destructive(Text("Cancel")) {
-                                // don't do anything.
+                                // remove the file if it is in the inbox folder
+                                do {
+                                    try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                } catch {
+                                    print("Error: \(error)")
+                                }
                             },
                             secondaryButton: .default(Text("Try Anyway")) {
                                 let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
@@ -47,14 +52,15 @@ struct MDRecipesApp: App {
                             title: Text("Import Recipes?"),
                             message: Text("Do you want to try to import the recipes in the zip archive?"),
                             primaryButton: .default(Text("Yes")) {
-                                // TODO: Handle Zip archive
-                                // Might use startViewSwitcher = .multiFile to show how many etc?
+                                // Handle Zip Archive
+                                startViewSwitcher = .multiFile
                                 do {
                                     try fileManager.unzipAndCopyRecipesToDisk(url: fileURL)
                                 } catch {
                                     print("Error: \(error)")
                                     // TODO: Add error overly here.
                                 }
+                                startViewSwitcher = .normal
                             },
                             secondaryButton: .destructive(Text("No Thanks")) {
                                 // don't do anything.
@@ -73,13 +79,15 @@ struct MDRecipesApp: App {
                                 // check if we have the right header in the file, if not ask if we should import it anyway then make recipe and then recipe.data
                                 if Parser.isThere7iiiRecipeHeader(in: markdownString) == false {
                                     showSingleHeaderAlert = true
+                                    fileURL = url.path
+                                    
                                 } else {
                                     let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                     recipeData = recipeStruct.recipe.data
                                     startViewSwitcher = .singleFile
+                                    fileURL = url.path
                                 }
-                                // remove the file
-                                try fileManager.removeItem(at: url)
+                                
                                                                 
                             } else if fileExtension == "zip" {
                                 // ask if user wants to import
@@ -111,14 +119,18 @@ struct MDRecipesApp: App {
                                 Button(role: .destructive) {
                                     startViewSwitcher = .normal
                                     textFieldIngredient = ""
+                                    // remove the file if it is in the inbox folder
+                                    do {
+                                        try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                    } catch {
+                                        print("Error: \(error)")
+                                    }
                                 } label: {
                                     Text("Cancel")
                                 }
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Save") {
-                                    
-                                    startViewSwitcher = .normal
                                     
                                     if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
                                         recipeData.ingredients.append(Ingredient(text: textFieldIngredient))
@@ -127,12 +139,22 @@ struct MDRecipesApp: App {
                                     
                                     // saving the new recipe
                                     fileManager.saveNewRecipe(newRecipeData: recipeData)
+                                    
+                                    startViewSwitcher = .normal
+                                    
+                                    // remove the file if it is in the inbox folder
+                                    do {
+                                        try fileManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
+                                    } catch {
+                                        print("Error: \(error)")
+                                    }
+                                    
                                 }
                             }
                         }
                 }
             case .multiFile:
-                Text("multifile")
+                Text("Importing Files...")
             }
         }
     }

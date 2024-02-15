@@ -74,7 +74,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 } else if timer.timerInMinutes >= 2 {
                     stepperValue = -1.0
                 }   else if timer.timerInMinutes >= 0.2 {
-                        stepperValue = -10/60
+                    stepperValue = -10/60
                 } else {
                     stepperValue = 0.0
                 }
@@ -87,77 +87,77 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     
     // Saving and loading of the timers and trash in the documents folder to keep the timers up when view gets destroyed
-      func saveTimersAndTrashToDisk() {
-          // New file URL to save the trash and timers to the same spot as the rest.
-          let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
-          let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
-          
-          DispatchQueue.global(qos: .background).async { [weak self] in
-              guard let timers = self?.timers else { fatalError("Self out of scope!") }
-              guard let data = try? JSONEncoder().encode(timers) else { fatalError("Error encoding timers data") }
-              
-              do {
-                  let outFile = timersFileURL
-                  try data.write(to: outFile)
-              } catch {
-                  fatalError("Couldn't write to file")
-              }
-              
-              guard let trash = self?.trash else { fatalError("Self out of scope!") }
-              guard let trashData = try? JSONEncoder().encode(trash) else { fatalError("Error encoding trash data") }
-              
-              do {
-                  let outFile = trashFileURL
-                  try trashData.write(to: outFile)
-              } catch {
-                  fatalError("Couldn't write to file")
-              }
-          }
-      }
-          
-      func loadTimersAndTrashFromDisk() {
-          // New file URL to save the trash and timers to the same spot as the rest.
-          let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
-          let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
-          
-          DispatchQueue.global(qos: .background).async { [weak self] in
-              guard let timersData = try? Data(contentsOf: timersFileURL) else {
-                  return
-              }
-              guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: timersData) else {
-                  print("Trouble with loading the json timer file")
-                  return
-              }
-              
-              DispatchQueue.main.async {
-                  self?.timers = jsonTimers
-                  for timer in self!.timers {
-                      if timer.targetDate < Date.now {
-                          if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
-                              self!.timers[index].running = .stopped
-                          }
-                      }
-                  }
-              }
-              
-              guard let trashData = try? Data(contentsOf: trashFileURL) else {
-                  return
-              }
-              guard let jsonTrash = try? JSONDecoder().decode([Recipe].self, from: trashData) else {
-                  fatalError("Couldn't decode saved timers data")
-              }
-              
-              DispatchQueue.main.async {
-                         self?.trash = jsonTrash
-                     }
-              
-                 }
-                // update the trash
-                updateTrash()
+    func saveTimersAndTrashToDisk() {
+        // New file URL to save the trash and timers to the same spot as the rest.
+        let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
+        let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
+        
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let timers = self?.timers else { fatalError("Self out of scope!") }
+            guard let data = try? JSONEncoder().encode(timers) else { fatalError("Error encoding timers data") }
+            
+            do {
+                let outFile = timersFileURL
+                try data.write(to: outFile)
+            } catch {
+                fatalError("Couldn't write to file")
             }
+            
+            guard let trash = self?.trash else { fatalError("Self out of scope!") }
+            guard let trashData = try? JSONEncoder().encode(trash) else { fatalError("Error encoding trash data") }
+            
+            do {
+                let outFile = trashFileURL
+                try trashData.write(to: outFile)
+            } catch {
+                fatalError("Couldn't write to file")
+            }
+        }
+    }
+    
+    func loadTimersAndTrashFromDisk() {
+        // New file URL to save the trash and timers to the same spot as the rest.
+        let timersFileURL = recipesDirectory.appendingPathComponent("timers.data")
+        let trashFileURL = recipesDirectory.appendingPathComponent("trash.data")
+        
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let timersData = try? Data(contentsOf: timersFileURL) else {
+                return
+            }
+            guard let jsonTimers = try? JSONDecoder().decode([DirectionTimer].self, from: timersData) else {
+                print("Trouble with loading the json timer file")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self?.timers = jsonTimers
+                for timer in self!.timers {
+                    if timer.targetDate < Date.now {
+                        if let index = self!.timers.firstIndex(where: { $0.id == timer.id }) {
+                            self!.timers[index].running = .stopped
+                        }
+                    }
+                }
+            }
+            
+            guard let trashData = try? Data(contentsOf: trashFileURL) else {
+                return
+            }
+            guard let jsonTrash = try? JSONDecoder().decode([Recipe].self, from: trashData) else {
+                fatalError("Couldn't decode saved timers data")
+            }
+            
+            DispatchQueue.main.async {
+                self?.trash = jsonTrash
+            }
+            
+        }
+        // update the trash
+        updateTrash()
+    }
     
     
-   
+    
     /// starting or stoping a timer
     /// starts and stops notification of timer and timer itself
     func toggleTimer(timer: DirectionTimer) {
@@ -172,7 +172,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 timers[index].targetDate = Date(timeIntervalSinceNow: TimeInterval(timer.timerInMinutes * 60))
                 timers[index].running = .running
                 
-
+                
             } else if timer.running == .alarm {
                 timers[index].running = .stopped
             }
@@ -187,12 +187,12 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         if let index = timers.firstIndex(where: { $0.id == timer.id }) {
             timers[index].running = .alarm
             
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-//                if self.timers[index].running == .alarm {
-//                    self.timers[index].running = .stopped
-//                }
-//                
-//            }
+            //            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+            //                if self.timers[index].running == .alarm {
+            //                    self.timers[index].running = .stopped
+            //                }
+            //
+            //            }
         } else {
             print("Couldn't find timer")
         }
@@ -366,24 +366,24 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // update recipe in the recipes array
         let newRecipeData = Recipe.Data(title: newTitle,
-                               source: data.source,
-                               categories: categories,
-                               tags: data.tags,
-                               rating: data.rating,
-                               prepTime: data.prepTime,
-                               cookTime: data.cookTime,
-                               additionalTime: data.additionalTime,
-                               totalTime: data.totalTime,
-                               servings: data.servings,
-                               timesCooked: data.timesCooked,
-                               ingredients: data.ingredients,
-                               directions: Parser.reParsingDirections(directions: data.directions), // re-parsing directions to find all the new timer from edits in the list.
-                               nutrition: data.nutrition,
-                               notes: data.notes,
-                               oldImages: updatingCleaningAndParsingImages(oldImages: data.oldImages, newImages: data.dataImages, recipeTitle: data.title),
-                               date: data.date,
-                               updated: Date.now,
-                               language: data.language)
+                                        source: data.source,
+                                        categories: categories,
+                                        tags: data.tags,
+                                        rating: data.rating,
+                                        prepTime: data.prepTime,
+                                        cookTime: data.cookTime,
+                                        additionalTime: data.additionalTime,
+                                        totalTime: data.totalTime,
+                                        servings: data.servings,
+                                        timesCooked: data.timesCooked,
+                                        ingredients: data.ingredients,
+                                        directions: Parser.reParsingDirections(directions: data.directions), // re-parsing directions to find all the new timer from edits in the list.
+                                        nutrition: data.nutrition,
+                                        notes: data.notes,
+                                        oldImages: updatingCleaningAndParsingImages(oldImages: data.oldImages, newImages: data.dataImages, recipeTitle: data.title),
+                                        date: data.date,
+                                        updated: Date.now,
+                                        language: data.language)
         
         recipes[index].update(from: newRecipeData)
         
@@ -580,7 +580,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         return RecipeImage(imagePath: "Couldn't save image", caption: caption)
     }
-       
+    
     
     /// restore recipe from trash
     func restoreRecipe(recipe: Recipe) {
@@ -600,8 +600,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // remove recipe from trash
         if let index = trash.firstIndex(where: { $0.id == recipeToRestore.id }) {
-                trash.remove(at: index)
-            }
+            trash.remove(at: index)
+        }
     }
     
     
@@ -638,7 +638,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         updateRecipe(updatedRecipe: updatedRecipe)
     }
     
-
+    
     
     /// set the note section of a recipe, update the Markdown file too
     func updateNoteSection(of recipe: Recipe, to string: String) {
@@ -663,11 +663,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             if string.contains(" ") {
                 let cleanArray = Parser.makeCleanArray(from: string)
                 filteredRecipes = filteredRecipes.filter { recipe in
-                            cleanArray.allSatisfy { word in
-                                let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
-                                return markdownText.range(of: word, options: .caseInsensitive) != nil
-                                }
-                            }
+                    cleanArray.allSatisfy { word in
+                        let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
+                        return markdownText.range(of: word, options: .caseInsensitive) != nil
+                    }
+                }
                 
             } else {
                 filteredRecipes = filteredRecipes.filter { Parser.makeMarkdownFromRecipe(recipe: $0).content.range(of: string, options: .caseInsensitive) != nil }
@@ -679,20 +679,20 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         if ingredients.isEmpty == false {
             
             filteredRecipes = filteredRecipes.filter { recipe in
-                        ingredients.allSatisfy { word in
-                            // we have to also find the singular ingredients now.
-                            let singularForm = String(word.dropLast())
-                            var ingredientsString = ""
-                            for ingredient in recipe.ingredients {
-                                ingredientsString.append(ingredient.text.lowercased())
-                            }
-                            
-                            return ingredientsString.contains(word.lowercased()) || ingredientsString.contains(singularForm.lowercased())
-//                            let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
-//                            return markdownText.range(of: word, options: .caseInsensitive) != nil ||
-//                                        markdownText.range(of: singularForm, options: .caseInsensitive) != nil
-                            }
-                        }
+                ingredients.allSatisfy { word in
+                    // we have to also find the singular ingredients now.
+                    let singularForm = String(word.dropLast())
+                    var ingredientsString = ""
+                    for ingredient in recipe.ingredients {
+                        ingredientsString.append(ingredient.text.lowercased())
+                    }
+                    
+                    return ingredientsString.contains(word.lowercased()) || ingredientsString.contains(singularForm.lowercased())
+                    //                            let markdownText = Parser.makeMarkdownFromRecipe(recipe: recipe).content
+                    //                            return markdownText.range(of: word, options: .caseInsensitive) != nil ||
+                    //                                        markdownText.range(of: singularForm, options: .caseInsensitive) != nil
+                }
+            }
         }
         
         // third stage: filtering the results by the categories
@@ -703,10 +703,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 categories.allSatisfy { word in
                     let categoriesString = recipe.categories.joined(separator: " ")
                     
-                        return categoriesString.contains(word)
-                    }
+                    return categoriesString.contains(word)
                 }
             }
+        }
         
         
         // fourth stage: filtering the results by the tags
@@ -884,15 +884,15 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // Merge contents of the unzipped archive with the destination folder
         try mergeContents(from: copyDirectory, into: recipesDirectory)
-                
+        
     }
     
     /// import a folder of recipes
     func importFolderOfRecipes(url: String) throws {
         try mergeContents(from: URL(fileURLWithPath: url), into: recipesDirectory)
         
-        // delete the original folders
-        try FileManager.default.removeItem(at: URL(fileURLWithPath: url))
+        // delete the original folders if they are in the inbox
+        try removeItemInInbox(at: URL(fileURLWithPath: url))
     }
     
     /// merging two directories and deletes the source afterwords.
@@ -941,6 +941,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             try FileManager.default.removeItem(at: url)
         } catch {
             print("Error removing item at url \(url): \(error.localizedDescription)")
+        }
+    }
+    
+    /// removing an item if it is in an inbox folder
+    func removeItemInInbox(at url: URL) throws {
+        let path = url.path
+        print(path)
+        if path.contains("/Inbox/") {
+            print("removing the thing")
+            try removeItem(at: url)
         }
     }
     
