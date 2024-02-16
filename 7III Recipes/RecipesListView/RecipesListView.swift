@@ -51,7 +51,10 @@ struct RecipesListView: View {
                 .opacity(0.1)
         )
         .navigationTitle(Text(category.isEmpty ? "All" : category))
-        
+        .navigationDestination(for: Recipe.self) { recipe in
+            RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: $recipeMovedAlert)
+            
+        }
         .toolbar {
             
             

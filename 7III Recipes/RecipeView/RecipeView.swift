@@ -239,6 +239,7 @@ struct RecipeView: View {
                                 
                                 fileManager.updateEditedRecipe(recipe: recipe, data: data)
                                 
+                                // TODO: change this to simply move the path to the first category the recipe is in (or "All" if none), and then to the recipe again.
                                 // check if the recipe is still in the category folder
                                 if !data.categories.contains(where: { $0 == categoryFolder }) && categoryFolder != "All" && categoryFolder != "" {
                                     // show alert and go back to list

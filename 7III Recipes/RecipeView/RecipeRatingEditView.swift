@@ -34,11 +34,6 @@ struct RecipeRatingEditView: View {
         }
     }
 
-struct RecipeRatingEditView_Previews: PreviewProvider {
-    static var previews: some View {
-        HStack {
-            RecipeRatingEditView(recipe: Recipe.sampleData[0], fileManager: RecipesManager())
-        }
-        
-    }
+#Preview {
+    RecipeRatingEditView(recipe: Recipe.sampleData[0], fileManager: RecipesManager())
 }

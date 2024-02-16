@@ -16,14 +16,14 @@ struct HomeView: View {
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     // Edit Things
-    @State private var editViewPresented = false
+    @State var editViewPresented = false
+    @State var newRecipeData = Recipe.Data()
+    var comingFromImportView = false
     
     @State private var newIngredient = ""
     
     @State private var importViewPresented = false
-    
-    @State private var newRecipeData = Recipe.Data()
-    
+        
     @State private var importSaveDisabled = true
     
     @State private var showNewRecipeButtons = false
@@ -70,6 +70,7 @@ struct HomeView: View {
                             .navigationDestination(for: String.self) { category in
                                 RecipesListView(fileManager: recipesManager, category: category)
                             }
+                            
                             .navigationDestination(for: Recipe.self) { recipe in
                                 RecipeView(fileManager: recipesManager, recipe: recipe, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
                                 
@@ -194,7 +195,7 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
-                RecipeEditView(recipeData: $newRecipeData, fileManager: recipesManager, newIngredient: $newIngredient)
+                RecipeEditView(recipeData: $newRecipeData, fileManager: recipesManager, newIngredient: $newIngredient, comingFromImportView: comingFromImportView)
                     .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {

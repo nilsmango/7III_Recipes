@@ -390,6 +390,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         recipes[index].update(from: newRecipeData)
         
+//        // change the path to the new recipe.
+//        path.removeLast()
+//        path.append(recipes[index])
+        
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
         
@@ -440,6 +444,12 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // save the new recipe in the recipes Array
         recipes.append(newRecipe)
+        
+        // move the path to the new recipe
+        let pathNumber = path.count
+        path.removeLast(pathNumber)
+        path.append("")
+        path.append(newRecipe)
         
         // save the recipe as a Markdown File on disk
         saveRecipeAsMarkdownFile(recipe: newRecipe)

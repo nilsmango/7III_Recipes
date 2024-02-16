@@ -15,10 +15,7 @@ struct MDRecipesApp: App {
     
     @State private var markdownString = ""
     @State private var showSingleHeaderAlert = false
-    
-    @State private var recipe = Recipe(title: "", source: "", categories: [], tags: [], rating: "", prepTime: "", cookTime: "", additionalTime: "", totalTime: "", servings: 0, timesCooked: 0, ingredients: [], directions: [], nutrition: "", notes: "", images: [], date: Date.now, updated: Date.now, language: .english)
     @State private var recipeData = Recipe.Data()
-    @State private var textFieldIngredient = ""
     
     @State private var showZipImportAlert = false
     @State private var fileURL = ""
@@ -34,12 +31,7 @@ struct MDRecipesApp: App {
                             title: Text("Not a 7III Recipe"),
                             message: Text("Couldn't find a 7III Recipe header in this file."),
                             primaryButton: .destructive(Text("Cancel")) {
-                                // remove the file if it is in the inbox folder
-                                do {
-                                    try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
-                                } catch {
-                                    print("Error: \(error)")
-                                }
+                                
                             },
                             secondaryButton: .default(Text("Try Anyway")) {
                                 let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
@@ -75,7 +67,6 @@ struct MDRecipesApp: App {
                             print("Error removing Inbox folder: \(error)")
                             // TODO: Add error overly here.
                         }
-                        
                     }
                 
                     .onOpenURL { url in
@@ -104,7 +95,12 @@ struct MDRecipesApp: App {
                                         let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                         recipeData = recipeStruct.recipe.data
                                         startViewSwitcher = .singleFile
-                                        fileURL = url.path
+                                        // remove the file if it is in the inbox folder
+                                        do {
+                                            try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: url.path))
+                                        } catch {
+                                            print("Error: \(error)")
+                                        }
                                     }
                                     
                                 } else {
@@ -112,15 +108,21 @@ struct MDRecipesApp: App {
                                 // check if we have the right header in the file, if not ask if we should import it anyway then make recipe and then recipe.data
                                 if Parser.isThere7iiiRecipeHeader(in: markdownString) == false {
                                     showSingleHeaderAlert = true
-                                    fileURL = url.path
+                                    
                                     
                                 } else {
                                     let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                     recipeData = recipeStruct.recipe.data
                                     startViewSwitcher = .singleFile
-                                    fileURL = url.path
+                                    
                                     
                                 }
+                                    // remove the file if it is in the inbox folder
+                                    do {
+                                        try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: url.path))
+                                    } catch {
+                                        print("Error: \(error)")
+                                    }
                                 }
                                 
                                                                 
@@ -145,82 +147,11 @@ struct MDRecipesApp: App {
                     }
                 
             case .singleFile:
-                NavigationView {
-                    RecipeEditView(recipeData: $recipeData, fileManager: recipesManager, newIngredient: $textFieldIngredient)
-                        .navigationTitle("Import Recipe")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(role: .destructive) {
-                                    startViewSwitcher = .normal
-                                    textFieldIngredient = ""
-                                    // remove the file if it is in the inbox folder
-                                    do {
-                                        try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
-                                    } catch {
-                                        print("Error: \(error)")
-                                    }
-                                } label: {
-                                    Text("Cancel")
-                                }
-                            }
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Save") {
-                                    
-                                    if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
-                                        recipeData.ingredients.append(Ingredient(text: textFieldIngredient))
-                                        textFieldIngredient = ""
-                                    }
-                                    
-                                    // saving the new recipe
-                                    recipesManager.saveNewRecipe(newRecipeData: recipeData)
-                                    
-                                    startViewSwitcher = .normal
-                                                                        
-                                    // remove the file if it is in the inbox folder
-                                    do {
-                                        try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: fileURL))
-                                    } catch {
-                                        print("Error: \(error)")
-                                    }
-                                    
-                                }
-                            }
-                        }
-                }
+                HomeView(recipesManager: recipesManager, editViewPresented: true, newRecipeData: recipeData, comingFromImportView: true)
+
             case .internalFile:
                 HomeView(recipesManager: recipesManager)
-//                NavigationView {
-//                    RecipeEditView(recipeData: $recipeData, fileManager: recipesManager, newIngredient: $textFieldIngredient)
-//                        .navigationTitle("Edit Recipe")
-//                        .navigationBarTitleDisplayMode(.inline)
-//                        .toolbar {
-//                            ToolbarItem(placement: .navigationBarLeading) {
-//                                Button(role: .destructive) {
-//                                    startViewSwitcher = .normal
-//                                    
-//                                    textFieldIngredient = ""
-//                                    
-//                                } label: {
-//                                    Text("Cancel")
-//                                }
-//                            }
-//                            ToolbarItem(placement: .navigationBarTrailing) {
-//                                Button("Update") {
-//                                    
-//                                    if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
-//                                        recipeData.ingredients.append(Ingredient(text: textFieldIngredient))
-//                                        textFieldIngredient = ""
-//                                    }
-//                                    
-//                                    // updating the recipe
-//                                    recipesManager.updateEditedRecipe(recipe: recipe, data: recipeData)
-//                                    
-//                                    startViewSwitcher = .normal
-//                                }
-//                            }
-//                        }
-//                }
+
             case .multiFile:
                 Text("Importing Files...")
             }
