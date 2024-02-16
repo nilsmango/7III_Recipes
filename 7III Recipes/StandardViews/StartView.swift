@@ -9,9 +9,7 @@ import SwiftUI
 
 struct StartView: View {
     @ObservedObject var recipesManager: RecipesManager
-        
-    @Environment(\.scenePhase) private var scenePhase
-    
+            
     @State private var loading = true
     
     @State private var showSplash = true
@@ -37,12 +35,7 @@ struct StartView: View {
             
         } else {
             HomeView(recipesManager: recipesManager)
-                .onChange(of: scenePhase) { phase in
-                    if phase == .inactive {
-                        // saving our timer status to disk
-                        recipesManager.saveTimersAndTrashToDisk()
-                    }
-                }
+                
         }
         
             

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {    
     @ObservedObject var recipesManager: RecipesManager
+    @Environment(\.scenePhase) private var scenePhase
     
     @State var searchText = ""
     
@@ -175,7 +176,12 @@ struct HomeView: View {
         .background(ignoresSafeAreaEdges: .all)
         // making the font rounded
         .customNavBar()
-        
+        .onChange(of: scenePhase) { phase in
+            if phase == .inactive {
+                // saving our timer status to disk
+                recipesManager.saveTimersAndTrashToDisk()
+            }
+        }
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
                 RecipeEditView(recipeData: $newRecipeData, fileManager: recipesManager, newIngredient: $newIngredient)
