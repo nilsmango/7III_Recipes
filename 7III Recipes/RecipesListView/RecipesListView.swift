@@ -32,12 +32,9 @@ struct RecipesListView: View {
         //        NavigationStack {
         List {
             ForEach(fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: [])) { recipe in
-                NavigationLink(destination: RecipeView(fileManager: fileManager,recipe: recipe, categoryFolder: category, recipeMovedAlert: $recipeMovedAlert)) {
-                    
+                NavigationLink(value: recipe) {
                     ListItemView(recipe: recipe)
                 }
-                .listStyle(.insetGrouped)
-                
             }
             .onDelete { indexSet in
                 fileManager.delete(at: indexSet, filteringCategory: category)
@@ -46,7 +43,9 @@ struct RecipesListView: View {
                 fileManager.move(from: indexSet, to: newPlace)
                 sortingSelection = .standard
             }
+            
         }
+        .listStyle(.insetGrouped)
         .background(
             .gray
                 .opacity(0.1)

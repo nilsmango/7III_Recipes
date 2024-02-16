@@ -48,8 +48,6 @@ struct ListItemView: View {
     }
 }
 
-struct ListItemView_Previews: PreviewProvider {
-    static var previews: some View {
-        ListItemView(recipe: Recipe.sampleData.first!)
-    }
+#Preview {
+    ListItemView(recipe: Recipe.sampleData.first!)
 }

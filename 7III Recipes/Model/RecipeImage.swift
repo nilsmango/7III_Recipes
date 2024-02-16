@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RecipeImage: Identifiable, Codable {
+struct RecipeImage: Identifiable, Codable, Hashable {
     var imagePath: String
     var caption: String
     

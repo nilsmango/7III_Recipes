@@ -8,7 +8,11 @@
 import Foundation
 import UIKit
 
-struct Recipe: Identifiable, Codable {
+struct Recipe: Identifiable, Codable, Hashable {
+//    static func == (lhs: Recipe, rhs: Recipe) -> Bool {
+//        return lhs.id == rhs.id
+//    }
+    
     var title: String
     var source: String
     var categories: [String]

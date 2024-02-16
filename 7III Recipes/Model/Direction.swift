@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Direction: Identifiable, Codable {
+struct Direction: Identifiable, Codable, Hashable {
     var step: Int
     var text: String
     var hasTimer: Bool

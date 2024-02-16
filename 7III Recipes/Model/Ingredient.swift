@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Ingredient: Identifiable, Codable {
+struct Ingredient: Identifiable, Codable, Hashable {
     
     var text: String
     var selected: Bool = false

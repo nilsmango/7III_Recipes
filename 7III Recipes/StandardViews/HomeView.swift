@@ -29,7 +29,7 @@ struct HomeView: View {
     @State private var showNewRecipeButtons = false
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $recipesManager.path) {
             if searchText.isEmpty {
                 ScrollView {
                     
@@ -43,27 +43,37 @@ struct HomeView: View {
                                 .fontDesign(.rounded)
                                 .padding([.horizontal, .top])
                             LazyVGrid(columns: columns) {
-                                NavigationLink(destination: RecipesListView(fileManager: recipesManager, category: "")) {
+                                Button {
+                                    recipesManager.path.append("")
+                                } label: {
                                     FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
                                 }
                                 
                                 ForEach(recipesManager.getAllCategories(), id: \.self) { category in
-                                    NavigationLink(destination: RecipesListView(fileManager: recipesManager, category: category)) {
+                                    Button {
+                                        recipesManager.path.append(category)
+                                    } label: {
                                         FolderView(categoryFolder: category, categoryNumber: String(recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
-                                        
-                                    }
-                                    
-                                }
-                                if let randomRecipe = recipesManager.randomRecipe() {
-                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: randomRecipe, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
-                                        RandomRecipeView()
-                                        
                                     }
                                 }
                                 
+                                if allRecipes > 1 {
+                                    Button {
+                                        recipesManager.path.append(recipesManager.randomRecipe()!)
+                                    } label: {
+                                        RandomRecipeView()
+                                    }
+                                }
                             }
-                            
                             .padding([.horizontal])
+                            
+                            .navigationDestination(for: String.self) { category in
+                                RecipesListView(fileManager: recipesManager, category: category)
+                            }
+                            .navigationDestination(for: Recipe.self) { recipe in
+                                RecipeView(fileManager: recipesManager, recipe: recipe, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
+                                
+                            }
                             
                             let allTags = recipesManager.getAllTags()
                             if allTags.count > 0 {

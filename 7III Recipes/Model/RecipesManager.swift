@@ -12,6 +12,9 @@ import ZIPFoundation
 
 class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
+    // MARK: Navigation Path
+    @Published var path = NavigationPath()
+    
     // MARK: Import
     @Published var showImportView = false
     

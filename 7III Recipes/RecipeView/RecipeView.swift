@@ -45,7 +45,6 @@ struct RecipeView: View {
     @Binding var recipeMovedAlert: RecipeMovedAlert
     
     var body: some View {
-        //        NavigationStack {
         ZStack {
             List {
                 Section {
@@ -253,7 +252,6 @@ struct RecipeView: View {
             }
         }
     }
-    //    }
     
     // not the prettiest way, but way less complicated than making one generic function out of these two.
     private func bindingIngredient(for ingredient: Ingredient) -> Binding<Ingredient> {
