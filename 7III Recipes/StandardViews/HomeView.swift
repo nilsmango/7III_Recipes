@@ -14,8 +14,6 @@ struct HomeView: View {
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
-    private var randomRecipe: Recipe? { recipesManager.randomRecipe() }
-    
     // Edit Things
     @State private var editViewPresented = false
     
@@ -55,8 +53,8 @@ struct HomeView: View {
                                     }
                                     
                                 }
-                                if randomRecipe != nil {
-                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: randomRecipe!, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                if let randomRecipe = recipesManager.randomRecipe() {
+                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: randomRecipe, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
                                         RandomRecipeView()
                                         
                                     }
