@@ -8,5 +8,5 @@
 import Foundation
 
 enum StartViewSwitcher {
-case normal, singleFile, multiFile
+case normal, singleFile, multiFile, internalFile
 }
