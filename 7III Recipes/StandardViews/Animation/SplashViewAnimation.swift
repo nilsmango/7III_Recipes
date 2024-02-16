@@ -33,9 +33,9 @@ struct SplashViewAnimation: View {
             }
         
         .onChange(of: loading) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 showSplash = false
-            }
+//            }
             
         }
         .onTapGesture {
