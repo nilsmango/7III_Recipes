@@ -85,17 +85,20 @@ struct MDRecipesApp: App {
                             markdownString = try String(contentsOf: url, encoding: .utf8)
                             
                             if fileExtension == "md" {
-                                
+                                print(url.path)
+                                print(recipesManager.recipesDirectory.path)
+                                print(url.lastPathComponent)
                                 // check if we are coming from our own folder
-                                if fileURL.hasPrefix(recipesManager.recipesDirectory.path) && !fileURL.contains("/Inbox/") {
+                                if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
+                                    print("now to finding")
                                     // find the recipe in the recipesArray
-                                    if let recipeInArray = recipesManager.recipes.first(where: { $0.title + ".md" == url.lastPathComponent }) {
+                                    if let recipeInArray = recipesManager.recipes.first(where: { Parser.sanitizeFileName($0.title) + ".md" == url.lastPathComponent }) {
                                         recipe = recipeInArray
                                         recipeData = recipeInArray.data
                                         startViewSwitcher = .internalFile
                                         
                                     } else {
-                                        
+                                        print("not found")
                                         let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                         recipeData = recipeStruct.recipe.data
                                         startViewSwitcher = .singleFile
@@ -192,6 +195,7 @@ struct MDRecipesApp: App {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button(role: .destructive) {
                                     startViewSwitcher = .normal
+                                    
                                     textFieldIngredient = ""
                                     
                                 } label: {
