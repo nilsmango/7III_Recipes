@@ -93,8 +93,10 @@ struct MDRecipesApp: App {
                                     print("now to finding")
                                     // find the recipe in the recipesArray
                                     if let recipeInArray = recipesManager.recipes.first(where: { Parser.sanitizeFileName($0.title) + ".md" == url.lastPathComponent }) {
-                                        recipe = recipeInArray
-                                        recipeData = recipeInArray.data
+                                        let allPaths = recipesManager.path.count
+                                        recipesManager.path.removeLast(allPaths)
+                                        recipesManager.path.append("")
+                                        recipesManager.path.append(recipeInArray)
                                         startViewSwitcher = .internalFile
                                         
                                     } else {
@@ -187,37 +189,38 @@ struct MDRecipesApp: App {
                         }
                 }
             case .internalFile:
-                NavigationView {
-                    RecipeEditView(recipeData: $recipeData, fileManager: recipesManager, newIngredient: $textFieldIngredient)
-                        .navigationTitle("Edit Recipe")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(role: .destructive) {
-                                    startViewSwitcher = .normal
-                                    
-                                    textFieldIngredient = ""
-                                    
-                                } label: {
-                                    Text("Cancel")
-                                }
-                            }
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Update") {
-                                    
-                                    if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
-                                        recipeData.ingredients.append(Ingredient(text: textFieldIngredient))
-                                        textFieldIngredient = ""
-                                    }
-                                    
-                                    // updating the recipe
-                                    recipesManager.updateEditedRecipe(recipe: recipe, data: recipeData)
-                                    
-                                    startViewSwitcher = .normal
-                                }
-                            }
-                        }
-                }
+                HomeView(recipesManager: recipesManager)
+//                NavigationView {
+//                    RecipeEditView(recipeData: $recipeData, fileManager: recipesManager, newIngredient: $textFieldIngredient)
+//                        .navigationTitle("Edit Recipe")
+//                        .navigationBarTitleDisplayMode(.inline)
+//                        .toolbar {
+//                            ToolbarItem(placement: .navigationBarLeading) {
+//                                Button(role: .destructive) {
+//                                    startViewSwitcher = .normal
+//                                    
+//                                    textFieldIngredient = ""
+//                                    
+//                                } label: {
+//                                    Text("Cancel")
+//                                }
+//                            }
+//                            ToolbarItem(placement: .navigationBarTrailing) {
+//                                Button("Update") {
+//                                    
+//                                    if textFieldIngredient.trimmingCharacters(in: .whitespaces) != "" {
+//                                        recipeData.ingredients.append(Ingredient(text: textFieldIngredient))
+//                                        textFieldIngredient = ""
+//                                    }
+//                                    
+//                                    // updating the recipe
+//                                    recipesManager.updateEditedRecipe(recipe: recipe, data: recipeData)
+//                                    
+//                                    startViewSwitcher = .normal
+//                                }
+//                            }
+//                        }
+//                }
             case .multiFile:
                 Text("Importing Files...")
             }
