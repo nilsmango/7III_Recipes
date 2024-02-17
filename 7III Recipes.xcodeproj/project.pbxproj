@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		78202CD92B80B3FC0043E204 /* TagSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78202CD82B80B3FC0043E204 /* TagSelection.swift */; };
 		7824BC3A2B16862400211579 /* TagsOrIngredientsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC392B16862400211579 /* TagsOrIngredientsListView.swift */; };
 		7824BC3C2B1687AE00211579 /* FlexiTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */; };
 		7824BC3E2B172DD100211579 /* SelectionButtonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */; };
@@ -103,6 +104,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		78202CD82B80B3FC0043E204 /* TagSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagSelection.swift; sourceTree = "<group>"; };
 		7824BC392B16862400211579 /* TagsOrIngredientsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsOrIngredientsListView.swift; sourceTree = "<group>"; };
 		7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexiTagsView.swift; sourceTree = "<group>"; };
 		7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionButtonLabel.swift; sourceTree = "<group>"; };
@@ -366,6 +368,7 @@
 				784AFE182B07CDD300A14417 /* RecipeMovedAlert.swift */,
 				783B4B8929E00DE000551888 /* RecipeSegment.swift */,
 				782C65DA29D6D58000A95C18 /* Ingredient.swift */,
+				78202CD82B80B3FC0043E204 /* TagSelection.swift */,
 				78ED4A692B796FB600171F27 /* StartViewSwitcher.swift */,
 				78F3186129E5598F00DE31BE /* RecipeImage.swift */,
 				78F3186729E5B3D200DE31BE /* RecipeImageData.swift */,
@@ -629,6 +632,7 @@
 				78D1520829D827990023DB08 /* DirectionTimerView.swift in Sources */,
 				78D6D21129ED38FB004FED05 /* DateToDateFormatted.swift in Sources */,
 				783B4B8C29E04CD100551888 /* SegmentStackView.swift in Sources */,
+				78202CD92B80B3FC0043E204 /* TagSelection.swift in Sources */,
 				782EB6C329C460800086D2E7 /* RecipeViewTryOne.swift in Sources */,
 				7824BC402B177CF400211579 /* ToolbarOptionsView.swift in Sources */,
 				78623AD429D9AFC700B9CF65 /* TrashList.swift in Sources */,

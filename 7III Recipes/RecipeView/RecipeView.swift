@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct RecipeView: View {
-    @Environment(\.dismiss) var dismiss
     
     @ObservedObject var recipesManager: RecipesManager
     
@@ -169,7 +168,7 @@ struct RecipeView: View {
                             let indexSet = IndexSet(integer: index)
                             recipesManager.delete(at: indexSet)
                             // dismissing the view
-                            dismiss()
+                            recipesManager.dismissView()
                         }
                     }, label: {
                         Label("Delete Recipe", systemImage: "trash")

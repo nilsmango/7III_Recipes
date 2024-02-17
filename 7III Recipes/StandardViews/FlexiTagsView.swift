@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FlexiTagsView: View {
-    @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var recipesManager: RecipesManager
     
     var strings: [String]
     
@@ -18,8 +18,10 @@ struct FlexiTagsView: View {
             spacing: 5,
             alignment: .leading
         ) { string in
-            NavigationLink(destination: TagsOrIngredientsListView(fileManager: fileManager, selectedString: string, allStrings: strings, isTags: true)) {
-
+            Button(action: {
+                recipesManager.path.append(TagSelection(tag: string))
+                recipesManager.chosenTags.append(string)
+            }, label: {
                 Text(string)
                     .foregroundColor(.primary)
 //                    .fontWeight(.bold)
@@ -29,13 +31,16 @@ struct FlexiTagsView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color("CustomLightGray"))
                     )
-            }
+            })
+        }
+        .navigationDestination(for: TagSelection.self) { tagSelection in
+            TagsOrIngredientsListView(recipesManager: recipesManager, allStrings: strings, isTags: true)
         }
     }
 }
 
 struct FlexiTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        FlexiTagsView(fileManager: RecipesManager(), strings: ["#SuckIt", "#motherFucker"])
+        FlexiTagsView(recipesManager: RecipesManager(), strings: ["#SuckIt", "#motherFucker"])
     }
 }

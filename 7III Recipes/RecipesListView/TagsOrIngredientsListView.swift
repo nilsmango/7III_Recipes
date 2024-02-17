@@ -8,12 +8,8 @@
 import SwiftUI
 
 struct TagsOrIngredientsListView: View {
-    @ObservedObject var fileManager: RecipesManager
-    
-    var selectedString: String
-    
-    @State var chosenStrings = [String]()
-    
+    @ObservedObject var recipesManager: RecipesManager
+        
     var allStrings: [String]
     
     var isTags: Bool
@@ -29,21 +25,19 @@ struct TagsOrIngredientsListView: View {
             alignment: .leading
         ) { string in
 
-            SelectionButtonLabel(string: string, chosenStrings: $chosenStrings, allStrings: allStrings)
+            SelectionButtonLabel(string: string, chosenStrings: $recipesManager.chosenTags, allStrings: allStrings)
                 .onTapGesture {
-                        if chosenStrings.contains(string) {
-                            chosenStrings.removeAll(where: { $0 == string})
+                    if recipesManager.chosenTags.contains(string) {
+                        recipesManager.chosenTags.removeAll(where: { $0 == string})
                         } else {
-                            chosenStrings.append(string)
+                            recipesManager.chosenTags.append(string)
                         }
                 }
         }
         .padding()
-            .onAppear {
-                    chosenStrings.append(selectedString)
-            }
+            
         List {
-            ForEach(fileManager.filterTheRecipes(string: "", ingredients: isTags ? [] : chosenStrings, categories: [], tags: isTags ? chosenStrings : [])) { recipe in
+            ForEach(recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [], tags: isTags ? recipesManager.chosenTags : [])) { recipe in
                 NavigationLink(value: recipe) {
                     ListItemView(recipe: recipe)
                 }
@@ -56,10 +50,11 @@ struct TagsOrIngredientsListView: View {
             .gray
                 .opacity(0.1)
         )
-        .navigationTitle(Text(chosenStrings.count < 2 ? chosenStrings.first ?? "Filter by Tags" : chosenStrings.first! + " +"))
+        .navigationTitle(Text(recipesManager.chosenTags.count < 2 ? recipesManager.chosenTags.first ?? "Filter by Tags" : recipesManager.chosenTags.first! + " +"))
+        
     }
 }
 
 #Preview {
-    TagsOrIngredientsListView(fileManager: RecipesManager(), selectedString: "#Bitch", allStrings: ["#Bitch", "#Watermelon", "#SomeOtherTag", "#Funny", "#Crazy"], isTags: true)
+    TagsOrIngredientsListView(recipesManager: RecipesManager(), allStrings: ["#Bitch", "#Watermelon", "#SomeOtherTag", "#Funny", "#Crazy"], isTags: true)
 }

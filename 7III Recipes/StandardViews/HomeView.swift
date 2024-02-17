@@ -45,7 +45,9 @@ struct HomeView: View {
                             LazyVGrid(columns: columns) {
                                 Button {
                                     recipesManager.path.append("")
+                                    // updating our navigation tools
                                     recipesManager.currentCategory = "All"
+                                    recipesManager.chosenTags = []
                                 } label: {
                                     FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
                                 }
@@ -53,7 +55,9 @@ struct HomeView: View {
                                 ForEach(recipesManager.getAllCategories(), id: \.self) { category in
                                     Button {
                                         recipesManager.path.append(category)
+                                        // updating our navigation tools
                                         recipesManager.currentCategory = category
+                                        recipesManager.chosenTags = []
                                     } label: {
                                         FolderView(categoryFolder: category, categoryNumber: String(recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                     }
@@ -62,7 +66,9 @@ struct HomeView: View {
                                 if allRecipes > 1 {
                                     Button {
                                         recipesManager.path.append(recipesManager.randomRecipe()!)
+                                        // updating our navigation tools
                                         recipesManager.currentCategory = "All"
+                                        recipesManager.chosenTags = []
                                     } label: {
                                         RandomRecipeView()
                                     }
@@ -86,7 +92,7 @@ struct HomeView: View {
                                     .fontDesign(.rounded)
                                     .padding([.horizontal, .top])
                                 
-                                FlexiTagsView(fileManager: recipesManager, strings: allTags)
+                                FlexiTagsView(recipesManager: recipesManager, strings: allTags)
                                     .padding(.horizontal)
                             }
                             
