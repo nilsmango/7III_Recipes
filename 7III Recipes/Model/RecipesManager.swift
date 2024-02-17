@@ -310,10 +310,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// deleting both Recipe and the corresponding Markdown File
-    func delete(at indexSet: IndexSet, filteringCategory: String = "") {
+    func delete(at indexSet: IndexSet, filteringCategory: String = "", filteringTags: Bool = false) {
         
         // find the id for later removing the markdown
-        let idsToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: [])[$0].id }
+        let idsToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: filteringTags ? chosenTags : [])[$0].id }
+        
         
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
@@ -341,6 +342,33 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // Remove the Recipe from the Recipes Arrays
         recipes.removeAll(where: { idsToDelete.contains($0.id) })
+        
+        // check if chosen tags still represent all tags
+        if filteringTags {
+            updateChosenTags()
+        }
+        
+        // check if chosen category is still present in all categories
+        let allCategories = getAllCategories()
+        if allCategories.isEmpty || !allCategories.contains(filteringCategory) {
+            path = NavigationPath()
+        }
+    }
+    
+    /// updates the chosen tags to represent a selection of all tags and not some tags that don't exist any more, also updates the path if there are no tags left to choose
+    private func updateChosenTags() {
+        let allTags = getAllTags()
+        if allTags.isEmpty {
+            chosenTags = []
+            path = NavigationPath()
+            
+        } else {
+            for tag in chosenTags {
+                if !allTags.contains(tag) {
+                    chosenTags.removeAll(where: { $0 == tag })
+                }
+            }
+        }
         
     }
     
@@ -447,7 +475,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             if allTags.isEmpty {
                 // go back to root
                 chosenTags = []
-                path.removeLast()
+                if path.count > 0 {
+                    path.removeLast()
+                }
             } else {
                 for tag in chosenTags {
                     if !allTags.contains(tag) {
@@ -461,12 +491,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 let allCategories = getAllCategories()
                 
                 if allCategories.isEmpty || !allCategories.contains(currentCategory) {
-                    path.removeLast()
+                    if path.count > 0 {
+                        path.removeLast()
+                    }
                 }
             }
         
         // remove view from navigation path
-        path.removeLast()
+        if path.count > 0 {
+            path.removeLast()
+        }
     }
     
     

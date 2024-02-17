@@ -166,9 +166,10 @@ struct RecipeView: View {
                     Button(role: .destructive, action: {
                         if let index = recipesManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
                             let indexSet = IndexSet(integer: index)
-                            recipesManager.delete(at: indexSet)
                             // dismissing the view
                             recipesManager.dismissView()
+                            recipesManager.delete(at: indexSet)
+                            
                         }
                     }, label: {
                         Label("Delete Recipe", systemImage: "trash")
@@ -231,7 +232,6 @@ struct RecipeView: View {
                                     textFieldIngredient = ""
                                 }
                                 
-                                // TODO: change this to simply move the path to the first category the recipe is in (or "All" if none), and then to the recipe again.
                                 recipesManager.updateEditedRecipe(recipe: recipe, data: data)
                                 
                                                               
@@ -245,24 +245,32 @@ struct RecipeView: View {
     // not the prettiest way, but way less complicated than making one generic function out of these two.
     private func bindingIngredient(for ingredient: Ingredient) -> Binding<Ingredient> {
         
-        // find the ingredient
-        guard let ingredientIndex = recipesManager.recipes[recipeIndex ?? 0].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
-//            fatalError("Can't find the stupid ingredient in array")
-            // a little hack: make fake binding when the model is slower than the ui
+        // if no recipe then return fake binding
+        if recipeIndex == nil {
             return Binding(get: { Ingredient(text: "Wow") }, set: { _ in })
+        } else {
+            // find the ingredient
+            guard let ingredientIndex = recipesManager.recipes[recipeIndex!].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
+                // a little hack: make fake binding when the model is slower than the ui
+                return Binding(get: { Ingredient(text: "Wow") }, set: { _ in })
+            }
+            return $recipesManager.recipes[recipeIndex!].ingredients[ingredientIndex]
         }
-        return $recipesManager.recipes[recipeIndex!].ingredients[ingredientIndex]
     }
     
     private func bindingDirection(for direction: Direction) -> Binding<Direction> {
         
-        // find the direction
-        guard let directionIndex = recipesManager.recipes[recipeIndex ?? 0].directions.firstIndex(where: { $0.id == direction.id }) else {
-//            fatalError("Can't find the stupid direction in array")
-            // a little hack: make fake binding when the model is slower than the ui
+        // if no recipe then return fake binding
+        if recipeIndex == nil {
             return Binding(get: { Direction(step: 200, text: "nope", hasTimer: false, timerInMinutes: 0.0) }, set: { _ in })
+        } else {
+            // find the direction
+            guard let directionIndex = recipesManager.recipes[recipeIndex!].directions.firstIndex(where: { $0.id == direction.id }) else {
+                // a little hack: make fake binding when the model is slower than the ui
+                return Binding(get: { Direction(step: 200, text: "nope", hasTimer: false, timerInMinutes: 0.0) }, set: { _ in })
+            }
+            return $recipesManager.recipes[recipeIndex!].directions[directionIndex]
         }
-        return $recipesManager.recipes[recipeIndex!].directions[directionIndex]
     }
 }
 

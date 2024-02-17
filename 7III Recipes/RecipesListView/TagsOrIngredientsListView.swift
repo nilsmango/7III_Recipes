@@ -9,6 +9,8 @@ import SwiftUI
 
 struct TagsOrIngredientsListView: View {
     @ObservedObject var recipesManager: RecipesManager
+    
+    @State private var editMode: EditMode = .inactive
         
     var allStrings: [String]
     
@@ -41,8 +43,12 @@ struct TagsOrIngredientsListView: View {
                 NavigationLink(value: recipe) {
                     ListItemView(recipe: recipe)
                 }
+                
                 .listStyle(.insetGrouped)
                 
+            }
+            .onDelete { indexSet in
+                recipesManager.delete(at: indexSet, filteringTags: true)
             }
         }
         }
