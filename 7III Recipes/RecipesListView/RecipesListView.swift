@@ -24,8 +24,6 @@ struct RecipesListView: View {
     
     @State private var saveDisabled = true
     
-    @State private var recipeMovedAlert = RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")
-    
     @State private var newIngredient = ""
     
     var body: some View {
@@ -51,10 +49,7 @@ struct RecipesListView: View {
                 .opacity(0.1)
         )
         .navigationTitle(Text(category.isEmpty ? "All" : category))
-        .navigationDestination(for: Recipe.self) { recipe in
-            RecipeView(fileManager: fileManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: $recipeMovedAlert)
-            
-        }
+
         .toolbar {
             
             
@@ -216,9 +211,7 @@ struct RecipesListView: View {
                     }
             }
         })
-        .overlay(
-            RecipeMovedAlertView(recipeMovedAlert: $recipeMovedAlert)
-        )
+        
     }
     
     private func addNotSubmittedIngredient() {

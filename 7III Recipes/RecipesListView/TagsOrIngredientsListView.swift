@@ -44,7 +44,7 @@ struct TagsOrIngredientsListView: View {
             }
         List {
             ForEach(fileManager.filterTheRecipes(string: "", ingredients: isTags ? [] : chosenStrings, categories: [], tags: isTags ? chosenStrings : [])) { recipe in
-                NavigationLink(destination: RecipeView(fileManager: fileManager,recipe: recipe, categoryFolder: "", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                NavigationLink(value: recipe) {
                     ListItemView(recipe: recipe)
                 }
                 .listStyle(.insetGrouped)

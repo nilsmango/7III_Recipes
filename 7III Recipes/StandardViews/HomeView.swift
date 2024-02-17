@@ -45,6 +45,7 @@ struct HomeView: View {
                             LazyVGrid(columns: columns) {
                                 Button {
                                     recipesManager.path.append("")
+                                    recipesManager.currentCategory = "All"
                                 } label: {
                                     FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
                                 }
@@ -52,6 +53,7 @@ struct HomeView: View {
                                 ForEach(recipesManager.getAllCategories(), id: \.self) { category in
                                     Button {
                                         recipesManager.path.append(category)
+                                        recipesManager.currentCategory = category
                                     } label: {
                                         FolderView(categoryFolder: category, categoryNumber: String(recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
                                     }
@@ -60,6 +62,7 @@ struct HomeView: View {
                                 if allRecipes > 1 {
                                     Button {
                                         recipesManager.path.append(recipesManager.randomRecipe()!)
+                                        recipesManager.currentCategory = "All"
                                     } label: {
                                         RandomRecipeView()
                                     }
@@ -72,8 +75,7 @@ struct HomeView: View {
                             }
                             
                             .navigationDestination(for: Recipe.self) { recipe in
-                                RecipeView(fileManager: recipesManager, recipe: recipe, categoryFolder: "All", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
-                                
+                                RecipeView(recipesManager: recipesManager, recipe: recipe)
                             }
                             
                             let allTags = recipesManager.getAllTags()
@@ -161,7 +163,7 @@ struct HomeView: View {
                         if !recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                             Section {
                                 ForEach(recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                    NavigationLink(destination: RecipeView(fileManager: recipesManager, recipe: recipe, categoryFolder: category, recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))) {
+                                    NavigationLink(value: recipe) {
                                         ListItemView(recipe: recipe)
                                     }
                                 }

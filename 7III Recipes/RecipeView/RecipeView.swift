@@ -10,7 +10,7 @@ import SwiftUI
 struct RecipeView: View {
     @Environment(\.dismiss) var dismiss
     
-    @ObservedObject var fileManager: RecipesManager
+    @ObservedObject var recipesManager: RecipesManager
     
     var recipe: Recipe
     
@@ -18,7 +18,7 @@ struct RecipeView: View {
     
     // custom bindings
     var recipeIndex: Int? {
-        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+        if let index = recipesManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
             return index
         } else {
             return nil
@@ -39,16 +39,11 @@ struct RecipeView: View {
     @State private var addImages = false
     @State private var dataImages = [RecipeImageData]()
     
-    // for navigating back to home view when we change the category to another category than the open one.
-    var categoryFolder: String
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var recipeMovedAlert: RecipeMovedAlert
-    
     var body: some View {
         ZStack {
             List {
                 Section {
-                    HeadSectionView(recipe: recipe, fileManager: fileManager)
+                    HeadSectionView(recipe: recipe, fileManager: recipesManager)
                     
                 }
                 
@@ -58,24 +53,24 @@ struct RecipeView: View {
                 
                 Section("Ingredients") {
                     ForEach(recipe.ingredients) { ingredient in
-                        IngredientView(fileManager: fileManager, ingredient: bindingIngredient(for: ingredient), recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
+                        IngredientView(fileManager: recipesManager, ingredient: bindingIngredient(for: ingredient), recipeServings: recipe.servings, chosenServings: selectedServings, recipe: recipe)
                         
                     }
                 }
                 
                 Section("Directions") {
                     ForEach(recipe.directions) { direction in
-                        if let timerManagerIndex = fileManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
-                            DirectionTimerView(fileManager: fileManager, direction: bindingDirection(for: direction), recipe: recipe, timer: fileManager.timers[timerManagerIndex])
+                        if let timerManagerIndex = recipesManager.timers.firstIndex(where: { $0.recipeTitle == recipe.title && $0.step == direction.step }) {
+                            DirectionTimerView(fileManager: recipesManager, direction: bindingDirection(for: direction), recipe: recipe, timer: recipesManager.timers[timerManagerIndex])
                         } else {
-                            DirectionView(fileManager: fileManager, direction: bindingDirection(for: direction), recipe: recipe)
+                            DirectionView(fileManager: recipesManager, direction: bindingDirection(for: direction), recipe: recipe)
                         }
                     }
                 }
                 
                 Section("Statistics") {
                     Button(confettiStopper ? "Well done!" : "I have finished this recipe!") {
-                        fileManager.setTimesCooked(of: recipe, to: recipe.timesCooked + 1)
+                        recipesManager.setTimesCooked(of: recipe, to: recipe.timesCooked + 1)
                         counter += 1
                         confettiStopper = true
                     }
@@ -84,7 +79,7 @@ struct RecipeView: View {
                     Text(recipe.timesCooked == 1 ? "You have cooked this meal 1 time." : "You have cooked this meal \(recipe.timesCooked) times.")
                     HStack {
                         Text("Update Rating:")
-                        RecipeRatingEditView(recipe: recipe, fileManager: fileManager)
+                        RecipeRatingEditView(recipe: recipe, fileManager: recipesManager)
                         
                     }
                 }
@@ -96,7 +91,7 @@ struct RecipeView: View {
                 }
                 
                 Section("Notes") {
-                    NotesView(recipe: recipe, fileManager: fileManager)
+                    NotesView(recipe: recipe, fileManager: recipesManager)
                 }
                 
                 Section("Images") {
@@ -152,7 +147,7 @@ struct RecipeView: View {
                     }
                     
                     Button {
-                        let newTitle = fileManager.duplicateRecipe(recipe: recipe)
+                        let newTitle = recipesManager.duplicateRecipe(recipe: recipe)
                         
                         data = recipe.data
                         
@@ -170,9 +165,9 @@ struct RecipeView: View {
                     }
                     
                     Button(role: .destructive, action: {
-                        if let index = fileManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
+                        if let index = recipesManager.recipes.firstIndex(where: { $0.id == recipe.id }) {
                             let indexSet = IndexSet(integer: index)
-                            fileManager.delete(at: indexSet)
+                            recipesManager.delete(at: indexSet)
                             // dismissing the view
                             dismiss()
                         }
@@ -208,7 +203,7 @@ struct RecipeView: View {
                             // update recipeData with updated images
                                 newRecipeData.dataImages = dataImages
                                 // update recipe
-                                fileManager.updateEditedRecipe(recipe: recipe, data: newRecipeData)
+                                recipesManager.updateEditedRecipe(recipe: recipe, data: newRecipeData)
 //                            }
                         }
                     }
@@ -217,7 +212,7 @@ struct RecipeView: View {
         }
         .sheet(isPresented: $editViewIsPresented) {
             NavigationView {
-                RecipeEditView(recipeData: $data, fileManager: fileManager, newIngredient: $textFieldIngredient)
+                RecipeEditView(recipeData: $data, fileManager: recipesManager, newIngredient: $textFieldIngredient)
                     .navigationTitle("Edit Recipe")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
@@ -237,16 +232,10 @@ struct RecipeView: View {
                                     textFieldIngredient = ""
                                 }
                                 
-                                fileManager.updateEditedRecipe(recipe: recipe, data: data)
-                                
                                 // TODO: change this to simply move the path to the first category the recipe is in (or "All" if none), and then to the recipe again.
-                                // check if the recipe is still in the category folder
-                                if !data.categories.contains(where: { $0 == categoryFolder }) && categoryFolder != "All" && categoryFolder != "" {
-                                    // show alert and go back to list
-                                        recipeMovedAlert = RecipeMovedAlert(showAlert: true, recipeName: data.title, movedToCategory: data.categories.first!)
-                                    
-                                    self.presentationMode.wrappedValue.dismiss()
-                                }                                
+                                recipesManager.updateEditedRecipe(recipe: recipe, data: data)
+                                
+                                                              
                             }
                         }
                     }
@@ -258,26 +247,26 @@ struct RecipeView: View {
     private func bindingIngredient(for ingredient: Ingredient) -> Binding<Ingredient> {
         
         // find the ingredient
-        guard let ingredientIndex = fileManager.recipes[recipeIndex ?? 0].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
+        guard let ingredientIndex = recipesManager.recipes[recipeIndex ?? 0].ingredients.firstIndex(where: { $0.id == ingredient.id }) else {
 //            fatalError("Can't find the stupid ingredient in array")
             // a little hack: make fake binding when the model is slower than the ui
             return Binding(get: { Ingredient(text: "Wow") }, set: { _ in })
         }
-        return $fileManager.recipes[recipeIndex!].ingredients[ingredientIndex]
+        return $recipesManager.recipes[recipeIndex!].ingredients[ingredientIndex]
     }
     
     private func bindingDirection(for direction: Direction) -> Binding<Direction> {
         
         // find the direction
-        guard let directionIndex = fileManager.recipes[recipeIndex ?? 0].directions.firstIndex(where: { $0.id == direction.id }) else {
+        guard let directionIndex = recipesManager.recipes[recipeIndex ?? 0].directions.firstIndex(where: { $0.id == direction.id }) else {
 //            fatalError("Can't find the stupid direction in array")
             // a little hack: make fake binding when the model is slower than the ui
             return Binding(get: { Direction(step: 200, text: "nope", hasTimer: false, timerInMinutes: 0.0) }, set: { _ in })
         }
-        return $fileManager.recipes[recipeIndex!].directions[directionIndex]
+        return $recipesManager.recipes[recipeIndex!].directions[directionIndex]
     }
 }
 
 #Preview {
-        RecipeView(fileManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe, categoryFolder: "No Category", recipeMovedAlert: .constant(RecipeMovedAlert(showAlert: false, recipeName: "", movedToCategory: "")))
+        RecipeView(recipesManager: RecipesManager(), recipe: Parser.makeRecipeFromString(string: MarkdownFile.sampleData.last!.content).recipe)
 }

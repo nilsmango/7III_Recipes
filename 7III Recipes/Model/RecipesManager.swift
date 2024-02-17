@@ -14,6 +14,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     // MARK: Navigation Path
     @Published var path = NavigationPath()
+    @Published var currentCategory = ""
     
     // MARK: Import
     @Published var showImportView = false
@@ -390,9 +391,20 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         recipes[index].update(from: newRecipeData)
         
-//        // change the path to the new recipe.
-//        path.removeLast()
-//        path.append(recipes[index])
+        // find if active category is now gone from recipe
+        if !data.categories.contains(where: { $0 == currentCategory }) && currentCategory != "All" && currentCategory != "" {
+            // move the path to another category in the recipe
+            var newPathCategory = ""
+            if !data.categories.isEmpty {
+                newPathCategory = data.categories.first!
+            }
+            
+            path.removeLast(2)
+            path.append(newPathCategory)
+        }
+        
+        // change the path to the new recipe.
+        path.append(recipes[index])
         
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
@@ -457,7 +469,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // update the timers
         loadTimers(for: newRecipe)
     }
-    
+
     /// make a duplication of the recipe
     func duplicateRecipe(recipe: Recipe) -> String {
         let newTitle = recipe.title + " Variation \(Int.random(in: 0...99))\(randomLetter())\(randomLetter())"
