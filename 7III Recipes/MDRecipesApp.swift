@@ -84,8 +84,7 @@ struct MDRecipesApp: App {
                                     print("now to finding")
                                     // find the recipe in the recipesArray
                                     if let recipeInArray = recipesManager.recipes.first(where: { Parser.sanitizeFileName($0.title) + ".md" == url.lastPathComponent }) {
-                                        let allPaths = recipesManager.path.count
-                                        recipesManager.path.removeLast(allPaths)
+                                        recipesManager.path = NavigationPath()
                                         recipesManager.path.append("")
                                         recipesManager.path.append(recipeInArray)
                                         startViewSwitcher = .internalFile
