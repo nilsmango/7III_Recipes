@@ -39,6 +39,8 @@ struct RecipeView: View {
     @State private var dataImages = [RecipeImageData]()
     
     var body: some View {
+        // small hack to get correct updating in swiftui
+        let recipe = recipesManager.recipes.first(where: { $0.id == self.recipe.id }) ?? Recipe.sampleData.first!
         ZStack {
             List {
                 Section {
