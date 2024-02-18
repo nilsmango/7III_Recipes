@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HomeView: View {    
+struct HomeView: View {
     @ObservedObject var recipesManager: RecipesManager
     @Environment(\.scenePhase) private var scenePhase
     
@@ -23,7 +23,7 @@ struct HomeView: View {
     @State private var newIngredient = ""
     
     @State private var importViewPresented = false
-        
+    
     @State private var importSaveDisabled = true
     
     @State private var showNewRecipeButtons = false
@@ -75,14 +75,6 @@ struct HomeView: View {
                                 }
                             }
                             .padding([.horizontal])
-                            
-                            .navigationDestination(for: String.self) { category in
-                                RecipesListView(fileManager: recipesManager, category: category)
-                            }
-                            
-                            .navigationDestination(for: Recipe.self) { recipe in
-                                RecipeView(recipesManager: recipesManager, recipe: recipe)
-                            }
                             
                             let allTags = recipesManager.getAllTags()
                             if allTags.count > 0 {
@@ -152,10 +144,17 @@ struct HomeView: View {
                         
                     }
                 }
+                .navigationDestination(for: String.self) { category in
+                    RecipesListView(fileManager: recipesManager, category: category)
+                }
+                
+                .navigationDestination(for: Recipe.self) { recipe in
+                    RecipeView(recipesManager: recipesManager, recipe: recipe)
+                }
                 
                 .background(
                     .gray.opacity(0.1)
-//                    BackgroundAnimation(backgroundColor: .gray.opacity(0.1), withLogo: false, foregroundColor: .blue)
+                    //                    BackgroundAnimation(backgroundColor: .gray.opacity(0.1), withLogo: false, foregroundColor: .blue)
                 )
                 //                .navigationTitle("Categories")
                 .toolbar {
@@ -180,18 +179,16 @@ struct HomeView: View {
                                     .fontDesign(.rounded)
                             }
                         }
-                        
-                        
                     }
-                    
                 }
-                
+                .navigationDestination(for: Recipe.self) { recipe in
+                    RecipeView(recipesManager: recipesManager, recipe: recipe)
+                }
             }
-            
-            
         }
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
+        
         .background(ignoresSafeAreaEdges: .all)
         // making the font rounded
         .customNavBar()
