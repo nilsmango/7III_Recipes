@@ -313,8 +313,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func delete(at indexSet: IndexSet, filteringCategory: String = "", filteringTags: Bool = false) {
         
         // find the id for later removing the markdown
-        let idsToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: filteringTags ? chosenTags : [])[$0].id }
-        
+        var recipesToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: currentCategory.isEmpty || currentCategory == "All" || filteringCategory.isEmpty ? [] : [currentCategory], tags: filteringTags ? chosenTags : [])[$0] }
+        let idsToDelete = recipesToDelete.map( { $0.id })
         
         // we use the titles to remove the Markdown files later on
         var recipeTitles = [String]()
@@ -330,7 +330,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         recipeTitles.forEach(deleteMarkdownFile)
         
         // Remove the timer of the recipes
-        var recipesToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: [])[$0] }
         recipesToDelete.forEach(removeTimers)
         
         // Update the updated date in the deleted recipes to the trash array
@@ -344,14 +343,18 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         recipes.removeAll(where: { idsToDelete.contains($0.id) })
         
         // check if chosen tags still represent all tags
-        if filteringTags {
+        if !chosenTags.isEmpty {
             updateChosenTags()
-        }
-        
-        // check if chosen category is still present in all categories
-        let allCategories = getAllCategories()
-        if allCategories.isEmpty || !allCategories.contains(filteringCategory) {
-            path = NavigationPath()
+        } else {
+            // check if chosen category is still present in all categories etc.
+            if recipes.count < 1 {
+                path = NavigationPath()
+            } else {
+                let allCategories = getAllCategories()
+                if !allCategories.contains(currentCategory) && currentCategory != "" && currentCategory != "All" {
+                    path = NavigationPath()
+                }
+            }
         }
     }
     
@@ -420,44 +423,37 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         recipes[index].update(from: newRecipeData)
         
-        // removing the now not up to date recipe from the navigation path
-        path.removeLast()
         
         // check if we are navigating in the tags
         if chosenTags != [] {
             // check if there are any tags left in the recipes
             if getAllTags() == [] {
                 // remove the tags view from navigation also
-                path.removeLast()
+                path = NavigationPath()
                 chosenTags = []
             } else {
                 // find out if chosen tags are gone from recipe tags
                 for tag in chosenTags {
                     if !data.tags.contains(tag) {
                         chosenTags.removeAll(where: { $0 == tag })
+                        path.removeLast()
                     }
                 }
             }
             
-            
         } else {
             // find if active category is now gone from recipe
-            if !data.categories.contains(where: { $0 == currentCategory }) && currentCategory != "All" {
-                // move the path to another category in the recipe
-                var newPathCategory = ""
-                if !data.categories.isEmpty {
-                    newPathCategory = data.categories.first!
-                }
-                
-                path.removeLast()
-                path.append(newPathCategory)
+            if !data.categories.contains(where: { $0 == currentCategory }) {
+                // move the path to category all
+                // remove all navigation
+                path = NavigationPath()
+                path.append("")
+                currentCategory = ""
+                // append the updated recipe to the path
+                path.append(recipes[index])
             }
         }
-        
-        
-        // append the updated recipe to the path
-        path.append(recipes[index])
-        
+
         // update the Markdown File on disk from updated recipe
         saveRecipeAsMarkdownFile(recipe: recipes[index])
         
@@ -468,34 +464,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// dismisses a view
     func dismissView() {
-        // if we are in tags navigation make sure that the tag still exists
-        if chosenTags != [] {
-            let allTags = getAllTags()
-            
-            if allTags.isEmpty {
-                // go back to root
-                chosenTags = []
-                if path.count > 0 {
-                    path.removeLast()
-                }
-            } else {
-                for tag in chosenTags {
-                    if !allTags.contains(tag) {
-                        chosenTags.removeAll(where: { $0 == tag })
-                    }
-                }
-            }
-            
-            } else {
-                // if we are in categories make sure the category still exists
-                let allCategories = getAllCategories()
-                
-                if allCategories.isEmpty || !allCategories.contains(currentCategory) {
-                    if path.count > 0 {
-                        path.removeLast()
-                    }
-                }
-            }
         
         // remove view from navigation path
         if path.count > 0 {
@@ -547,9 +515,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         recipes.append(newRecipe)
         
         // move the path to the new recipe
-        let pathNumber = path.count
-        path.removeLast(pathNumber)
+        path = NavigationPath()
         path.append("")
+        currentCategory = ""
         path.append(newRecipe)
         
         // save the recipe as a Markdown File on disk
