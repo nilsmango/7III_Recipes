@@ -29,6 +29,7 @@ struct IngredientView: View {
             
             Text(Parser.stringMaker(of: ingredient.text.trimmingCharacters(in: .whitespaces), selectedServings: chosenServings, recipeServings: recipeServings))
         }
+        .contentShape(Rectangle())
         .onTapGesture {
 //            selected.toggle()
             ingredient.selected.toggle()

@@ -44,7 +44,7 @@ struct DirectionView: View {
             
         }
         .padding(.vertical)
-        
+        .contentShape(Rectangle())
         .onLongPressGesture {
             directionsString = recipe.directions.map({ $0.text }).joined(separator: "\n")
             showDirectionsEdit = true

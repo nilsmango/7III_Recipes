@@ -22,15 +22,11 @@ struct RecipeRatingEditView: View {
                     let fill = ratingInt >= selectedRating
                     Image(systemName: fill ? "star.fill" : "star")
                         .foregroundColor(.yellow)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             fileManager.updateRating(of: recipe, to: selectedRating)
                         }
-                        
                 }
-                
-            
-            
-
         }
     }
 
