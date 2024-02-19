@@ -28,6 +28,22 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         completionHandler([.banner, .sound])
     }
     
+    // Handle notification when the user taps on it
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        // Handle user's response to the notification
+        let identifier = response.notification.request.identifier
+        // Extract information from the notification content and perform actions
+        if let recipeTitle = identifier.components(separatedBy: Constants.notificationSeparator).first {
+            print("Result: \(recipeTitle)")
+            // change path to the recipe of the notification
+            if let recipeIndex = recipes.firstIndex(where: { $0.title == recipeTitle }) {
+                path = NavigationPath()
+                path.append(recipes[recipeIndex])
+            }
+        }
+        completionHandler()
+    }
+    
     
     // MARK: TIMERS
     

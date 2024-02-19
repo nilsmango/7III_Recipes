@@ -39,7 +39,7 @@ struct TimerButtonView: View {
                     let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: targetDate)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
                     
-                    let request = UNNotificationRequest(identifier: dirTimer.recipeTitle + String(dirTimer.step), content: content, trigger: trigger)
+                    let request = UNNotificationRequest(identifier: dirTimer.recipeTitle + Constants.notificationSeparator + String(dirTimer.step), content: content, trigger: trigger)
                     
                     notificationCenter.add(request) { error in
                         if let error = error {
