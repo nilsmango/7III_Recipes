@@ -30,8 +30,8 @@ struct TimerButtonView: View {
                 if dirTimer.running == .stopped {
                     // add a notification for this timer
                     let content = UNMutableNotificationContent()
-                    content.title = "Recipe \(dirTimer.recipeTitle)"
-                    content.subtitle = "Time's up for \(dirTimer.stepString)"
+                    content.title = dirTimer.recipeTitle
+                    content.body = "Time's up for: \(dirTimer.stepString)"
 
                     content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "Kitchen Timer Normal.caf"))
                     

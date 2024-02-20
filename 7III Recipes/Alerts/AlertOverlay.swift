@@ -42,7 +42,7 @@ struct AlertOverlay: View {
                 showAlert = false
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     showAlert = false
                 }
             }
