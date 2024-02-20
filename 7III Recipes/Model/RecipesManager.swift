@@ -489,7 +489,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     
     /// save a new recipe
-    func saveNewRecipe(newRecipeData: Recipe.Data) {
+    func saveNewRecipe(newRecipeData: Recipe.Data, withoutMovingPath: Bool = false) {
         
         // ad no category to all recipes without a category
         var categories = newRecipeData.categories
@@ -530,11 +530,13 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // save the new recipe in the recipes Array
         recipes.append(newRecipe)
         
-        // move the path to the new recipe
-        path = NavigationPath()
-        path.append("")
-        currentCategory = ""
-        path.append(newRecipe)
+        if withoutMovingPath == false {
+            // move the path to the new recipe
+            path = NavigationPath()
+            path.append("")
+            currentCategory = ""
+            path.append(newRecipe)
+        }
         
         // save the recipe as a Markdown File on disk
         saveRecipeAsMarkdownFile(recipe: newRecipe)
@@ -571,8 +573,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     private func updatingCleaningAndParsingImages(oldImages: [RecipeImage], newImages: [RecipeImageData], recipeTitle: String) -> [RecipeImage] {
         // check if there are any new images in the newImages
         let newImagesInNew = newImages.filter( { $0.isOldImage == false })
-        // if there are no new images we simply return the newImages converted to RecipeImages
         var recipeImages = [RecipeImage]()
+        
+        // if there are no new images we simply return the newImages converted to RecipeImages
         if newImagesInNew.count == 0 {
             for image in newImages {
                 // using the old image path, but the maybe new caption
@@ -663,10 +666,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             UIGraphicsEndImageContext()
         }
         
-        // Save each selected image to the RecipePhotos directory
+        // Save each selected image to the Images directory
         if let data = rotatedImage.pngData() {
             
             let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
+//            let relativeFileURL = "/" + Constants.imageFolder + "/" + fileName
             
             do {
                 try data.write(to: fileURL)
@@ -674,7 +678,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             } catch {
                 print("Error saving image: \(error.localizedDescription)")
             }
-            return RecipeImage(imagePath: "\(fileURL.path())", caption: caption)
+            return RecipeImage(imagePath: fileURL.path, caption: caption)
         }
         return RecipeImage(imagePath: "Couldn't save image", caption: caption)
     }
@@ -962,9 +966,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     // MARK: Import ZIP recipes
     
-    /// unzips and copies all the recipes into the recipes folder
-    func unzipAndCopyRecipesToDisk(url: String) throws {
-        print(url)
+    /// unzips and copies all the recipes into the recipes folder, returns the number of recipes imported
+    func unzipAndCopyRecipesToDisk(url: String) throws -> Int {
+        print("URL of thing we are importing: \(url)")
         let fileManager = FileManager.default
         
         let copyDirectory = recipesDirectory.appendingPathComponent(Constants.copyFolder)
@@ -981,78 +985,63 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // delete the original zip archive
         try fileManager.removeItem(at: URL(fileURLWithPath: url))
         
-        // check if the copyDirectory contains only a folder or files.
-        let contents = try fileManager.contentsOfDirectory(atPath: copyDirectory.path)
-        print(contents)
-        if let content = contents.first(where: { url.hasSuffix($0 + ".zip") }) {
-                print("found the folder")
-                let sourceItemURL = copyDirectory.appendingPathComponent(content)
-                
-                var isDirectory: ObjCBool = false
-                if fileManager.fileExists(atPath: sourceItemURL.path, isDirectory: &isDirectory) {
-                    if isDirectory.boolValue {
-                        // go one in
-                        print("Merging from: \(sourceItemURL)")
-                        try mergeContents(from: sourceItemURL, into: recipesDirectory)
-                    } else {
-                        // Merge contents of the unzipped archive with the destination folder
-                        try mergeContents(from: copyDirectory, into: recipesDirectory)
-                    }
-                }
-        } else {
-            // Merge contents of the unzipped archive with the destination folder
-            try mergeContents(from: copyDirectory, into: recipesDirectory)
-        }
+        // Merge contents of the unzipped archive with the destination folder
+        let counter = try mergeContents(from: copyDirectory)
         
         // Cleanup: Remove the copy folder
         try fileManager.removeItem(at: copyDirectory)
+        
+        return counter
     }
     
-    /// imports a folder of recipes
-    func importFolderOfRecipes(url: String) throws {
-        try mergeContents(from: URL(fileURLWithPath: url), into: recipesDirectory)
+    /// imports a folder of recipes, returns number of recipes imported
+    func importFolderOfRecipes(url: String) throws -> Int {
+        let counter = try mergeContents(from: URL(fileURLWithPath: url))
         
         // delete the original folders if they are in the inbox
         try removeItemInInbox(at: URL(fileURLWithPath: url))
+        
+        return counter
     }
     
-    /// merges two directories and deletes the source afterwords.
-    private func mergeContents(from sourceURL: URL, into destinationURL: URL) throws {
+    /// saves the markdown recipes from a source to our recipes folder with images, returns the number of recipes copied
+    private func mergeContents(from sourceURL: URL) throws -> Int {
+        var recipesCounter = 0
         let fileManager = FileManager.default
         
         let contents = try fileManager.contentsOfDirectory(atPath: sourceURL.path)
         
         for item in contents {
             let sourceItemURL = sourceURL.appendingPathComponent(item)
-            let destinationItemURL = destinationURL.appendingPathComponent(item)
-            
             var isDirectory: ObjCBool = false
             
             if fileManager.fileExists(atPath: sourceItemURL.path, isDirectory: &isDirectory) {
                 if isDirectory.boolValue {
                     // If it's a directory, recursively merge its contents
-                    try mergeContents(from: sourceItemURL, into: destinationItemURL)
+                    recipesCounter += try mergeContents(from: sourceItemURL)
                 } else {
-                    // If it's a file, handle conflicts by renaming the destination file
-                    // TODO: if it's an .md file then check if there is a 7III Recipes header.
-                    var count = 2
-                    var finalDestinationURL = destinationItemURL
-                    
-                    while fileManager.fileExists(atPath: finalDestinationURL.path) {
-                        let fileName = destinationItemURL.deletingPathExtension().lastPathComponent
-                        let fileExtension = destinationItemURL.pathExtension
-                        let newFileName = "\(fileName)\(count).\(fileExtension)"
-                        finalDestinationURL = destinationItemURL.deletingLastPathComponent().appendingPathComponent(newFileName)
-                        count += 1
+                    // Try to make all the .md files in the copyDirectory into 7III Recipes
+                    let fileExtension = sourceItemURL.pathExtension.lowercased()
+                    if fileExtension == "md" {
+                        var markdownString = ""
+                        
+                        do {
+                            markdownString = try String(contentsOf: sourceItemURL, encoding: .utf8)
+                        } catch {
+                            print("Error making string of \(sourceItemURL): \(error)")
+                        }
+                        
+                        if markdownString != "" {
+                            let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
+                            let recipeData = recipeStruct.recipe.data
+                            saveNewRecipe(newRecipeData: recipeData, withoutMovingPath: true)
+                            recipesCounter += 1
+                        }
                     }
-                    
-                    // Copy the file to the destination with a unique name
-                    try fileManager.moveItem(at: sourceItemURL, to: finalDestinationURL)
                 }
             }
         }
-        
-        
+        return recipesCounter
     }
     
     /// removes an item at the url
@@ -1074,6 +1063,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// removes the Inbox folder items and the copy folder
     func removeInboxAndCopyFolder() throws {
+        print("Cleaning up some folders if they exist.")
         let fileManager = FileManager.default
         let inboxURL = recipesDirectory.appendingPathComponent("Inbox")
         if fileManager.fileExists(atPath: inboxURL.path) {

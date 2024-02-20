@@ -14,6 +14,11 @@ struct StartView: View {
     
     @State private var showSplash = true
     
+    // edit view in home view
+    @Binding var editViewPresented: Bool
+    @Binding var newRecipeData: Recipe.Data
+    @Binding var comingFromImportView: Bool
+    
     var body: some View {
         if showSplash {
             SplashViewAnimation(loading: $loading, showSplash: $showSplash)
@@ -34,7 +39,7 @@ struct StartView: View {
                 }
             
         } else {
-            HomeView(recipesManager: recipesManager)
+            HomeView(recipesManager: recipesManager, editViewPresented: $editViewPresented, newRecipeData: $newRecipeData, comingFromImportView: $comingFromImportView)
                 
         }
         
@@ -44,5 +49,5 @@ struct StartView: View {
 }
 
 #Preview {
-    StartView(recipesManager: RecipesManager())
+    StartView(recipesManager: RecipesManager(), editViewPresented: .constant(false), newRecipeData: .constant(Recipe.sampleData.first!.data), comingFromImportView: .constant(false))
 }

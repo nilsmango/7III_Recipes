@@ -747,11 +747,14 @@ struct Parser {
         lines.append(recipe.notes)
         
         // Images
+        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         lines.append("")
         let imagesTitle = recipe.language == .german ? "## Bilder" : "## Images"
         lines.append(imagesTitle)
         for image in recipe.images {
-            let imageLine = "![[\(image.imagePath)|\(image.caption)]]"
+            // make the image path relative again
+            let relativePath = image.imagePath.replacingOccurrences(of: documentDirectory.path, with: "")
+            let imageLine = "![[\(relativePath)|\(image.caption)]]"
             lines.append(imageLine)
         }
        
@@ -1599,6 +1602,7 @@ struct Parser {
     
     
     private static func extractImages(from text: String) -> [RecipeImage] {
+        let recipesDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.path
         var images: [RecipeImage] = []
         
         let regex1 = try! NSRegularExpression(pattern: "!\\[\\[(.*?)\\]\\]")
@@ -1610,7 +1614,9 @@ struct Parser {
             let matchString = String(text[range])
             let components = matchString.components(separatedBy: "|")
             if components.count == 2 {
-                let path = components[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                let relativePath = components[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                let path = recipesDirectory + relativePath
+                print(path)
                 let caption = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
                 images.append(RecipeImage(imagePath: path, caption: caption))
             }
@@ -1621,7 +1627,9 @@ struct Parser {
             let range1 = Range(match.range(at: 1), in: text)!
             let caption = String(text[range1]).trimmingCharacters(in: .whitespacesAndNewlines)
             let range2 = Range(match.range(at: 2), in: text)!
-            let path = String(text[range2]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let relativePath = String(text[range2]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let path = recipesDirectory + relativePath
+            print(path)
             images.append(RecipeImage(imagePath: path, caption: caption))
         }
         

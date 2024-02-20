@@ -155,6 +155,9 @@ struct RecipeView: View {
                         // making sure the edit view has the right title
                         data.title = newTitle
                         
+                        // reseting the times cooked
+                        data.timesCooked = 0
+                        
                         // removing the images for the new recipe
                         data.oldImages = []
                         data.dataImages = []
@@ -195,7 +198,7 @@ struct RecipeView: View {
                         }
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Save") {
+                        Button("Update") {
                             
                             addImages = false
                             

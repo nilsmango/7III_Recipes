@@ -16,9 +16,9 @@ struct HomeView: View {
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     // Edit Things
-    @State var editViewPresented = false
-    @State var newRecipeData = Recipe.Data()
-    var comingFromImportView = false
+    @Binding var editViewPresented: Bool
+    @Binding var newRecipeData: Recipe.Data
+    @Binding var comingFromImportView: Bool
     
     @State private var newIngredient = ""
     
@@ -227,6 +227,8 @@ struct HomeView: View {
                                     newRecipeData.dataImages = []
                                     newRecipeData.date = Date.now
                                 }
+                                
+                                comingFromImportView = false
                             }
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
@@ -258,6 +260,7 @@ struct HomeView: View {
                                     newRecipeData.date = Date.now
                                     
                                 }
+                                comingFromImportView = false
                                 
                             }
                         }
@@ -344,10 +347,8 @@ struct HomeView: View {
 }
 
 #Preview {
-    let fileManager = RecipesManager()
-    fileManager.recipes = Recipe.sampleData
-    
-    return HomeView(recipesManager: fileManager)
+
+    return HomeView(recipesManager: RecipesManager(), editViewPresented: .constant(false), newRecipeData: .constant(Recipe.sampleData.first!.data), comingFromImportView: .constant(false))
 }
 
 
