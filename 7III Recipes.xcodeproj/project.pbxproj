@@ -72,6 +72,9 @@
 		786F9A3329CDAB6300CAA48B /* DirectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */; };
 		786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */; };
 		786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */; };
+		788D3E0F2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788D3E0E2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift */; };
+		788D3E122B8F40E8003CB6F8 /* OutsideTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788D3E102B8F40E8003CB6F8 /* OutsideTap.swift */; };
+		788D3E132B8F40E8003CB6F8 /* OverlayVStackModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788D3E112B8F40E8003CB6F8 /* OverlayVStackModifier.swift */; };
 		78C1C44B2B7D1FED009EBBBF /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C1C44A2B7D1FED009EBBBF /* ExportView.swift */; };
 		78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */; };
 		78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C59E8B2B1BCF9000C44F5F /* SplashViewAnimation.swift */; };
@@ -171,6 +174,9 @@
 		786F9A3229CDAB6300CAA48B /* DirectionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionTimer.swift; sourceTree = "<group>"; };
 		786F9A3429CDAC3900CAA48B /* FloatingTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTimerView.swift; sourceTree = "<group>"; };
 		786F9A3629CDAF6D00CAA48B /* RandomColorWithContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomColorWithContrast.swift; sourceTree = "<group>"; };
+		788D3E0E2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportRecipesOverlay.swift; sourceTree = "<group>"; };
+		788D3E102B8F40E8003CB6F8 /* OutsideTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutsideTap.swift; sourceTree = "<group>"; };
+		788D3E112B8F40E8003CB6F8 /* OverlayVStackModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayVStackModifier.swift; sourceTree = "<group>"; };
 		78C1C44A2B7D1FED009EBBBF /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		78C22AF229F12E8800CEA2BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		78C22AF329F1491A00CEA2BE /* CameraButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButtonView.swift; sourceTree = "<group>"; };
@@ -327,7 +333,7 @@
 				78C22AF229F12E8800CEA2BE /* Info.plist */,
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
 				782C65D329D58F0000A95C18 /* StandardViews */,
-				78ED4A6B2B7A424D00171F27 /* Alerts */,
+				78ED4A6B2B7A424D00171F27 /* Overlays */,
 				7824BC412B1780B100211579 /* ToolbarOptions */,
 				78623AD229D9AF6600B9CF65 /* Trash */,
 				782C65D529D58F7B00A95C18 /* RecipesListView */,
@@ -459,12 +465,15 @@
 			path = Experiments;
 			sourceTree = "<group>";
 		};
-		78ED4A6B2B7A424D00171F27 /* Alerts */ = {
+		78ED4A6B2B7A424D00171F27 /* Overlays */ = {
 			isa = PBXGroup;
 			children = (
 				78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */,
+				788D3E0E2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift */,
+				788D3E102B8F40E8003CB6F8 /* OutsideTap.swift */,
+				788D3E112B8F40E8003CB6F8 /* OverlayVStackModifier.swift */,
 			);
-			path = Alerts;
+			path = Overlays;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -572,6 +581,7 @@
 				786F9A3729CDAF6D00CAA48B /* RandomColorWithContrast.swift in Sources */,
 				782C65C829D56FFF00A95C18 /* IngredientsEditView.swift in Sources */,
 				78F3186829E5B3D200DE31BE /* RecipeImageData.swift in Sources */,
+				788D3E122B8F40E8003CB6F8 /* OutsideTap.swift in Sources */,
 				782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */,
 				782C65D229D58B0A00A95C18 /* ServingsCookedEditView.swift in Sources */,
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,
@@ -614,6 +624,7 @@
 				78C1C44B2B7D1FED009EBBBF /* ExportView.swift in Sources */,
 				786F9A0429C851A400CAA48B /* _FlexibleView.swift in Sources */,
 				78F553D029D429E2001C9F56 /* RecipeEditView.swift in Sources */,
+				788D3E132B8F40E8003CB6F8 /* OverlayVStackModifier.swift in Sources */,
 				78C22AF429F1491A00CEA2BE /* CameraButtonView.swift in Sources */,
 				78F553D629D4B226001C9F56 /* TagsEditView.swift in Sources */,
 				783B4B8429DEB41200551888 /* QuickIngredientsEditView.swift in Sources */,
@@ -633,6 +644,7 @@
 				7824BC402B177CF400211579 /* ToolbarOptionsView.swift in Sources */,
 				78623AD429D9AFC700B9CF65 /* TrashList.swift in Sources */,
 				786F9A0C29C8E0C000CAA48B /* HomeView.swift in Sources */,
+				788D3E0F2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

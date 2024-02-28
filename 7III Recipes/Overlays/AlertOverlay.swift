@@ -31,23 +31,18 @@ struct AlertOverlay: View {
                 .background {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.folderBG)
-                    //                        .background(.ultraThinMaterial)
+                        .shadow(color: .gray.opacity(0.2), radius: 10)
                 }
                                 
             }
             .frame(width: UIScreen.main.bounds.width * 0.8)
-            
-
             .onTapGesture {
                 showAlert = false
             }
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                    showAlert = false
-                }
+            .outsideTap {
+                showAlert = false
             }
         }
-        
     }
 }
 

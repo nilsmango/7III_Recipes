@@ -32,18 +32,6 @@
 				<string>public.zip-archive</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Folder</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.folder</string>
-			</array>
-		</dict>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
@@ -110,6 +98,7 @@
 			<key>UTTypeTagSpecification</key>
 			<dict/>
 		</dict>
+		<dict/>
 	</array>
 </dict>
 </plist>

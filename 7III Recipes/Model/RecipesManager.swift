@@ -967,7 +967,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     // MARK: Import ZIP recipes
     
     /// unzips and copies all the recipes into the recipes folder, returns the number of recipes imported
-    func unzipAndCopyRecipesToDisk(url: String) throws -> Int {
+    func unzipAndCopyRecipesToDisk(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
         print("URL of thing we are importing: \(url)")
         let fileManager = FileManager.default
         
@@ -982,31 +982,46 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // Unzip the archive
         try fileManager.unzipItem(at: URL(fileURLWithPath: url), to: copyDirectory)
         
-        // delete the original zip archive
-        try fileManager.removeItem(at: URL(fileURLWithPath: url))
+        // Delete the original zip archive
+        try removeItem(at: URL(fileURLWithPath: url))
         
-        // Merge contents of the unzipped archive with the destination folder
-        let counter = try mergeContents(from: copyDirectory)
+        return try importFolderOfRecipes(url: copyDirectory, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
         
-        // Cleanup: Remove the copy folder
-        try fileManager.removeItem(at: copyDirectory)
-        
-        return counter
     }
     
     /// imports a folder of recipes, returns number of recipes imported
-    func importFolderOfRecipes(url: String) throws -> Int {
-        let counter = try mergeContents(from: URL(fileURLWithPath: url))
+    func importFolderOfRecipes(url: URL, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+        // Make import recipes array
+        var importRecipes = try makeImportRecipesArray(from: url)
         
-        // delete the original folders if they are in the inbox
-        try removeItemInInbox(at: URL(fileURLWithPath: url))
+        // Cleanup: Remove the copy folder
+        try removeItem(at: url)
+
+        // Manipulate the recipes if requested
+        if resetTimesCooked || specialTag != "" {
+            importRecipes = importRecipes.map { recipe in
+                var modifiedRecipe = recipe
+                if resetTimesCooked {
+                    modifiedRecipe.timesCooked = 0
+                }
+                if specialTag != "" {
+                    modifiedRecipe.tags.append(specialTag)
+                }
+                return modifiedRecipe
+            }
+        }
         
-        return counter
+        // Save the new recipes
+        importRecipes.forEach { saveNewRecipe(newRecipeData: $0.data, withoutMovingPath: true) }
+        
+        // return the number of imported recipes
+        return importRecipes.count
+        
     }
     
     /// saves the markdown recipes from a source to our recipes folder with images, returns the number of recipes copied
-    private func mergeContents(from sourceURL: URL) throws -> Int {
-        var recipesCounter = 0
+    private func makeImportRecipesArray(from sourceURL: URL) throws -> [Recipe] {
+        var importRecipes = [Recipe]()
         let fileManager = FileManager.default
         
         let contents = try fileManager.contentsOfDirectory(atPath: sourceURL.path)
@@ -1018,7 +1033,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             if fileManager.fileExists(atPath: sourceItemURL.path, isDirectory: &isDirectory) {
                 if isDirectory.boolValue {
                     // If it's a directory, recursively merge its contents
-                    recipesCounter += try mergeContents(from: sourceItemURL)
+                    let moreRecipes = try makeImportRecipesArray(from: sourceItemURL)
+                    importRecipes.append(contentsOf: moreRecipes)
                 } else {
                     // Try to make all the .md files in the copyDirectory into 7III Recipes
                     let fileExtension = sourceItemURL.pathExtension.lowercased()
@@ -1033,15 +1049,14 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                         
                         if markdownString != "" {
                             let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
-                            let recipeData = recipeStruct.recipe.data
-                            saveNewRecipe(newRecipeData: recipeData, withoutMovingPath: true)
-                            recipesCounter += 1
+                            
+                            importRecipes.append(recipeStruct.recipe)
                         }
                     }
                 }
             }
         }
-        return recipesCounter
+        return importRecipes
     }
     
     /// removes an item at the url
