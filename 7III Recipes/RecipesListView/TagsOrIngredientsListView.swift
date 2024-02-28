@@ -11,7 +11,7 @@ struct TagsOrIngredientsListView: View {
     @ObservedObject var recipesManager: RecipesManager
     
     @State private var editMode: EditMode = .inactive
-        
+    
     var allStrings: [String]
     
     var isTags: Bool
@@ -20,37 +20,46 @@ struct TagsOrIngredientsListView: View {
         // add a row of FlexibleView items that are buttons that will get added to the tags
         VStack {
             
-        
-        FlexibleView(
-            data: allStrings,
-            spacing: 5,
-            alignment: .leading
-        ) { string in
-
-            SelectionButtonLabel(string: string, chosenStrings: $recipesManager.chosenTags, allStrings: allStrings)
-                .onTapGesture {
-                    if recipesManager.chosenTags.contains(string) {
-                        recipesManager.chosenTags.removeAll(where: { $0 == string})
+            
+            FlexibleView(
+                data: allStrings,
+                spacing: 5,
+                alignment: .leading
+            ) { string in
+                
+                SelectionButtonLabel(string: string, chosenStrings: $recipesManager.chosenTags, allStrings: allStrings)
+                    .onTapGesture {
+                        if recipesManager.chosenTags.contains(string) {
+                            recipesManager.chosenTags.removeAll(where: { $0 == string})
                         } else {
                             recipesManager.chosenTags.append(string)
                         }
-                }
-        }
-        .padding()
+                    }
+            }
+            .padding()
             
-        List {
-            ForEach(recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [], tags: isTags ? recipesManager.chosenTags : [])) { recipe in
-                NavigationLink(value: recipe) {
-                    ListItemView(recipe: recipe)
+            List {
+                ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+                    if !recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [category], tags: isTags ? recipesManager.chosenTags : []).isEmpty {
+                        Section {
+                            ForEach(recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [category], tags: isTags ? recipesManager.chosenTags : [])) { recipe in
+                                NavigationLink(value: recipe) {
+                                    ListItemView(recipe: recipe)
+                                }
+                            }
+                            .onDelete { indexSet in
+                                recipesManager.delete(at: indexSet, filteringCategory: category, filteringTags: true)
+                            }
+                        } header: {
+                            Text(category)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .fontDesign(.rounded)
+                        }
+                        .listStyle(.insetGrouped)
+                    }
                 }
-                
-                .listStyle(.insetGrouped)
-                
             }
-            .onDelete { indexSet in
-                recipesManager.delete(at: indexSet, filteringTags: true)
-            }
-        }
         }
         .background(
             .gray
