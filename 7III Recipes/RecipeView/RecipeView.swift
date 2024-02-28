@@ -132,6 +132,7 @@ struct RecipeView: View {
             // ZStack Layer
             ConfettiCannon(counter: $counter, num: numberArray, colors: [.blue, .red, .yellow, .purple, .green, .black])
         }
+        .scrollContentBackground(.hidden)
         .background(
             .gray
                 .opacity(0.1)

@@ -117,6 +117,7 @@ struct RecipeEditView: View {
                 ImagesPickerView(dataImages: $recipeData.dataImages)
             }
         }
+        .scrollContentBackground(.hidden)
         .background(
             .gray
                 .opacity(0.1)

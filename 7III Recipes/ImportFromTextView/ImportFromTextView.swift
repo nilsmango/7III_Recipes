@@ -1,5 +1,5 @@
 //
-//  ImportView.swift
+//  ImportFromTextView.swift
 //  MDRecipes
 //
 //  Created by Simon Lang on 02.04.23.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ImportView: View {
+struct ImportFromTextView: View {
     @StateObject var importer = Importer()
     
     @ObservedObject var fileManager: RecipesManager
@@ -77,10 +77,13 @@ Cooking can be dangerous
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .background(
                 .gray
                     .opacity(0.1)
             )
+            
+
             .onAppear {
                 saveDisabled = true
             }
@@ -124,5 +127,5 @@ Cooking can be dangerous
 }
 
 #Preview {
-        ImportView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), newIngredient: .constant(""), saveDisabled: .constant(true))
+        ImportFromTextView(importer: Importer(), fileManager: RecipesManager(), recipeData: .constant(Recipe.sampleData[0].data), newIngredient: .constant(""), saveDisabled: .constant(true))
 }

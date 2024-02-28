@@ -145,7 +145,7 @@ struct RecipesListView: View {
         })
         .fullScreenCover(isPresented: $importViewPresented, content: {
             NavigationView {
-                ImportView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $saveDisabled)
+                ImportFromTextView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $saveDisabled)
                     .navigationTitle(newRecipeData.title == "" ? "Import from Text" : newRecipeData.title)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
