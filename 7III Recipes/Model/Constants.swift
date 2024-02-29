@@ -12,5 +12,6 @@ struct Constants {
     static let noCategoryFolder = "No Category"
     static let recipesType = "type: 7III Recipe"
     static let copyFolder = "copyFolder"
+    static let exportFolder = "RecipesExport"
     static let notificationSeparator = "/Step/"
 }

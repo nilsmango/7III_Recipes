@@ -48,7 +48,6 @@ struct ToolbarOptionsView: View {
                             } else {
                                 Text(sortCase.rawValue.capitalized)
                             }
-                            
                         }
                     }
                 }

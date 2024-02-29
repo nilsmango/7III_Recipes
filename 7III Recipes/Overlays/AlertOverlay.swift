@@ -12,7 +12,7 @@ struct AlertOverlay: View {
     @Binding var showAlert: Bool
     
     var text: String
-    var showSymbol: Bool = true
+    var showSymbol = true
     var symbolPositive = false
     var padding: Double = 16.0
     

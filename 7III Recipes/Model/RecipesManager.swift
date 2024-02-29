@@ -302,10 +302,17 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    private func saveRecipeAsMarkdownFile(recipe: Recipe) {
+    private func saveRecipeAsMarkdownFile(recipe: Recipe, exportDirectory: Bool = false) {
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
         
-        let fileURL = recipesDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+        let fileURL: URL
+        
+        if exportDirectory {
+            fileURL = recipesDirectory.appendingPathComponent(Constants.exportFolder).appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+        } else {
+            fileURL = recipesDirectory.appendingPathComponent(markdownFile.name).appendingPathExtension("md")
+        }
+
         do {
             try markdownFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
@@ -491,7 +498,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     /// save a new recipe
     func saveNewRecipe(newRecipeData: Recipe.Data, withoutMovingPath: Bool = false) {
         
-        // ad no category to all recipes without a category
+        // add no category to all recipes without a category
         var categories = newRecipeData.categories
         if categories.isEmpty {
             categories = [Constants.noCategoryFolder]
@@ -615,7 +622,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         do {
             try FileManager.default.removeItem(at: url)
         } catch {
-            print("Error deleting Markdown file for recipe with name \(imagePath): \(error.localizedDescription)")
+            print("Error deleting Image file for recipe with path \(imagePath): \(error.localizedDescription)")
         }
         
     }
@@ -1092,6 +1099,86 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         let copyFolderURL = recipesDirectory.appendingPathComponent(Constants.copyFolder)
         if fileManager.fileExists(atPath: copyFolderURL.path) {
             try removeItem(at: copyFolderURL)
+        }
+    }
+    
+    // MARK: Export
+    
+    /// removes the export folder
+    func removeExportFolder() {
+        let fileManager = FileManager.default
+        let exportDirectory = recipesDirectory.appendingPathComponent(Constants.exportFolder)
+        
+        do {
+            // Check if the directory already exists
+            if fileManager.fileExists(atPath: exportDirectory.path) {
+                // If it exists, remove its contents
+                try fileManager.removeItem(at: exportDirectory)
+            }
+        } catch {
+               print("Error removing export folder directory: \(error.localizedDescription)")
+           }
+    }
+    
+    /// takes a recipes array, makes a temporary folder for export
+    func exportRecipes(recipes: [Recipe], resetTimesCooked: Bool, includeImages: Bool, tagToAdd: String, completion: @escaping () -> Void) {
+        // create empty export folder in tempDirectory for the to be exported recipes
+        
+        do {
+            // remove export directory
+            removeExportFolder()
+            
+            // Create the directory (or recreate after deletion)
+            try FileManager.default.createDirectory(at: recipesDirectory.appendingPathComponent(Constants.exportFolder), withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("Error creating/exporting directory: \(error.localizedDescription)")
+        }
+        
+        // modify the recipes
+        var modifiedRecipes = recipes
+        
+        modifiedRecipes = modifiedRecipes.map { recipe in
+            var modifiedRecipe = recipe
+            if resetTimesCooked {
+                modifiedRecipe.timesCooked = 0
+            }
+            if tagToAdd != "" {
+                modifiedRecipe.tags.append(tagToAdd)
+            }
+            if !modifiedRecipe.images.isEmpty {
+                if !includeImages {
+                    modifiedRecipe.images = []
+                } else {
+                    // copy paste images
+                    modifiedRecipe.images.forEach { copyPasteExportImages(url: $0.imagePath) }
+                }
+            }
+            return modifiedRecipe
+        }
+        
+        // safe recipes as markdown in Export folder
+        modifiedRecipes.forEach { saveRecipeAsMarkdownFile(recipe: $0, exportDirectory: true) }
+        
+        // Call completion handler to notify the caller that the export is complete
+        completion()
+    }
+    
+    /// copy pastes an image from the document folder to the export folder
+    private func copyPasteExportImages(url: String) {
+        let fileManager = FileManager.default
+        // Find the image
+        let imageSourcePath = url
+
+        let imageTargetPath = url.replacingOccurrences(of: recipesDirectory.path, with: recipesDirectory.appendingPathComponent(Constants.exportFolder).path)
+
+        // copy the image to the export folder
+        let exportPhotosDirectory = recipesDirectory.appendingPathComponent(Constants.exportFolder).appendingPathComponent(Constants.imageFolder)
+        // Create the directory if it doesn't exist
+        do {
+            try fileManager.createDirectory(at: exportPhotosDirectory, withIntermediateDirectories: true, attributes: nil)
+            try fileManager.copyItem(atPath: imageSourcePath, toPath: imageTargetPath)
+        } catch {
+            print("Error copying export images: \(error.localizedDescription)")
         }
     }
 }

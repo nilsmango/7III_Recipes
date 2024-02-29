@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		78202CD92B80B3FC0043E204 /* TagSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78202CD82B80B3FC0043E204 /* TagSelection.swift */; };
 		7822648F2B8FD28F00759188 /* ExportListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7822648E2B8FD28F00759188 /* ExportListView.swift */; };
+		782264912B90840A00759188 /* ExportOverlayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782264902B90840A00759188 /* ExportOverlayButton.swift */; };
+		782264932B9085C100759188 /* ExportRecipesOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782264922B9085C100759188 /* ExportRecipesOverlay.swift */; };
+		782264952B90BCA500759188 /* ExportLinkOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782264942B90BCA500759188 /* ExportLinkOverlay.swift */; };
 		7824BC3A2B16862400211579 /* TagsOrIngredientsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC392B16862400211579 /* TagsOrIngredientsListView.swift */; };
 		7824BC3C2B1687AE00211579 /* FlexiTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */; };
 		7824BC3E2B172DD100211579 /* SelectionButtonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */; };
@@ -109,6 +112,9 @@
 /* Begin PBXFileReference section */
 		78202CD82B80B3FC0043E204 /* TagSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagSelection.swift; sourceTree = "<group>"; };
 		7822648E2B8FD28F00759188 /* ExportListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportListView.swift; sourceTree = "<group>"; };
+		782264902B90840A00759188 /* ExportOverlayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportOverlayButton.swift; sourceTree = "<group>"; };
+		782264922B9085C100759188 /* ExportRecipesOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportRecipesOverlay.swift; sourceTree = "<group>"; };
+		782264942B90BCA500759188 /* ExportLinkOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportLinkOverlay.swift; sourceTree = "<group>"; };
 		7824BC392B16862400211579 /* TagsOrIngredientsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsOrIngredientsListView.swift; sourceTree = "<group>"; };
 		7824BC3B2B1687AE00211579 /* FlexiTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexiTagsView.swift; sourceTree = "<group>"; };
 		7824BC3D2B172DD100211579 /* SelectionButtonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionButtonLabel.swift; sourceTree = "<group>"; };
@@ -226,6 +232,7 @@
 			children = (
 				78C1C44A2B7D1FED009EBBBF /* ExportView.swift */,
 				7822648E2B8FD28F00759188 /* ExportListView.swift */,
+				782264902B90840A00759188 /* ExportOverlayButton.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -481,6 +488,8 @@
 			children = (
 				78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */,
 				788D3E0E2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift */,
+				782264922B9085C100759188 /* ExportRecipesOverlay.swift */,
+				782264942B90BCA500759188 /* ExportLinkOverlay.swift */,
 				788D3E102B8F40E8003CB6F8 /* OutsideTap.swift */,
 				788D3E112B8F40E8003CB6F8 /* OverlayVStackModifier.swift */,
 			);
@@ -600,10 +609,12 @@
 				78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */,
 				78F3186A29E6A24500DE31BE /* RecipeImageView.swift in Sources */,
 				7824BC3C2B1687AE00211579 /* FlexiTagsView.swift in Sources */,
+				782264952B90BCA500759188 /* ExportLinkOverlay.swift in Sources */,
 				782C65DD29D7333600A95C18 /* FlexiStringsView.swift in Sources */,
 				78D6D20B29EC3FDA004FED05 /* NotesView.swift in Sources */,
 				786F9A3529CDAC3900CAA48B /* FloatingTimerView.swift in Sources */,
 				78D6D20F29ED2FFC004FED05 /* TimerButtonView.swift in Sources */,
+				782264912B90840A00759188 /* ExportOverlayButton.swift in Sources */,
 				786F9A2D29CC7F6D00CAA48B /* VisibilityView.swift in Sources */,
 				782EB6BF29C3A4650086D2E7 /* RecipesManager.swift in Sources */,
 				78F3186029E5442B00DE31BE /* ImageDetailView.swift in Sources */,
@@ -616,6 +627,7 @@
 				783B4B8829E0073B00551888 /* SegmentView.swift in Sources */,
 				78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */,
 				786F99FA29C4F0C700CAA48B /* SizePref.swift in Sources */,
+				782264932B9085C100759188 /* ExportRecipesOverlay.swift in Sources */,
 				78D6D20929EC3B23004FED05 /* RecipeRatingEditView.swift in Sources */,
 				784AFE192B07CDD300A14417 /* RecipeMovedAlert.swift in Sources */,
 				78623AD929DA007100B9CF65 /* ConvertFractionsIntoDoubles.swift in Sources */,

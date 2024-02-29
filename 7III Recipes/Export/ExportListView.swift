@@ -13,6 +13,8 @@ struct ExportListView: View {
     @State private var searchText = ""
     
     @State private var selectedRecipes: [Recipe] = []
+    
+    @State private var showExportOverlay = false
 
     var body: some View {
         List {
@@ -49,6 +51,16 @@ struct ExportListView: View {
                             .fontDesign(.rounded)
                     }
                 }
+            }
+        }
+        .overlay {
+            if showExportOverlay {
+                ExportRecipesOverlay(recipesManager: recipesManager, showExportOverlay: $showExportOverlay, recipes: selectedRecipes)
+            } else {
+                ExportOverlayButton(onExport: {
+                    showExportOverlay = true
+                })
+                    .disabled(selectedRecipes.isEmpty)
             }
         }
         .background(

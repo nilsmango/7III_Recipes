@@ -118,7 +118,7 @@ struct MDRecipesApp: App {
                     
                     catch {
                         // Showing the alert
-                        alertOverlayText = "Error opening file: \(error.localizedDescription)"
+                        alertOverlayText = "Error opening file: \(error.localizedDescription)\n\nIf you tried to import a file, use \"import files\" in the menu instead."
                         showAlertOverlay = true
                     }
                 }

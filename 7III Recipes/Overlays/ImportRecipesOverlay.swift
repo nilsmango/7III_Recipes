@@ -25,7 +25,7 @@ struct ImportRecipesOverlay: View {
     var body: some View {
         ZStack {
             if showOverlay {
-                VStack() {
+                VStack {
                     Text("Import Recipes")
                         .font(.headline)
                         .padding()
@@ -35,12 +35,11 @@ struct ImportRecipesOverlay: View {
                             Image(systemName: resetTimesCooked ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(resetTimesCooked ? .blue : .primary)
                             
-                            Text("Reset times cooked counter")
+                            Text("Reset times cooked counters")
                             
                             Spacer()
                         }
                         .padding(.horizontal)
-                        
                         .contentShape(Rectangle())
                         .onTapGesture {
                             resetTimesCooked.toggle()
