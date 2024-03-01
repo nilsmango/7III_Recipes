@@ -86,7 +86,7 @@ struct ImportRecipesOverlay: View {
                             showOverlay = false
                             
                             do {
-                                let recipesImported = try recipesManager.unzipAndCopyRecipesToDisk(url: fileURL, resetTimesCooked: resetTimesCooked, specialTag: tagForImport)
+                                let recipesImported = try recipesManager.importRecipes(url: fileURL, resetTimesCooked: resetTimesCooked, specialTag: tagForImport)
                                 alertText = "\(recipesImported) recipes imported!"
                                 alertPositive = true
                                 showRecipesGotImported = true

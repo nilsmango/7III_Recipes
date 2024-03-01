@@ -17,13 +17,16 @@ struct ExportRecipesOverlay: View {
     @State private var tagToAdd = ""
     @State private var resetTimesCooked = false
     @State private var includeImages = false
+    @State private var makeZIP = false
+    
+    @State private var showInfoPopover = false
     
     @State private var showStatusOverlay = false
     @State private var showShareLink = false
     var body: some View {
         if showStatusOverlay {
             
-            ExportLinkOverlay(showShareLink: showShareLink, item: recipesManager.recipesDirectory.appendingPathComponent(Constants.exportFolder)) {
+            ExportLinkOverlay(showShareLink: showShareLink, item: makeZIP ? recipesManager.recipesDirectory.appendingPathComponent(Constants.exportFolder).appendingPathExtension("zip") : recipesManager.recipesDirectory.appendingPathComponent(Constants.exportFolder)) {
                 // Close overlays, delete folder
                 showExportOverlay = false
                 showStatusOverlay = false
@@ -66,6 +69,28 @@ struct ExportRecipesOverlay: View {
                     }
                     
                     HStack {
+                        Image(systemName: makeZIP ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(makeZIP ? .blue : .primary)
+                        
+                        Text("Export as ZIP")
+                        
+                        Button(action: {
+                                showInfoPopover.toggle()
+                            
+                        }, label: {
+                            Label("Info", systemImage: "info.circle")
+                        })
+                        .labelStyle(.iconOnly)
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        makeZIP.toggle()
+                    }
+                    
+                    HStack {
                         Image(systemName: addTag ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(addTag ? .blue : .primary)
                         
@@ -105,7 +130,7 @@ struct ExportRecipesOverlay: View {
                         
                         showStatusOverlay = true
                         
-                        recipesManager.exportRecipes(recipes: recipes, resetTimesCooked: resetTimesCooked, includeImages: includeImages, tagToAdd: tagForExport) {
+                        recipesManager.exportRecipes(recipes: recipes, resetTimesCooked: resetTimesCooked, includeImages: includeImages, tagToAdd: tagForExport, makeItZIP: makeZIP) {
                             showShareLink = true
                         }
                         
@@ -125,6 +150,18 @@ struct ExportRecipesOverlay: View {
                 .padding(.bottom)
             }
             .overlayVStack()
+            .customPopup(isPresented: $showInfoPopover) {
+                HStack {
+                    Image(systemName: "info.circle")
+                        .padding(.horizontal)
+                    Text("Recommended for ease of import: ZIP files can be opened with 7III Recipes for automatic import.")
+
+                        .padding(.trailing)
+                        
+                }
+                .padding(.vertical)
+                
+                    }
         }
     }
 }

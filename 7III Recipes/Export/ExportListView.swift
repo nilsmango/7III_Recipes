@@ -68,6 +68,7 @@ struct ExportListView: View {
             )
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
         .scrollContentBackground(.hidden)
+        .navigationTitle("Select Recipes")
         
 //        .background(ignoresSafeAreaEdges: .all)
     }

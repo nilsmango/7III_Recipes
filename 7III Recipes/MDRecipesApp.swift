@@ -15,7 +15,7 @@ struct MDRecipesApp: App {
     @State private var showSingleHeaderAlert = false
     
     // ZIP import
-    @State private var showZipImportAlert = false
+    @State private var showRecipesImportAlert = false
     @State private var fileURL = ""
     
     // Import Overlay
@@ -47,7 +47,7 @@ struct MDRecipesApp: App {
                     )
                 }
                 .overlay {
-                    ImportRecipesOverlay(recipesManager: recipesManager, showOverlay: $showZipImportAlert, fileURL: fileURL)
+                    ImportRecipesOverlay(recipesManager: recipesManager, showOverlay: $showRecipesImportAlert, fileURL: fileURL)
                     AlertOverlay(showAlert: $showAlertOverlay, text: alertOverlayText)
                 }
                 .onAppear {
@@ -59,7 +59,6 @@ struct MDRecipesApp: App {
                 }
                 .onOpenURL { url in
                     do {
-                        // TODO: make this one func inside my model?
                         let fileExtension = url.pathExtension.lowercased()
                         
                         if fileExtension == "md" {
@@ -70,12 +69,10 @@ struct MDRecipesApp: App {
                             if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
                                 print("opening internal file, now to finding")
                                 // find the recipe in the recipesArray open it if it's in there
-                                if let recipeInArray = recipesManager.recipes.first(where: { Parser.sanitizeFileName($0.title) + ".md" == url.lastPathComponent }) {
-                                    recipesManager.path = NavigationPath()
-                                    recipesManager.path.append("")
-                                    recipesManager.path.append(recipeInArray)
-                                    // else try to import the recipe
-                                } else {
+                                let foundRecipe = recipesManager.findAndGoToInternalRecipe(url: url)
+                                
+                                // if not found try to import the recipe
+                                if foundRecipe == false {
                                     print("not found")
                                     markdownString = try String(contentsOf: url, encoding: .utf8)
                                     let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
@@ -95,8 +92,8 @@ struct MDRecipesApp: App {
                                 // check if we have the right header in the file, if not ask if we should import it anyway then make recipe and then recipe.data
                                 if Parser.isThere7iiiRecipeHeader(in: markdownString) == false {
                                     showSingleHeaderAlert = true
-                                    
-                                } else {
+                                }
+                                else {
                                     let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                     recipeData = recipeStruct.recipe.data
                                     comingFromImportView = true
@@ -110,9 +107,10 @@ struct MDRecipesApp: App {
                                     print("Error: \(error)")
                                 }
                             }
-                        } else if fileExtension == "zip" {
+                        } else {
+                            // we have either zip or folder
                             fileURL = url.path
-                            showZipImportAlert = true
+                            showRecipesImportAlert = true
                         }
                     }
                     

@@ -971,10 +971,34 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     
-    // MARK: Import ZIP recipes
+    // MARK: Import recipes
+    
+    /// finds and goes to internal recipe, returns false if it hasn't found it
+    func findAndGoToInternalRecipe(url: URL) -> Bool {
+        if let recipeInArray = recipes.first(where: { Parser.sanitizeFileName($0.title) + ".md" == url.lastPathComponent }) {
+            path = NavigationPath()
+            path.append("")
+            path.append(recipeInArray)
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    /// checks if we are importing a folder or a zip and calls the appropriate function
+    func importRecipes(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+        let actualURL = URL(fileURLWithPath: url)
+        let fileExtension = actualURL.pathExtension.lowercased()
+        
+        if fileExtension == "zip" {
+            return try unzipAndCopyRecipesToDisk(url: url, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
+        } else {
+            return try importFolderOfRecipes(url: actualURL, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
+        }
+    }
     
     /// unzips and copies all the recipes into the recipes folder, returns the number of recipes imported
-    func unzipAndCopyRecipesToDisk(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+    private func unzipAndCopyRecipesToDisk(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
         print("URL of thing we are importing: \(url)")
         let fileManager = FileManager.default
         
@@ -997,12 +1021,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// imports a folder of recipes, returns number of recipes imported
-    func importFolderOfRecipes(url: URL, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+    private func importFolderOfRecipes(url: URL, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
         // Make import recipes array
         var importRecipes = try makeImportRecipesArray(from: url)
         
         // Cleanup: Remove the copy folder
-        try removeItem(at: url)
+        do {
+            try removeItem(at: url)
+        } catch {
+            print("Error removing item at url \(url): \(error.localizedDescription)")
+        }
 
         // Manipulate the recipes if requested
         if resetTimesCooked || specialTag != "" {
@@ -1104,16 +1132,23 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     // MARK: Export
     
-    /// removes the export folder
+    /// removes the export folder and or export zip
     func removeExportFolder() {
         let fileManager = FileManager.default
         let exportDirectory = recipesDirectory.appendingPathComponent(Constants.exportFolder)
         
         do {
-            // Check if the directory already exists
+            // Check if the directory exists
             if fileManager.fileExists(atPath: exportDirectory.path) {
                 // If it exists, remove its contents
                 try fileManager.removeItem(at: exportDirectory)
+            }
+            
+            // Also check if a zip archive exists
+            let zipURL = exportDirectory.appendingPathExtension("zip")
+            if fileManager.fileExists(atPath: zipURL.path) {
+                // If it exists, remove its contents
+                try fileManager.removeItem(at: zipURL)
             }
         } catch {
                print("Error removing export folder directory: \(error.localizedDescription)")
@@ -1121,7 +1156,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// takes a recipes array, makes a temporary folder for export
-    func exportRecipes(recipes: [Recipe], resetTimesCooked: Bool, includeImages: Bool, tagToAdd: String, completion: @escaping () -> Void) {
+    func exportRecipes(recipes: [Recipe], resetTimesCooked: Bool, includeImages: Bool, tagToAdd: String, makeItZIP: Bool, completion: @escaping () -> Void) {
         // create empty export folder in tempDirectory for the to be exported recipes
         
         do {
@@ -1158,6 +1193,14 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // safe recipes as markdown in Export folder
         modifiedRecipes.forEach { saveRecipeAsMarkdownFile(recipe: $0, exportDirectory: true) }
+        
+        // ZIP the folder
+        do {
+            try FileManager.default.zipItem(at: recipesDirectory.appendingPathComponent(Constants.exportFolder), to: recipesDirectory.appendingPathComponent(Constants.exportFolder).appendingPathExtension("zip"), shouldKeepParent: false)
+        } catch {
+            print("Error zipping the export folder: \(error.localizedDescription)")
+        }
+        
         
         // Call completion handler to notify the caller that the export is complete
         completion()

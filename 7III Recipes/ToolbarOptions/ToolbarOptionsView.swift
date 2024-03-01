@@ -18,6 +18,8 @@ struct ToolbarOptionsView: View {
     
     var isHomeView: Bool
     
+    @State private var showImport = false
+    
     var body: some View {
         Menu {
             NavigationLink(destination: ExportView(recipesManager: fileManager)) {
@@ -63,15 +65,25 @@ struct ToolbarOptionsView: View {
             } label: {
                 Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
             }
+            
+            Button {
+                // import
+                showImport = true
+            } label: {
+                Label("Import File(s)", systemImage: "square.and.arrow.down")
+            }
+            
             if !fileManager.trash.isEmpty && isHomeView {
                 NavigationLink(destination: TrashList(fileManager: fileManager)) {
                     Label("Show Trash", systemImage: "trash")
                 }
             }
-            
         } label: {
             Label("Options", systemImage: "ellipsis.circle")
                 .labelStyle(.iconOnly)
+        }
+        .fileImporter(isPresented: $showImport, allowedContentTypes: [.folder, .zip, .text]) { url in
+            // do something
         }
     }
 }
