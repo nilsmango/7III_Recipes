@@ -494,6 +494,26 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
+    private func makeVersionNumber(_ newTitle: inout String) {
+        let lastLetter = newTitle.last
+        
+        if lastLetter?.isNumber != nil && lastLetter != " " {
+            newTitle.removeLast()
+            let versionNumber = Int(String(lastLetter!))!
+            
+            if versionNumber == 9 {
+                makeVersionNumber(&newTitle)
+                newTitle.append("0")
+                
+            } else {
+                let newVersion = versionNumber + 1
+                newTitle.append(String(newVersion))
+            }
+            
+        } else {
+            newTitle.append("1")
+        }
+    }
     
     /// save a new recipe
     func saveNewRecipe(newRecipeData: Recipe.Data, withoutMovingPath: Bool = false) {
@@ -509,7 +529,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // change title if already in the recipes or if ""!
         while recipes.contains(where: { $0.title == newTitle }) || newTitle.trimmingCharacters(in: .whitespaces) == "" {
-            newTitle += "2"
+            makeVersionNumber(&newTitle)
         }
         
         
@@ -528,7 +548,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                                directions: Parser.reParsingDirections(directions: newRecipeData.directions), // re-parsing directions to find all the new timer from edits in the list.
                                nutrition: newRecipeData.nutrition,
                                notes: newRecipeData.notes,
-                               images: updatingCleaningAndParsingImages(oldImages: newRecipeData.oldImages, newImages: newRecipeData.dataImages, recipeTitle: newRecipeData.title),
+                               images: updatingCleaningAndParsingImages(oldImages: newRecipeData.oldImages, newImages: newRecipeData.dataImages, recipeTitle: newTitle),
                                date: newRecipeData.date,
                                updated: Date.now,
                                language: newRecipeData.language)

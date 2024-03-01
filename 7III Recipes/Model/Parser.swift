@@ -139,14 +139,17 @@ struct Parser {
         let servingsVariables = findValue(for: servingsStrings, in: lines, anchored: false)
         var servingsIndexes = [servingsVariables.index]
         // check if the servings string line has a number in it
-        if !containsNumber(in: lines[servingsVariables.index!]) {
-            // if no number is found check the next line
-            let nextLine = lines[servingsVariables.index!+1]
-            if containsNumber(in: nextLine) {
-                servingsIndexes.append(servingsVariables.index!+1)
+        if servingsVariables.index != nil {
+            if !containsNumber(in: lines[servingsVariables.index!]) {
+                // if no number is found check the next line
+                let nextLine = lines[servingsVariables.index!+1]
+                if containsNumber(in: nextLine) {
+                    servingsIndexes.append(servingsVariables.index!+1)
+                }
             }
+            checkAndAppendSegmentsAndIndexes(recipePart: .servings, variablesIndex: servingsIndexes)
         }
-        checkAndAppendSegmentsAndIndexes(recipePart: .servings, variablesIndex: servingsIndexes)
+        
         
         // Ingredients
         let ingredientsVariables = findIngredients(searchStrings: ingredientsStrings, cutoff: ingredientsCutoff, in: lines)

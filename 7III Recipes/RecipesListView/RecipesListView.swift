@@ -16,16 +16,6 @@ struct RecipesListView: View {
     
     var category: String
     
-    @State private var editViewPresented = false
-    
-    @State private var importViewPresented = false
-    
-    @State private var newRecipeData = Recipe.Data()
-    
-    @State private var saveDisabled = true
-    
-    @State private var newIngredient = ""
-    
     var body: some View {
         //        NavigationStack {
         List {
@@ -51,9 +41,26 @@ struct RecipesListView: View {
         .navigationTitle(Text(category.isEmpty ? "All" : category))
 
         .toolbar {
+            if fileManager.filterTheRecipes(string: "", ingredients: [], categories: category.isEmpty ? [] : [category], tags: []).count > 1 {
+                Menu {
+                    Picker("Sorting", selection: $sortingSelection) {
+                        ForEach(Sorting.allCases) { sortCase in
+                            if sortCase == .cooked {
+                                Text("Times Cooked")
+                            } else if sortCase == .time {
+                                Text("Total Time")
+                            } else {
+                                Text(sortCase.rawValue.capitalized)
+                            }
+                        }
+                    }
+                }
+            label: {
+                Label("Sort by", systemImage: "arrow.up.arrow.down.circle")
+                    .labelStyle(.iconOnly)
+            }
+            }
             
-            
-            ToolbarOptionsView(fileManager: fileManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, sortingSelection: $sortingSelection, isHomeView: false)
             
             //                Button(action: {
             //                    let name = "Curry No. \(Int.random(in: 0...1000))"
@@ -77,150 +84,7 @@ struct RecipesListView: View {
         .onAppear {
             fileManager.sortRecipes(selection: sortingSelection)
         }
-        .fullScreenCover(isPresented: $editViewPresented, content: {
-            NavigationView {
-                RecipeEditView(recipeData: $newRecipeData, fileManager: fileManager, newIngredient: $newIngredient)
-                    .navigationTitle(newRecipeData.title == "" ? "New Recipe" : newRecipeData.title)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Cancel") {
-                                editViewPresented = false
-                                
-                                newIngredient = ""
-                                // reseting newRecipeData
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    newRecipeData.timesCooked = 0
-                                    newRecipeData.title = ""
-                                    newRecipeData.source = ""
-                                    newRecipeData.tags = []
-                                    newRecipeData.categories = []
-                                    newRecipeData.prepTime = ""
-                                    newRecipeData.cookTime = ""
-                                    newRecipeData.additionalTime = ""
-                                    newRecipeData.totalTime = ""
-                                    newRecipeData.notes = ""
-                                    newRecipeData.nutrition = ""
-                                    newRecipeData.directions = []
-                                    newRecipeData.servings = 4
-                                    newRecipeData.ingredients = []
-                                    newRecipeData.dataImages = []
-                                    newRecipeData.date = Date.now
-                                }
-                            }
-                        }
-                        
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Save") {
-                                editViewPresented = false
-                                
-                                addNotSubmittedIngredient()
-                                
-                                // saving the new recipe
-                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-                                
-                                // reseting newRecipeData
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    newRecipeData.timesCooked = 0
-                                    newRecipeData.title = ""
-                                    newRecipeData.source = ""
-                                    newRecipeData.tags = []
-                                    newRecipeData.categories = []
-                                    newRecipeData.prepTime = ""
-                                    newRecipeData.cookTime = ""
-                                    newRecipeData.additionalTime = ""
-                                    newRecipeData.totalTime = ""
-                                    newRecipeData.notes = ""
-                                    newRecipeData.nutrition = ""
-                                    newRecipeData.directions = []
-                                    newRecipeData.servings = 4
-                                    newRecipeData.ingredients = []
-                                    newRecipeData.dataImages = []
-                                    newRecipeData.date = Date.now
-                                    
-                                }
-                            }
-                        }
-                    }
-            }
-        })
-        .fullScreenCover(isPresented: $importViewPresented, content: {
-            NavigationView {
-                ImportFromTextView(fileManager: fileManager, recipeData: $newRecipeData, newIngredient: $newIngredient, saveDisabled: $saveDisabled)
-                    .navigationTitle(newRecipeData.title == "" ? "Import from Text" : newRecipeData.title)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Cancel") {
-                                importViewPresented = false
-                                
-                                newIngredient = ""
-                                // reseting newRecipeData
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    newRecipeData.timesCooked = 0
-                                    newRecipeData.title = ""
-                                    newRecipeData.source = ""
-                                    newRecipeData.tags = []
-                                    newRecipeData.categories = []
-                                    newRecipeData.prepTime = ""
-                                    newRecipeData.cookTime = ""
-                                    newRecipeData.additionalTime = ""
-                                    newRecipeData.totalTime = ""
-                                    newRecipeData.notes = ""
-                                    newRecipeData.nutrition = ""
-                                    newRecipeData.directions = []
-                                    newRecipeData.servings = 4
-                                    newRecipeData.ingredients = []
-                                    newRecipeData.dataImages = []
-                                    newRecipeData.date = Date.now
-                                }
-                            }
-                        }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Save") {
-                                saveDisabled = true
-                                importViewPresented = false
-                                
-                                addNotSubmittedIngredient()
-                                // saving the new recipe
-                                fileManager.saveNewRecipe(newRecipeData: newRecipeData)
-                                
-                                // reseting newRecipeData
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    newRecipeData.timesCooked = 0
-                                    newRecipeData.title = ""
-                                    newRecipeData.source = ""
-                                    newRecipeData.tags = []
-                                    newRecipeData.categories = []
-                                    newRecipeData.prepTime = ""
-                                    newRecipeData.cookTime = ""
-                                    newRecipeData.additionalTime = ""
-                                    newRecipeData.totalTime = ""
-                                    newRecipeData.notes = ""
-                                    newRecipeData.nutrition = ""
-                                    newRecipeData.directions = []
-                                    newRecipeData.servings = 4
-                                    newRecipeData.ingredients = []
-                                    newRecipeData.dataImages = []
-                                    newRecipeData.date = Date.now
-                                    
-                                }
-                                
-                            }
-                            .disabled(saveDisabled)
-                            
-                        }
-                    }
-            }
-        })
-        
     }
-    
-    private func addNotSubmittedIngredient() {
-        if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
-            newRecipeData.ingredients.append(Ingredient(text: newIngredient))
-            newIngredient = ""
-        }
-    }
-    //    }
 }
 
 #Preview {

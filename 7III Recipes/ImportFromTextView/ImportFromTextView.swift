@@ -29,34 +29,10 @@ struct ImportFromTextView: View {
     
     @State private var recipeLanguage: RecipeLanguage = .english
     
-    @State private var newRecipe = """
-
-What the fuck
-
-for 5 persons
-Serves 4
-
-
-Ingredients
-500 g sugar
-20 black peas
-
-
-Instructions
-1. Take the sugar and make it wet.
-2. Wait for 10 Min
-3. Take the peas and let soak. Wait another few hours, then you might be finished.
-4. Once you think you are done.
-
-You might be finished.
-
-
-Notes:
-Cooking can be dangerous
-"""
+    @State private var newRecipe = ""
     
     var body: some View {
-        if counter < 1 || showingSheet {
+        if counter < 100 || showingSheet {
             List {
                 Section(header: Text("Paste Recipe Text here"), footer: Text("Make sure in the text editor above, title, ingredients and instructions are all on separate lines and ingredients and instructions are titled as such. Then press the decode button below")) {
                     TextEditor(text: $newRecipe)
@@ -75,6 +51,7 @@ Cooking can be dangerous
                     } label: {
                         Label(counter > 0 ? "Update" : "Decode", systemImage: "wand.and.stars")
                     }
+                    .disabled(newRecipe.isEmpty)
                 }
             }
             .scrollContentBackground(.hidden)
@@ -82,7 +59,6 @@ Cooking can be dangerous
                 .gray
                     .opacity(0.1)
             )
-            
 
             .onAppear {
                 saveDisabled = true
@@ -92,18 +68,20 @@ Cooking can be dangerous
                     SegmentsImportView(importer: importer, recipeLanguage: $recipeLanguage)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Back") {
+                                Button("Back to Text") {
                                     showingSheet = false
-                                    counter = 0
                                 }
+                                .tint(.red)
+
                             }
+                            
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button("Continue") {
                                     
                                     recipeData = Parser.makeDataFromSegments(segments: importer.recipeSegments, language: recipeLanguage)
                                     
                                     showingSheet = false
-                                    
+                                    counter = 101
                                     saveDisabled = false
                                     
                                 }
@@ -114,15 +92,7 @@ Cooking can be dangerous
             
         } else {
             RecipeEditView(recipeData: $recipeData, fileManager: fileManager, newIngredient: $newIngredient, comingFromImportView: true)
-                
         }
-                
-            
-            
-            
-        
-            
-        
     }
 }
 

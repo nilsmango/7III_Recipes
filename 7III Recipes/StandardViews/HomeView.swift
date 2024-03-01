@@ -28,6 +28,8 @@ struct HomeView: View {
     
     @State private var showNewRecipeButtons = false
     
+    @State private var showImportSheet = false
+    
     var body: some View {
         NavigationStack(path: $recipesManager.path) {
             if searchText.isEmpty {
@@ -113,7 +115,7 @@ struct HomeView: View {
                                     importViewPresented = true
                                     showNewRecipeButtons = false
                                 }) {
-                                    Label("From Text", systemImage: "square.and.arrow.down")
+                                    Label("From Text", systemImage: "text.viewfinder")
                                         .fontWeight(.bold)
                                         .fontDesign(.rounded)
                                         .padding()
@@ -159,31 +161,11 @@ struct HomeView: View {
                 //                .navigationTitle("Categories")
                 .toolbar {
                     
-                    ToolbarOptionsView(fileManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, sortingSelection: .constant(.standard), isHomeView: true)
+                    ToolbarOptionsView(fileManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, showImportSheet: $showImportSheet)
                 }
                 
             } else {
-                List {
-                    ForEach(recipesManager.getAllCategories(), id: \.self) { category in
-                        if !recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
-                            Section {
-                                ForEach(recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
-                                    NavigationLink(value: recipe) {
-                                        ListItemView(recipe: recipe)
-                                    }
-                                }
-                            } header: {
-                                Text(category)
-                                    .font(.title3)
-                                    .fontWeight(.bold)
-                                    .fontDesign(.rounded)
-                            }
-                        }
-                    }
-                }
-                .navigationDestination(for: Recipe.self) { recipe in
-                    RecipeView(recipesManager: recipesManager, recipe: recipe)
-                }
+                HomeListView(recipesManager: recipesManager, searchText: searchText)
             }
         }
         .scrollContentBackground(.hidden)
@@ -230,6 +212,8 @@ struct HomeView: View {
                                 
                                 comingFromImportView = false
                             }
+                            .tint(.red)
+
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Save") {
@@ -297,6 +281,7 @@ struct HomeView: View {
                                     newRecipeData.date = Date.now
                                 }
                             }
+                            .tint(.red)
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Save") {
@@ -337,6 +322,9 @@ struct HomeView: View {
                     }
             }
         })
+        .fileImporter(isPresented: $showImportSheet, allowedContentTypes: [.folder, .zip, .text]) { url in
+            // do something
+        }
     }
     private func addNotSubmittedIngredient() {
         if newIngredient.trimmingCharacters(in: .whitespaces) != "" {
@@ -350,5 +338,3 @@ struct HomeView: View {
 
     return HomeView(recipesManager: RecipesManager(), editViewPresented: .constant(false), newRecipeData: .constant(Recipe.sampleData.first!.data), comingFromImportView: .constant(false))
 }
-
-

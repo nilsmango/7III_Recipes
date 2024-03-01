@@ -14,80 +14,64 @@ struct ToolbarOptionsView: View {
     
     @Binding var importViewPresented: Bool
     
-    @Binding var sortingSelection: Sorting
-    
-    var isHomeView: Bool
-    
-    @State private var showImport = false
+    @Binding var showImportSheet: Bool
     
     var body: some View {
         Menu {
+                
+                NavigationLink(destination: AboutView()) {
+                    Label("About", systemImage: "info.circle")
+                }
+                
+                NavigationLink(destination: PrivacyView()) {
+                    Label("Privacy Notice", systemImage: "doc.text.magnifyingglass")
+                }
+                
+                Button(action: {
+                    // TODO: Add donation thing
+                }) {
+                    Label("Tip us 1 USD!", systemImage: "heart")
+                }
+                
+                Divider()
+            
             NavigationLink(destination: ExportView(recipesManager: fileManager)) {
                 Label("Export Recipes", systemImage: "square.and.arrow.up")
             }
-            
-            NavigationLink(destination: AboutView()) {
-                Label("About", systemImage: "info.circle")
-            }
-            
-            NavigationLink(destination: PrivacyView()) {
-                Label("Privacy Notice", systemImage: "doc.text.magnifyingglass")
-            }
-            
-            Button(action: {
-                // TODO: Add donation thing
-            }) {
-                Label("Tip us 1 USD!", systemImage: "heart")
-            }
-            if !isHomeView {
-                Menu {
-                    Picker("Sorting", selection: $sortingSelection) {
-                        ForEach(Sorting.allCases) { sortCase in
-                            if sortCase == .cooked {
-                                Text("Times Cooked")
-                            } else if sortCase == .time {
-                                Text("Total Time")
-                            } else {
-                                Text(sortCase.rawValue.capitalized)
-                            }
-                        }
+                
+                Button(action: {
+                    editViewPresented = true
+                }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
+                
+                Button {
+                    importViewPresented = true
+                } label: {
+                    Label("Import Recipe from Text", systemImage: "text.viewfinder")
+                }
+                
+                Button {
+                    // import
+                    showImportSheet = true
+                } label: {
+                    Label("Import File(s)", systemImage: "square.and.arrow.down")
+                }
+                
+                
+                
+                if !fileManager.trash.isEmpty {
+                    NavigationLink(destination: TrashList(fileManager: fileManager)) {
+                        Label("Show Trash", systemImage: "trash")
                     }
-                }
-            label: { Label("Sort by", systemImage: "arrow.up.arrow.down") }
             }
-            
-            Button(action: {
-                editViewPresented = true
-            }) { Label("Write New Recipe", systemImage: "square.and.pencil")}
-            
-            Button {
-                importViewPresented = true
-            } label: {
-                Label("Import Recipe from Text", systemImage: "square.and.arrow.down")
-            }
-            
-            Button {
-                // import
-                showImport = true
-            } label: {
-                Label("Import File(s)", systemImage: "square.and.arrow.down")
-            }
-            
-            if !fileManager.trash.isEmpty && isHomeView {
-                NavigationLink(destination: TrashList(fileManager: fileManager)) {
-                    Label("Show Trash", systemImage: "trash")
-                }
-            }
+
         } label: {
             Label("Options", systemImage: "ellipsis.circle")
                 .labelStyle(.iconOnly)
         }
-        .fileImporter(isPresented: $showImport, allowedContentTypes: [.folder, .zip, .text]) { url in
-            // do something
-        }
+        
     }
 }
 
 #Preview {
-    ToolbarOptionsView(fileManager: RecipesManager(), editViewPresented: .constant(false), importViewPresented: .constant(false), sortingSelection: .constant(.standard), isHomeView: true)
+    ToolbarOptionsView(fileManager: RecipesManager(), editViewPresented: .constant(false), importViewPresented: .constant(false), showImportSheet: .constant(false))
 }
