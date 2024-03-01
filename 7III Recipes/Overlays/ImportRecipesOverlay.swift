@@ -112,9 +112,6 @@ struct ImportRecipesOverlay: View {
                     .padding(.bottom)
                 }
                 .overlayVStack()
-                .outsideTap {
-                    showOverlay = false
-                }
             }
             
             AlertOverlay(showAlert: $showRecipesGotImported, text: alertText, symbolPositive: alertPositive)

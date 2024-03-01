@@ -12,15 +12,16 @@ struct OutsideTap: ViewModifier {
     
     func body(content: Content) -> some View {
         ZStack {
-            content
-            
+
             Rectangle()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .opacity(0.0)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     onTap()
-                }            
+                }    
+            
+            content
         }
     }
 }
