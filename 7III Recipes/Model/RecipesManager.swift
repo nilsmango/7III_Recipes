@@ -249,12 +249,15 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     // MARK: RECIPES
     
     @Published var recipes = [Recipe]()
+    @Published var tags = [String]()
+    @Published var categories = [String]()
+    @Published var ingredients = [String]()
     
     /// The document directory
     let recipesDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     
     /// Loading all Markdown files in the chosen directory and making them into recipes and adding them to our recipes array
-    func loadMarkdownFiles(completion: @escaping (Result<Void, Error>) -> Void) {
+    func loadMarkdownFilesAndStart(completion: @escaping (Result<Void, Error>) -> Void) {
         // empty the recipes if we have still some in the array (this is to not load everything twice
         recipes = []
         do {
@@ -280,6 +283,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                     }
                 }
             }
+            
+            updateMetaData()
             
             completion(.success(()))
             
@@ -365,6 +370,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // Remove the Recipe from the Recipes Arrays
         recipes.removeAll(where: { idsToDelete.contains($0.id) })
         
+        // update the metaData
+        updateMetaData()
+        
         // check if chosen tags still represent all tags
         if !chosenTags.isEmpty {
             updateChosenTags()
@@ -373,8 +381,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             if recipes.count < 1 {
                 path = NavigationPath()
             } else {
-                let allCategories = getAllCategories()
-                if !allCategories.contains(currentCategory) && currentCategory != "" && currentCategory != "All" {
+                if !categories.contains(currentCategory) && currentCategory != "" && currentCategory != "All" {
                     path = NavigationPath()
                 }
             }
@@ -383,14 +390,13 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// updates the chosen tags to represent a selection of all tags and not some tags that don't exist any more, also updates the path if there are no tags left to choose
     private func updateChosenTags() {
-        let allTags = getAllTags()
-        if allTags.isEmpty {
+        if tags.isEmpty {
             chosenTags = []
             path = NavigationPath()
             
         } else {
             for tag in chosenTags {
-                if !allTags.contains(tag) {
+                if !tags.contains(tag) {
                     chosenTags.removeAll(where: { $0 == tag })
                 }
             }
@@ -446,11 +452,13 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         recipes[index].update(from: newRecipeData)
         
+        // update the metaData
+        updateMetaData()
         
         // check if we are navigating in the tags
         if chosenTags != [] {
             // check if there are any tags left in the recipes
-            if getAllTags() == [] {
+            if tags.isEmpty {
                 // remove the tags view from navigation also
                 path = NavigationPath()
                 chosenTags = []
@@ -570,6 +578,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         
         // update the timers
         loadTimers(for: newRecipe)
+        
+        // update the metaData
+        updateMetaData()
     }
 
     /// make a duplication of the recipe
@@ -635,7 +646,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         return recipeImages
     }
     
-    
     /// Deleting an image from disk
     private func deleteImage(imagePath: String) {
         let url = URL(fileURLWithPath: imagePath)
@@ -646,7 +656,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         
     }
-    
     
     /// Saving a new images to disk and returns the RecipeImage
     private func saveImage(image: UIImage, caption: String, recipeName: String) -> RecipeImage {
@@ -697,7 +706,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         if let data = rotatedImage.pngData() {
             
             let fileURL = recipePhotosDirectory.appendingPathComponent(fileName)
-//            let relativeFileURL = "/" + Constants.imageFolder + "/" + fileName
+            //            let relativeFileURL = "/" + Constants.imageFolder + "/" + fileName
             
             do {
                 try data.write(to: fileURL)
@@ -709,7 +718,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         return RecipeImage(imagePath: "Couldn't save image", caption: caption)
     }
-    
     
     /// restore recipe from trash
     func restoreRecipe(recipe: Recipe) {
@@ -733,13 +741,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    
     /// move a recipe in the list
     func move(from offset: IndexSet, to newPlace: Int) {
         recipes.move(fromOffsets: offset, toOffset: newPlace)
     }
-    
-    
+
     /// sets the times Cooked of a recipe and resets the steps done and ingredients selected, also updates the Markdown file
     func setTimesCooked(of recipe: Recipe, to count: Int) {
         var updatedRecipe = recipe
@@ -766,10 +772,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // update recipe
         updateRecipe(updatedRecipe: updatedRecipe)
     }
-    
-    
-    
-    /// set the note section of a recipe, update the Markdown file too
+
+    /// Sets the note section of a recipe, also updates the Markdown file.
     func updateNoteSection(of recipe: Recipe, to string: String) {
         var updatedRecipe = recipe
         updatedRecipe.notes = string
@@ -783,8 +787,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         updateRecipe(updatedRecipe: updatedRecipe)
     }
     
-    
-    /// Search and filter the recipes
+    /// Searches and filters the recipes by a couple of things.
     func filterTheRecipes(string: String, ingredients: [String], categories: [String], tags: [String]) -> [Recipe] {
         var filteredRecipes = recipes
         // first is the searchString
@@ -809,6 +812,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             
             filteredRecipes = filteredRecipes.filter { recipe in
                 ingredients.allSatisfy { word in
+                    
                     // we have to also find the singular ingredients now.
                     let singularForm = String(word.dropLast())
                     var ingredientsString = ""
@@ -825,7 +829,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         
         // third stage: filtering the results by the categories
-        
         if categories.isEmpty == false {
             
             filteredRecipes = filteredRecipes.filter { recipe in
@@ -837,9 +840,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
             }
         }
         
-        
         // fourth stage: filtering the results by the tags
-        
         if tags.isEmpty == false {
             filteredRecipes = filteredRecipes.filter { recipe in
                 tags.allSatisfy { word in
@@ -852,53 +853,27 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         return filteredRecipes
     }
     
-    
-    
-    
-    // TODO: make this one function to find ingredients, categories, tags (?)
-    /// get a list of all categories in the recipes
-    func getAllCategories() -> [String] {
+    /// Returns categories, tags and ingredients for all the recipes.
+    private func getMetaData() -> (categories: [String], tags: [String], ingredients: [String]) {
         var categories = [String]()
+        var tags = [String]()
+        var ingredients = [String]()
         
         for recipe in recipes {
+            // find and append the categories
             for category in recipe.categories {
                 if categories.contains(category.capitalized) == false {
                     categories.append(category.capitalized)
                 }
             }
-        }
-        
-        categories.sort()
-        // put "No Category" at the end of the index
-        if let index = categories.firstIndex(where: { $0 == Constants.noCategoryFolder }) {
-            categories.remove(at: index)
-            categories.append(Constants.noCategoryFolder)
-        }
-        
-        return categories
-    }
-    
-    /// get a list of tags from the recipes
-    func getAllTags() -> [String] {
-        var tags = [String]()
-        
-        for recipe in recipes {
+            // find and append the tags
             for tag in recipe.tags {
-                // lowercasing everything so we only get one unique tag, first one in will set the style
+                // lowercasing everything so we only get one unique tag, first found will set the style
                 if !tags.contains(where: { $0.lowercased() == tag.lowercased() }) {
                     tags.append(tag)
                 }
             }
-        }
-        return tags.sorted()
-    }
-    
-    
-    /// get a list of all ingredients in the recipes
-    func getAllIngredients() -> [String] {
-        var ingredients: [String] = []
-        
-        for recipe in recipes {
+            // find and append the ingredients
             for ingredient in recipe.ingredients {
                 let cleanIngredient = ingredient.text.capitalized
                 let oneIngredient = String(cleanIngredient.dropLast())
@@ -911,7 +886,110 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 }
             }
         }
-        return ingredients.sorted()
+        
+        // sort everything
+        categories.sort()
+        tags.sort()
+        ingredients.sort()
+        
+        // put "No Category" at the end of the index
+        if let index = categories.firstIndex(where: { $0 == Constants.noCategoryFolder }) {
+            categories.remove(at: index)
+            categories.append(Constants.noCategoryFolder)
+        }
+        
+        return (categories, tags, ingredients)
+    }
+    
+    /// Updates the meta data for all recipes
+    private func updateMetaData() {
+        let metaData = getMetaData()
+        tags = metaData.tags
+        categories = metaData.categories
+        ingredients = metaData.ingredients
+    }
+        
+    // TODO: remove if not needed any more
+    
+//    /// get a list of all categories in the recipes
+//    private func getAllCategories() -> [String] {
+//        var categories = [String]()
+//        
+//        for recipe in recipes {
+//            for category in recipe.categories {
+//                if categories.contains(category.capitalized) == false {
+//                    categories.append(category.capitalized)
+//                }
+//            }
+//        }
+//        
+//        categories.sort()
+//        // put "No Category" at the end of the index
+//        if let index = categories.firstIndex(where: { $0 == Constants.noCategoryFolder }) {
+//            categories.remove(at: index)
+//            categories.append(Constants.noCategoryFolder)
+//        }
+//        
+//        return categories
+//    }
+//    
+//    /// get a list of tags from the recipes
+//    private func getAllTags() -> [String] {
+//        var tags = [String]()
+//        
+//        for recipe in recipes {
+//            for tag in recipe.tags {
+//                // lowercasing everything so we only get one unique tag, first one in will set the style
+//                if !tags.contains(where: { $0.lowercased() == tag.lowercased() }) {
+//                    tags.append(tag)
+//                }
+//            }
+//        }
+//        return tags.sorted()
+//    }
+//    
+//    
+//    /// get a list of all ingredients in the recipes
+//    private func getAllIngredients() -> [String] {
+//        var ingredients: [String] = []
+//        
+//        for recipe in recipes {
+//            for ingredient in recipe.ingredients {
+//                let cleanIngredient = ingredient.text.capitalized
+//                let oneIngredient = String(cleanIngredient.dropLast())
+//                let pluralIngredient = cleanIngredient + "s"
+//                
+//                if let i = ingredients.firstIndex(of: oneIngredient) {
+//                    ingredients[i] = cleanIngredient
+//                } else if !ingredients.contains(cleanIngredient) && !ingredients.contains(pluralIngredient) {
+//                    ingredients.append(cleanIngredient)
+//                }
+//            }
+//        }
+//        return ingredients.sorted()
+//    }
+    
+    /// removes a tag from all the recipes
+    func deleteTag(tag: String) -> Int {
+        
+        var numberOfRecipesChanged = 0
+        
+        // find the recipes with tag
+        for (recipeIndex, recipe) in recipes.enumerated() {
+            if let tagIndex = recipe.tags.firstIndex(where: { $0 == tag }) {
+                // update count
+                numberOfRecipesChanged += 1
+                // remove tag
+                recipes[recipeIndex].tags.remove(at: tagIndex)
+                // save recipe to disk
+                saveRecipeAsMarkdownFile(recipe: recipes[recipeIndex])
+            }
+        }
+        
+        // remove the tag from tags
+        tags.removeAll(where: { $0 == tag })
+        
+        return numberOfRecipesChanged
     }
     
     
@@ -1051,7 +1129,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         } catch {
             print("Error removing item at url \(url): \(error.localizedDescription)")
         }
-
+        
         // Manipulate the recipes if requested
         if resetTimesCooked || specialTag != "" {
             importRecipes = importRecipes.map { recipe in
@@ -1171,8 +1249,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 try fileManager.removeItem(at: zipURL)
             }
         } catch {
-               print("Error removing export folder directory: \(error.localizedDescription)")
-           }
+            print("Error removing export folder directory: \(error.localizedDescription)")
+        }
     }
     
     /// takes a recipes array, makes a temporary folder for export

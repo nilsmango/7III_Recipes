@@ -39,7 +39,7 @@ struct TagsOrIngredientsListView: View {
             .padding()
             
             List {
-                ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+                ForEach(recipesManager.categories, id: \.self) { category in
                     if !recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [category], tags: isTags ? recipesManager.chosenTags : []).isEmpty {
                         Section {
                             ForEach(recipesManager.filterTheRecipes(string: "", ingredients: isTags ? [] : recipesManager.chosenTags, categories: [category], tags: isTags ? recipesManager.chosenTags : [])) { recipe in

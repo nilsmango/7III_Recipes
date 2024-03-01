@@ -39,7 +39,7 @@ struct HomeRecipesFolderView: View {
                             FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
                         }
                         
-                        ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+                        ForEach(recipesManager.categories, id: \.self) { category in
                             Button {
                                 recipesManager.path.append(category)
                                 // updating our navigation tools
@@ -63,7 +63,7 @@ struct HomeRecipesFolderView: View {
                     }
                     .padding([.horizontal])
                     
-                    let allTags = recipesManager.getAllTags()
+                    let allTags = recipesManager.tags
                     if allTags.count > 0 {
                         Text("Tags")
                             .font(.title3)

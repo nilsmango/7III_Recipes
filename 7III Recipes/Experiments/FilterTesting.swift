@@ -92,7 +92,7 @@ struct FilterTesting: View {
 //            
             Text("Tags")
             FlexibleView(
-                data: fileManager.getAllTags(),
+                data: fileManager.tags,
               spacing: 5,
                 alignment: .leading
             ) { tag in
@@ -143,7 +143,7 @@ struct FilterTesting: View {
             if showIngredients {
                 ScrollView {
                     FlexibleView(
-                        data: fileManager.getAllIngredients(),
+                        data: fileManager.ingredients,
                       spacing: 5,
                         alignment: .leading
                     ) { ingredient in

@@ -13,7 +13,7 @@ struct TagsEditView: View {
     var fileManager: RecipesManager
     
     private var recipesTags: [String] {
-        fileManager.getAllTags()
+        fileManager.tags
     }
     
     @State private var allTags = [String]()
