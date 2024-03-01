@@ -13,8 +13,6 @@ struct HomeView: View {
     
     @State var searchText = ""
     
-    let columns = [GridItem(.flexible()), GridItem(.flexible())]
-    
     // Edit Things
     @Binding var editViewPresented: Bool
     @Binding var newRecipeData: Recipe.Data
@@ -26,144 +24,36 @@ struct HomeView: View {
     
     @State private var importSaveDisabled = true
     
-    @State private var showNewRecipeButtons = false
-    
     @State private var showImportSheet = false
+    
+    @State private var markdownString = ""
+    @State private var showSingleHeaderAlert = false
+    
+    // Folder/ZIP import
+    @State private var showRecipesImportAlert = false
+    @State private var fileURL = ""
+    
+    // Import Overlay
+    @State private var showAlertOverlay = false
+    @State private var alertOverlayText = ""
+    
     
     var body: some View {
         NavigationStack(path: $recipesManager.path) {
             if searchText.isEmpty {
-                ScrollView {
-                    
-                    VStack(alignment: .leading) {
-                        let allRecipes = recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [], tags: []).count
-                        
-                        if allRecipes > 0 {
-                            Text("7III Recipes")
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .fontDesign(.rounded)
-                                .padding([.horizontal, .top])
-                            LazyVGrid(columns: columns) {
-                                Button {
-                                    recipesManager.path.append("")
-                                    // updating our navigation tools
-                                    recipesManager.currentCategory = "All"
-                                    recipesManager.chosenTags = []
-                                } label: {
-                                    FolderView(categoryFolder: "All", categoryNumber: String(allRecipes))
-                                }
-                                
-                                ForEach(recipesManager.getAllCategories(), id: \.self) { category in
-                                    Button {
-                                        recipesManager.path.append(category)
-                                        // updating our navigation tools
-                                        recipesManager.currentCategory = category
-                                        recipesManager.chosenTags = []
-                                    } label: {
-                                        FolderView(categoryFolder: category, categoryNumber: String(recipesManager.filterTheRecipes(string: "", ingredients: [], categories: [category], tags: []).count))
-                                    }
-                                }
-                                
-                                if allRecipes > 1 {
-                                    Button {
-                                        recipesManager.path.append(recipesManager.randomRecipe()!)
-                                        // updating our navigation tools
-                                        recipesManager.currentCategory = "All"
-                                        recipesManager.chosenTags = []
-                                    } label: {
-                                        RandomRecipeView()
-                                    }
-                                }
-                            }
-                            .padding([.horizontal])
-                            
-                            let allTags = recipesManager.getAllTags()
-                            if allTags.count > 0 {
-                                Text("Tags")
-                                    .font(.title3)
-                                    .fontWeight(.bold)
-                                    .fontDesign(.rounded)
-                                    .padding([.horizontal, .top])
-                                
-                                FlexiTagsView(recipesManager: recipesManager, strings: allTags)
-                                    .padding(.horizontal)
-                            }
-                            
-                        }
-                        HStack {
-                            Spacer()
-                            
-                            if showNewRecipeButtons {
-                                Button(action: {
-                                    editViewPresented = true
-                                    showNewRecipeButtons = false
-                                }) {
-                                    Label("Write New", systemImage: "square.and.pencil")
-                                        .fontWeight(.bold)
-                                        .fontDesign(.rounded)
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .foregroundColor(Color("FolderBG"))
-                                        )
-                                }
-                                
-                                Spacer()
-                                
-                                Button(action: {
-                                    importViewPresented = true
-                                    showNewRecipeButtons = false
-                                }) {
-                                    Label("From Text", systemImage: "text.viewfinder")
-                                        .fontWeight(.bold)
-                                        .fontDesign(.rounded)
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .foregroundColor(Color("FolderBG"))
-                                        )
-                                }
-                            } else {
-                                Button(action: {
-                                    showNewRecipeButtons = true
-                                }) {
-                                    Label("Add new Recipe", systemImage: "plus.circle.fill")
-                                        .fontWeight(.bold)
-                                        .fontDesign(.rounded)
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .foregroundColor(Color("FolderBG"))
-                                        )
-                                }
-                                
-                            }
-                            
-                            Spacer()
-                        }
-                        .padding()
-                        
+                HomeRecipesFolderView(recipesManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented)
+                    .navigationDestination(for: String.self) { category in
+                        RecipesListView(fileManager: recipesManager, category: category)
                     }
-                }
-                .navigationDestination(for: String.self) { category in
-                    RecipesListView(fileManager: recipesManager, category: category)
-                }
-                
-                .navigationDestination(for: Recipe.self) { recipe in
-                    RecipeView(recipesManager: recipesManager, recipe: recipe)
-                }
-                
-                .background(
-                    .gray.opacity(0.1)
-                    //                    BackgroundAnimation(backgroundColor: .gray.opacity(0.1), withLogo: false, foregroundColor: .blue)
-                )
-                //                .navigationTitle("Categories")
-                .toolbar {
-                    
-                    ToolbarOptionsView(fileManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, showImportSheet: $showImportSheet)
-                }
-                
+                    .navigationDestination(for: Recipe.self) { recipe in
+                        RecipeView(recipesManager: recipesManager, recipe: recipe)
+                    }
+                    .background(
+                        .gray.opacity(0.1)
+                    )
+                    .toolbar {
+                        ToolbarOptionsView(fileManager: recipesManager, editViewPresented: $editViewPresented, importViewPresented: $importViewPresented, showImportSheet: $showImportSheet)
+                    }
             } else {
                 HomeListView(recipesManager: recipesManager, searchText: searchText)
             }
@@ -179,6 +69,25 @@ struct HomeView: View {
                 // saving our timer status to disk
                 recipesManager.saveTimersAndTrashToDisk()
             }
+        }
+        .alert(isPresented: $showSingleHeaderAlert) {
+            Alert(
+                title: Text("Not a 7III Recipe"),
+                message: Text("Couldn't find a 7III Recipe header in this file."),
+                primaryButton: .destructive(Text("Cancel")) {
+                    
+                },
+                secondaryButton: .default(Text("Try Anyway")) {
+                    let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
+                    newRecipeData = recipeStruct.recipe.data
+                    comingFromImportView = true
+                    editViewPresented = true
+                }
+            )
+        }
+        .overlay {
+            ImportRecipesOverlay(recipesManager: recipesManager, showOverlay: $showRecipesImportAlert, fileURL: fileURL)
+            AlertOverlay(showAlert: $showAlertOverlay, text: alertOverlayText)
         }
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {
@@ -213,7 +122,7 @@ struct HomeView: View {
                                 comingFromImportView = false
                             }
                             .tint(.red)
-
+                            
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Save") {
@@ -322,8 +231,79 @@ struct HomeView: View {
                     }
             }
         })
-        .fileImporter(isPresented: $showImportSheet, allowedContentTypes: [.folder, .zip, .text]) { url in
-            // do something
+        .fileImporter(isPresented: $showImportSheet, allowedContentTypes: [.folder, .zip, .text]) { result in
+            switch result {
+            case .success(let url):
+                // gain access to the directory
+                _ = url.startAccessingSecurityScopedResource()
+                do {
+                    let fileExtension = url.pathExtension.lowercased()
+                    
+                    if fileExtension == "md" {
+                        print(url.path)
+                        print(url.lastPathComponent)
+                        // check if we are coming from our own folder
+                        if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
+                            print("opening internal file, now to finding")
+                            // find the recipe in the recipesArray open it if it's in there
+                            let foundRecipe = recipesManager.findAndGoToInternalRecipe(url: url)
+                            
+                            // if not found try to import the recipe
+                            if foundRecipe == false {
+                                print("not found")
+                                markdownString = try String(contentsOf: url, encoding: .utf8)
+                                let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
+                                newRecipeData = recipeStruct.recipe.data
+                                comingFromImportView = true
+                                editViewPresented = true
+                                // remove the file if it is in the inbox folder
+                                do {
+                                    try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: url.path))
+                                } catch {
+                                    print("Error: \(error)")
+                                }
+                            }
+                            
+                        } else {
+                            markdownString = try String(contentsOf: url, encoding: .utf8)
+                            // check if we have the right header in the file, if not ask if we should import it anyway then make recipe and then recipe.data
+                            if Parser.isThere7iiiRecipeHeader(in: markdownString) == false {
+                                showSingleHeaderAlert = true
+                            }
+                            else {
+                                let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
+                                newRecipeData = recipeStruct.recipe.data
+                                comingFromImportView = true
+                                editViewPresented = true
+                                
+                            }
+                            // remove the file if it is in the inbox folder
+                            do {
+                                try recipesManager.removeItemInInbox(at: URL(fileURLWithPath: url.path))
+                            } catch {
+                                print("Error: \(error)")
+                            }
+                        }
+                    } else {
+                        // we have either zip or folder
+                        fileURL = url.path
+                        showRecipesImportAlert = true
+                    }
+                }
+                
+                catch {
+                    // Showing the alert
+                    alertOverlayText = "Error opening file: \(error.localizedDescription)\n\nIf you tried to import a file, use \"Import File(s)\" in the menu instead."
+                    showAlertOverlay = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 300) {
+                    url.stopAccessingSecurityScopedResource()
+                }
+                
+            case .failure(let error):
+                print("Error selecting file: \(error.localizedDescription)")
+            }
         }
     }
     private func addNotSubmittedIngredient() {
@@ -335,6 +315,6 @@ struct HomeView: View {
 }
 
 #Preview {
-
+    
     return HomeView(recipesManager: RecipesManager(), editViewPresented: .constant(false), newRecipeData: .constant(Recipe.sampleData.first!.data), comingFromImportView: .constant(false))
 }

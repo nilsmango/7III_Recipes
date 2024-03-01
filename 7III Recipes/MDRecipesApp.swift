@@ -14,7 +14,7 @@ struct MDRecipesApp: App {
     @State private var markdownString = ""
     @State private var showSingleHeaderAlert = false
     
-    // ZIP import
+    // Folder/ZIP import
     @State private var showRecipesImportAlert = false
     @State private var fileURL = ""
     
@@ -58,13 +58,15 @@ struct MDRecipesApp: App {
                     }
                 }
                 .onOpenURL { url in
+                    
+                    _ = url.startAccessingSecurityScopedResource()
+                    
                     do {
                         let fileExtension = url.pathExtension.lowercased()
                         
                         if fileExtension == "md" {
                             print(url.path)
-                            print(recipesManager.recipesDirectory.path)
-                            print(url.lastPathComponent)
+
                             // check if we are coming from our own folder
                             if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
                                 print("opening internal file, now to finding")
@@ -116,9 +118,10 @@ struct MDRecipesApp: App {
                     
                     catch {
                         // Showing the alert
-                        alertOverlayText = "Error opening file: \(error.localizedDescription)\n\nIf you tried to import a file, use \"import files\" in the menu instead."
+                        alertOverlayText = "Error opening file: \(error.localizedDescription)\n\nIf you tried to import a file, use \"Import File(s)\" in the menu instead."
                         showAlertOverlay = true
                     }
+                    url.stopAccessingSecurityScopedResource()
                 }
         }
     }

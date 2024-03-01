@@ -495,11 +495,11 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     private func makeVersionNumber(_ newTitle: inout String) {
-        let lastLetter = newTitle.last
+        let lastLetter = newTitle.last!
         
-        if lastLetter?.isNumber != nil && lastLetter != " " {
+        if lastLetter.isNumber == true {
             newTitle.removeLast()
-            let versionNumber = Int(String(lastLetter!))!
+            let versionNumber = Int(String(lastLetter))!
             
             if versionNumber == 9 {
                 makeVersionNumber(&newTitle)
