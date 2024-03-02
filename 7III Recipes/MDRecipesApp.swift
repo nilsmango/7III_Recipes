@@ -118,7 +118,7 @@ struct MDRecipesApp: App {
                     
                     catch {
                         // Showing the alert
-                        alertOverlayText = "Error opening file: \(error.localizedDescription)\n\nIf you tried to import a file, use \"Import File(s)\" in the menu instead."
+                        alertOverlayText = "Error importing the recipes.\n\nIf you tried to import a file, use the \"Import File(s)\" option in the menu located at the top right-hand corner instead."
                         showAlertOverlay = true
                     }
                     url.stopAccessingSecurityScopedResource()

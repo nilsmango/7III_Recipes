@@ -38,7 +38,7 @@ struct CustomPopupModifier<PopupContent: View>: ViewModifier {
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(.folderBG)
-                        .frame(maxWidth: 300)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.75)
                         .background(.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 25))
                         .shadow(color: .gray.opacity(0.2), radius: 10)

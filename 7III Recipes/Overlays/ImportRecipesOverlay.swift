@@ -77,7 +77,7 @@ struct ImportRecipesOverlay: View {
                                 showRecipesGotImported = true
                                 
                             } catch {
-                                alertText = "Error importing the recipes: \(error)"
+                                alertText = "Error importing the recipes.\n\nIf you tried to import files, use the \"Import File(s)\" option in the menu located at the top right-hand corner instead."
                                 alertPositive = false
                                 showRecipesGotImported = true
                                 
