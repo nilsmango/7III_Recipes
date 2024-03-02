@@ -71,7 +71,7 @@ struct HomeRecipesFolderView: View {
                             .fontDesign(.rounded)
                             .padding([.horizontal, .top])
                         
-                        FlexiTagsView(recipesManager: recipesManager, strings: allTags)
+                        FlexiTagsView(recipesManager: recipesManager, tags: allTags)
                             .padding(.horizontal)
                     }
                     

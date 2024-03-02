@@ -16,10 +16,12 @@ struct TagsOrIngredientsListView: View {
     
     var isTags: Bool
     
+    @State private var showDoneAlert = false
+    @State private var doneAlertText = ""
+    
     var body: some View {
         // add a row of FlexibleView items that are buttons that will get added to the tags
         VStack {
-            
             
             FlexibleView(
                 data: allStrings,
@@ -34,6 +36,9 @@ struct TagsOrIngredientsListView: View {
                         } else {
                             recipesManager.chosenTags.append(string)
                         }
+                    }
+                    .contextMenu {
+                        TagsContextMenu(recipesManager: recipesManager, tag: string)
                     }
             }
             .padding()

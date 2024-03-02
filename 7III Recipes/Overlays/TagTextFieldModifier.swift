@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TagTextField: ViewModifier {
+struct TagTextFieldModifier: ViewModifier {
     @Binding var text: String
     var active: Bool
 
@@ -36,6 +36,6 @@ struct TagTextField: ViewModifier {
 
 extension View {
     func tagTextField(text: Binding<String>, active: Bool) -> some View {
-        self.modifier(TagTextField(text: text, active: active))
+        self.modifier(TagTextFieldModifier(text: text, active: active))
     }
 }

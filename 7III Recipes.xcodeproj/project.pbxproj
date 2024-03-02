@@ -93,6 +93,11 @@
 		78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DCB73629D1B53B00D02A2C /* RecipeView.swift */; };
 		78DDC7242B92033E001D7183 /* HomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC7232B92033E001D7183 /* HomeListView.swift */; };
 		78DDC7262B921FAA001D7183 /* HomeRecipesFolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC7252B921FAA001D7183 /* HomeRecipesFolderView.swift */; };
+		78DDC7282B932EDD001D7183 /* TagsContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC7272B932EDD001D7183 /* TagsContextMenu.swift */; };
+		78DDC72A2B93399B001D7183 /* TagTextFieldModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC7292B93399B001D7183 /* TagTextFieldModifier.swift */; };
+		78DDC72C2B933CB3001D7183 /* RenameTagOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC72B2B933CB3001D7183 /* RenameTagOverlay.swift */; };
+		78DDC72E2B937061001D7183 /* TagAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC72D2B937061001D7183 /* TagAlert.swift */; };
+		78DDC7302B93754D001D7183 /* RenameTagVStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DDC72F2B93754D001D7183 /* RenameTagVStack.swift */; };
 		78ED4A682B796AAF00171F27 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 78ED4A672B796AAF00171F27 /* ZIPFoundation */; };
 		78ED4A6D2B7A425D00171F27 /* AlertOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */; };
 		78ED4A6F2B7CC7FB00171F27 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ED4A6E2B7CC7FB00171F27 /* Constants.swift */; };
@@ -203,6 +208,11 @@
 		78DCB73629D1B53B00D02A2C /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
 		78DDC7232B92033E001D7183 /* HomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeListView.swift; sourceTree = "<group>"; };
 		78DDC7252B921FAA001D7183 /* HomeRecipesFolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecipesFolderView.swift; sourceTree = "<group>"; };
+		78DDC7272B932EDD001D7183 /* TagsContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsContextMenu.swift; sourceTree = "<group>"; };
+		78DDC7292B93399B001D7183 /* TagTextFieldModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTextFieldModifier.swift; sourceTree = "<group>"; };
+		78DDC72B2B933CB3001D7183 /* RenameTagOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameTagOverlay.swift; sourceTree = "<group>"; };
+		78DDC72D2B937061001D7183 /* TagAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagAlert.swift; sourceTree = "<group>"; };
+		78DDC72F2B93754D001D7183 /* RenameTagVStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameTagVStack.swift; sourceTree = "<group>"; };
 		78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertOverlay.swift; sourceTree = "<group>"; };
 		78ED4A6E2B7CC7FB00171F27 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		78ED6BF12B9107D8004FA166 /* CustomPopupModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPopupModifier.swift; sourceTree = "<group>"; };
@@ -243,12 +253,13 @@
 			path = Export;
 			sourceTree = "<group>";
 		};
-		7824BC412B1780B100211579 /* ToolbarOptions */ = {
+		7824BC412B1780B100211579 /* Menus */ = {
 			isa = PBXGroup;
 			children = (
 				7824BC3F2B177CF400211579 /* ToolbarOptionsView.swift */,
+				78DDC7272B932EDD001D7183 /* TagsContextMenu.swift */,
 			);
-			path = ToolbarOptions;
+			path = Menus;
 			sourceTree = "<group>";
 		};
 		7824BC442B189F4D00211579 /* Sounds */ = {
@@ -359,7 +370,7 @@
 				782EB6AC29C3A3A20086D2E7 /* MDRecipesApp.swift */,
 				782C65D329D58F0000A95C18 /* StandardViews */,
 				78ED4A6B2B7A424D00171F27 /* Overlays */,
-				7824BC412B1780B100211579 /* ToolbarOptions */,
+				7824BC412B1780B100211579 /* Menus */,
 				78623AD229D9AF6600B9CF65 /* Trash */,
 				782C65D529D58F7B00A95C18 /* RecipesListView */,
 				78623AD529D9FB5400B9CF65 /* ImportFromTextView */,
@@ -389,6 +400,7 @@
 			isa = PBXGroup;
 			children = (
 				782EB6BE29C3A4650086D2E7 /* RecipesManager.swift */,
+				78DDC72D2B937061001D7183 /* TagAlert.swift */,
 				78ED4A6E2B7CC7FB00171F27 /* Constants.swift */,
 				782EB6BC29C3A3F70086D2E7 /* MarkdownFile.swift */,
 				782AB9E629CE2F0E00EC23FC /* Recipe.swift */,
@@ -496,11 +508,14 @@
 			children = (
 				78ED4A6C2B7A425D00171F27 /* AlertOverlay.swift */,
 				788D3E0E2B8F3F65003CB6F8 /* ImportRecipesOverlay.swift */,
+				78DDC72B2B933CB3001D7183 /* RenameTagOverlay.swift */,
+				78DDC72F2B93754D001D7183 /* RenameTagVStack.swift */,
 				782264922B9085C100759188 /* ExportRecipesOverlay.swift */,
 				782264942B90BCA500759188 /* ExportLinkOverlay.swift */,
 				788D3E102B8F40E8003CB6F8 /* OutsideTap.swift */,
 				788D3E112B8F40E8003CB6F8 /* OverlayVStackModifier.swift */,
 				78ED6BF12B9107D8004FA166 /* CustomPopupModifier.swift */,
+				78DDC7292B93399B001D7183 /* TagTextFieldModifier.swift */,
 			);
 			path = Overlays;
 			sourceTree = "<group>";
@@ -599,6 +614,7 @@
 				782821FF29F177F4006128CA /* RandomRecipeView.swift in Sources */,
 				7865CFDC2B1F0B9D007CB7D6 /* BackgroundAnimation.swift in Sources */,
 				78DDC7242B92033E001D7183 /* HomeListView.swift in Sources */,
+				78DDC72C2B933CB3001D7183 /* RenameTagOverlay.swift in Sources */,
 				7824BC3E2B172DD100211579 /* SelectionButtonLabel.swift in Sources */,
 				783B4B8E29E148E600551888 /* Importer.swift in Sources */,
 				783B4B8029DDA7C700551888 /* DirectionsEditTextView.swift in Sources */,
@@ -613,11 +629,14 @@
 				782C65C829D56FFF00A95C18 /* IngredientsEditView.swift in Sources */,
 				78F3186829E5B3D200DE31BE /* RecipeImageData.swift in Sources */,
 				788D3E122B8F40E8003CB6F8 /* OutsideTap.swift in Sources */,
+				78DDC7302B93754D001D7183 /* RenameTagVStack.swift in Sources */,
+				78DDC72A2B93399B001D7183 /* TagTextFieldModifier.swift in Sources */,
 				782AB9E729CE2F0E00EC23FC /* Recipe.swift in Sources */,
 				782C65D229D58B0A00A95C18 /* ServingsCookedEditView.swift in Sources */,
 				78ED6BF22B9107D8004FA166 /* CustomPopupModifier.swift in Sources */,
 				786F9A0229C84EFE00CAA48B /* FlexibleView.swift in Sources */,
 				782EB6C129C3B0A70086D2E7 /* RecipesListView.swift in Sources */,
+				78DDC72E2B937061001D7183 /* TagAlert.swift in Sources */,
 				78DCB73729D1B53B00D02A2C /* RecipeView.swift in Sources */,
 				78F3186A29E6A24500DE31BE /* RecipeImageView.swift in Sources */,
 				7824BC3C2B1687AE00211579 /* FlexiTagsView.swift in Sources */,
@@ -635,6 +654,7 @@
 				786F9A2229CC418800CAA48B /* NotificationDelegate.swift in Sources */,
 				782AB9ED29CE39C800EC23FC /* Direction.swift in Sources */,
 				786F9A2F29CC84CE00CAA48B /* AnotherVisibilityTest.swift in Sources */,
+				78DDC7282B932EDD001D7183 /* TagsContextMenu.swift in Sources */,
 				786F9A0E29C8E18300CAA48B /* FolderView.swift in Sources */,
 				783B4B8829E0073B00551888 /* SegmentView.swift in Sources */,
 				78C59E8C2B1BCF9000C44F5F /* SplashViewAnimation.swift in Sources */,

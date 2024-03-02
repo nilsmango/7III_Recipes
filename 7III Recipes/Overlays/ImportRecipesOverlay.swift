@@ -31,6 +31,7 @@ struct ImportRecipesOverlay: View {
                         .padding()
                     
                     VStack(spacing: 12) {
+                        
                         HStack {
                             Image(systemName: resetTimesCooked ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(resetTimesCooked ? .blue : .primary)
@@ -67,7 +68,6 @@ struct ImportRecipesOverlay: View {
                     HStack {
                         Button(action: {
                             let tagForImport = addTag ? tagToAdd : ""
-                            
                             showOverlay = false
                             
                             do {
@@ -80,11 +80,13 @@ struct ImportRecipesOverlay: View {
                                 alertText = "Error importing the recipes: \(error)"
                                 alertPositive = false
                                 showRecipesGotImported = true
+                                
                             }
                         }, label: {
                             Label("Import", systemImage: "checkmark")
                         })
                         .buttonStyle(.bordered)
+                        .disabled(addTag && ( tagToAdd == "" || tagToAdd == "#" ))
                         
                         Button(role: .destructive, action: {
                             showOverlay = false
@@ -92,7 +94,6 @@ struct ImportRecipesOverlay: View {
                             Label("Cancel", systemImage: "xmark")
                         })
                         .buttonStyle(.bordered)
-                        
                     }
                     .padding(.bottom)
                 }
@@ -100,6 +101,7 @@ struct ImportRecipesOverlay: View {
             }
             
             AlertOverlay(showAlert: $showRecipesGotImported, text: alertText, symbolPositive: alertPositive)
+            
         }
     }
 }

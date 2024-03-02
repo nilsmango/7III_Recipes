@@ -10,19 +10,19 @@ import SwiftUI
 struct FlexiTagsView: View {
     @ObservedObject var recipesManager: RecipesManager
     
-    var strings: [String]
+    var tags: [String]
     
     var body: some View {
         FlexibleView(
-            data: strings,
+            data: tags,
             spacing: 5,
             alignment: .leading
-        ) { string in
+        ) { tag in
             Button(action: {
-                recipesManager.path.append(TagSelection(tag: string))
-                recipesManager.chosenTags.append(string)
+                recipesManager.path.append(TagSelection(tag: tag))
+                recipesManager.chosenTags = [tag]
             }, label: {
-                Text(string)
+                Text(tag)
                     .foregroundColor(.primary)
 //                    .fontWeight(.bold)
 //                    .fontDesign(.rounded)
@@ -32,15 +32,16 @@ struct FlexiTagsView: View {
                             .fill(Color("CustomLightGray"))
                     )
             })
+            .contextMenu {
+                TagsContextMenu(recipesManager: recipesManager, tag: tag)
+            }
         }
         .navigationDestination(for: TagSelection.self) { tagSelection in
-            TagsOrIngredientsListView(recipesManager: recipesManager, allStrings: strings, isTags: true)
+            TagsOrIngredientsListView(recipesManager: recipesManager, allStrings: tags, isTags: true)
         }
     }
 }
 
-struct FlexiTagsView_Previews: PreviewProvider {
-    static var previews: some View {
-        FlexiTagsView(recipesManager: RecipesManager(), strings: ["#SuckIt", "#motherFucker"])
+#Preview {
+    FlexiTagsView(recipesManager: RecipesManager(), tags: ["#SuckIt", "#motherFucker"])
     }
-}

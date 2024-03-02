@@ -88,6 +88,8 @@ struct HomeView: View {
         .overlay {
             ImportRecipesOverlay(recipesManager: recipesManager, showOverlay: $showRecipesImportAlert, fileURL: fileURL)
             AlertOverlay(showAlert: $showAlertOverlay, text: alertOverlayText)
+            // tags
+            RenameTagOverlay(recipesManager: recipesManager)
         }
         .fullScreenCover(isPresented: $editViewPresented, content: {
             NavigationView {

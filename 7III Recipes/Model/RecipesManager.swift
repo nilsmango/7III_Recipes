@@ -12,6 +12,9 @@ import ZIPFoundation
 
 class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
+    // MARK: Alerts
+    @Published var tagAlert = TagAlert()
+    
     // MARK: Navigation Path
     @Published var path = NavigationPath()
     @Published var currentCategory = ""
@@ -401,8 +404,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 }
             }
         }
-        
     }
+    
     
     /// update an edited recipe
     func updateEditedRecipe(recipe: Recipe, data: Recipe.Data) {
@@ -910,7 +913,71 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         categories = metaData.categories
         ingredients = metaData.ingredients
     }
+
+    /// removes a tag from all the recipes
+    func deleteTag(tag: String) -> Int {
         
+        var numberOfRecipesChanged = 0
+        
+        // find the recipes with tag
+        for (recipeIndex, recipe) in recipes.enumerated() {
+            if let tagIndex = recipe.tags.firstIndex(where: { $0 == tag }) {
+                // update count
+                numberOfRecipesChanged += 1
+                // remove tag
+                recipes[recipeIndex].tags.remove(at: tagIndex)
+                // save recipe to disk
+                saveRecipeAsMarkdownFile(recipe: recipes[recipeIndex])
+            }
+        }
+        
+        // remove the tag from tags
+        tags.removeAll(where: { $0 == tag })
+        
+        chosenTags.removeAll(where: { $0 == tag })
+        
+        return numberOfRecipesChanged
+    }
+    
+    /// updates a tag in all the recipes
+    func updateTag(oldName: String, newName: String) {
+        // find the recipes with tag
+        for (recipeIndex, recipe) in recipes.enumerated() {
+            if let tagIndex = recipe.tags.firstIndex(where: { $0 == oldName }) {
+                // remove tag
+                recipes[recipeIndex].tags.remove(at: tagIndex)
+                // append new tag if it isn't there yet
+                if !recipes[recipeIndex].tags.contains(newName) {
+                    recipes[recipeIndex].tags.append(newName)
+                }
+                // save recipe to disk
+                saveRecipeAsMarkdownFile(recipe: recipes[recipeIndex])
+            }
+        }
+        
+        // remove old, append new tag from/to all tags
+        tags.removeAll(where: { $0 == oldName })
+        if !tags.contains(newName) {
+            tags.append(newName)
+        }
+        
+        chosenTags.removeAll(where: { $0 == oldName })
+    }
+    
+    /// returns the number of recipes that have this tag
+    func findNumberForTag(tag: String) -> Int {
+        var numberOfRecipesWithTag = 0
+        for recipe in recipes {
+            if recipe.tags.contains(tag) {
+                // update count
+                numberOfRecipesWithTag += 1
+            }
+        }
+        return numberOfRecipesWithTag
+    }
+    
+    
+    
     // TODO: remove if not needed any more
     
 //    /// get a list of all categories in the recipes
@@ -971,30 +1038,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
 //        return ingredients.sorted()
 //    }
     
-    /// removes a tag from all the recipes
-    func deleteTag(tag: String) -> Int {
         
-        var numberOfRecipesChanged = 0
-        
-        // find the recipes with tag
-        for (recipeIndex, recipe) in recipes.enumerated() {
-            if let tagIndex = recipe.tags.firstIndex(where: { $0 == tag }) {
-                // update count
-                numberOfRecipesChanged += 1
-                // remove tag
-                recipes[recipeIndex].tags.remove(at: tagIndex)
-                // save recipe to disk
-                saveRecipeAsMarkdownFile(recipe: recipes[recipeIndex])
-            }
-        }
-        
-        // remove the tag from tags
-        tags.removeAll(where: { $0 == tag })
-        
-        return numberOfRecipesChanged
-    }
-    
-    
     /// get a list of all the titles in the library
     func getTitles() -> [String] {
         recipes.map { $0.title }
