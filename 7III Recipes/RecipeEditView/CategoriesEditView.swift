@@ -15,7 +15,7 @@ struct CategoriesEditView: View {
     var fileManager: RecipesManager
     
     private var recipesCategories: [String] {
-        fileManager.getAllCategories()
+        fileManager.categories
     }
     
     @State private var allCategories = [String]()
@@ -35,7 +35,7 @@ struct CategoriesEditView: View {
                 spacing: 5,
                 alignment: .leading
             ) { category in
-                SelectionButtonLabel(string: category, chosenStrings: $categories, allStrings: recipesCategories)
+                SelectionButtonLabel(string: category, chosenStrings: $categories, allStrings: categories)
                     .onTapGesture {
                             if categories.contains(category) {
                                 categories.removeAll(where: { $0 == category })

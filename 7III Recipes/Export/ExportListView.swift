@@ -18,7 +18,7 @@ struct ExportListView: View {
 
     var body: some View {
         List {
-            ForEach(recipesManager.getAllCategories(), id: \.self) { category in
+            ForEach(recipesManager.categories, id: \.self) { category in
                 if !recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: []).isEmpty {
                     Section {
                         ForEach(recipesManager.filterTheRecipes(string: searchText, ingredients: [], categories: [category], tags: [])) { recipe in
