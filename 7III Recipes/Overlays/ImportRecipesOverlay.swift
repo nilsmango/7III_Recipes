@@ -60,22 +60,7 @@ struct ImportRecipesOverlay: View {
                         }
                         
                         TextField("#yourTag", text: $tagToAdd)
-                            .onChange(of: tagToAdd) { newValue in
-                                var newTag = newValue
-                                if !newTag.hasPrefix("#") {
-                                    newTag = "#" + newTag
-                                }
-                                tagToAdd = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
-                            }
-                            .foregroundStyle(addTag ? .primary : .secondary)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundStyle(.buttonBG)
-                            )
-                            .frame(width: 170)
-                            .padding(.bottom)
+                            .tagTextField(text: $tagToAdd, active: addTag)
                         
                     }
                     
