@@ -524,7 +524,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// save a new recipe
-    func saveNewRecipe(newRecipeData: Recipe.Data, withoutMovingPath: Bool = false) {
+    func saveNewRecipe(newRecipeData: Recipe.Data, withoutMovingPath: Bool = false, updateMetaData: Bool = true) {
         
         // add no category to all recipes without a category
         var categories = newRecipeData.categories
@@ -580,7 +580,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         loadTimers(for: newRecipe)
         
         // update the metaData
-        updateMetaData()
+        if updateMetaData {
+            self.updateMetaData()
+        }
     }
 
     /// make a duplication of the recipe
@@ -1145,7 +1147,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
         
         // Save the new recipes
-        importRecipes.forEach { saveNewRecipe(newRecipeData: $0.data, withoutMovingPath: true) }
+        importRecipes.forEach { saveNewRecipe(newRecipeData: $0.data, withoutMovingPath: true, updateMetaData: false) }
+        
+        // Update the meta data only once
+        updateMetaData()
         
         // return the number of imported recipes
         return importRecipes.count
