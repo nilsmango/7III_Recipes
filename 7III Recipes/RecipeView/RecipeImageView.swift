@@ -16,10 +16,11 @@ struct RecipeImageView: View {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 25.0))
                     } else {
                         Text("Error loading image")
                             .onAppear {
-                                print(imagePath)
+                                print("could not load this image: \(imagePath)")
                             }
                     }
             Text(caption)
@@ -27,8 +28,6 @@ struct RecipeImageView: View {
     }
 }
 
-struct RecipeImageView_Previews: PreviewProvider {
-    static var previews: some View {
-        RecipeImageView(imagePath: "/Users/simxn/Downloads/71zsGsx7cJL.jpg", caption: "Captioning the shit out of this.")
-    }
+#Preview {
+    RecipeImageView(imagePath: "/Users/simxn/Downloads/WhatsApp Image 2024-01-03 at 10.40.04.jpeg", caption: "Captioning the shit out of this.")
 }

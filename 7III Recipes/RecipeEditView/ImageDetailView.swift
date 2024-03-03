@@ -17,6 +17,7 @@ struct ImageDetailView: View {
             image
                 .resizable()
                 .scaledToFit()
+                .clipShape(RoundedRectangle(cornerRadius: 25.0))
             
             TextField("Your caption ...", text: $caption, axis: .vertical)
                 .padding(5)
@@ -29,8 +30,6 @@ struct ImageDetailView: View {
     }
 }
 
-struct ImageDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        ImageDetailView(image: Image(systemName: "photo"), caption: .constant("Some caption"))
-    }
+#Preview {
+    ImageDetailView(image: Image(systemName: "photo"), caption: .constant("Some caption"))
 }
