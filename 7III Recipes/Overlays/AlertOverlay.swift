@@ -16,19 +16,16 @@ struct AlertOverlay: View {
     var symbolPositive = false
     var padding: Double = 16.0
     
-    @State private var offsetY: CGFloat = 0
+    @State private var offset = CGSize(width: 0, height: 0)
     
     var body: some View {
         if showAlert {
             VStack {
                 HStack {
-                    
                     if showSymbol {
                         Image(systemName: symbolPositive ? "checkmark.circle" : "exclamationmark.triangle")
                     }
-                    
                     Text(text)
-                    
                 }
                 .foregroundStyle(.folderBG)
                 .fixedSize(horizontal: false, vertical: true)
@@ -36,20 +33,20 @@ struct AlertOverlay: View {
                 .padding(padding)
                 .background {
                     RoundedRectangle(cornerRadius: 25)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.accentColor)
                         .shadow(color: .gray.opacity(0.2), radius: 10)
                 }
             }
             .frame(width: UIScreen.main.bounds.width * 0.8)
-            .offset(y: offsetY)
+            .offset(offset)
             .gesture(
                 DragGesture()
                     .onChanged { gesture in
-                        offsetY = gesture.translation.height
+                        offset = gesture.translation
                     }
                     .onEnded { _ in
                         withAnimation {
-                            offsetY = 0
+                            offset = CGSize(width: 0, height: 0)
                         }
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
