@@ -1130,19 +1130,19 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     }
     
     /// checks if we are importing a folder or a zip and calls the appropriate function
-    func importRecipes(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+    func importRecipes(url: String, resetTimesCooked: Bool = false, specialTag: String = "", deleteFolder: Bool) throws -> Int {
         let actualURL = URL(fileURLWithPath: url)
         let fileExtension = actualURL.pathExtension.lowercased()
         
         if fileExtension == "zip" {
-            return try unzipAndCopyRecipesToDisk(url: url, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
+            return try unzipAndCopyRecipesToDisk(url: url, resetTimesCooked: resetTimesCooked, specialTag: specialTag, deleteFolder: deleteFolder)
         } else {
-            return try importFolderOfRecipes(url: actualURL, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
+            return try importFolderOfRecipes(url: actualURL, resetTimesCooked: resetTimesCooked, specialTag: specialTag, deleteFolder: deleteFolder)
         }
     }
     
     /// unzips and copies all the recipes into the recipes folder, returns the number of recipes imported
-    private func unzipAndCopyRecipesToDisk(url: String, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+    private func unzipAndCopyRecipesToDisk(url: String, resetTimesCooked: Bool = false, specialTag: String = "", deleteFolder: Bool) throws -> Int {
         print("URL of thing we are importing: \(url)")
         let fileManager = FileManager.default
         
@@ -1160,20 +1160,22 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         // Delete the original zip archive
         try removeItem(at: URL(fileURLWithPath: url))
         
-        return try importFolderOfRecipes(url: copyDirectory, resetTimesCooked: resetTimesCooked, specialTag: specialTag)
+        return try importFolderOfRecipes(url: copyDirectory, resetTimesCooked: resetTimesCooked, specialTag: specialTag, deleteFolder: deleteFolder)
         
     }
     
     /// imports a folder of recipes, returns number of recipes imported
-    private func importFolderOfRecipes(url: URL, resetTimesCooked: Bool = false, specialTag: String = "") throws -> Int {
+    private func importFolderOfRecipes(url: URL, resetTimesCooked: Bool = false, specialTag: String = "", deleteFolder: Bool) throws -> Int {
         // Make import recipes array
         var importRecipes = try makeImportRecipesArray(from: url)
         
-        // Cleanup: Remove the copy folder
-        do {
-            try removeItem(at: url)
-        } catch {
-            print("Error removing item at url \(url): \(error.localizedDescription)")
+        if deleteFolder {
+            // Cleanup: Remove the copy folder
+            do {
+                try removeItem(at: url)
+            } catch {
+                print("Error removing item at url \(url): \(error.localizedDescription)")
+            }
         }
         
         // Manipulate the recipes if requested

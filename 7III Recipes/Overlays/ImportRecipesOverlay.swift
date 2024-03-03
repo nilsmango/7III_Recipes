@@ -17,6 +17,7 @@ struct ImportRecipesOverlay: View {
     @State private var addTag = false
     @State private var tagToAdd = ""
     @State private var resetTimesCooked = false
+    @State private var deleteFolder = false
     
     @State private var showRecipesGotImported = false
     @State private var alertText = ""
@@ -47,6 +48,20 @@ struct ImportRecipesOverlay: View {
                         }
                         
                         HStack {
+                            Image(systemName: deleteFolder ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(deleteFolder ? .blue : .primary)
+                            
+                            Text("Delete folder during import")
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            deleteFolder.toggle()
+                        }
+                        
+                        HStack {
                             Image(systemName: addTag ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(addTag ? .blue : .primary)
                             
@@ -59,7 +74,6 @@ struct ImportRecipesOverlay: View {
                         .onTapGesture {
                             addTag.toggle()
                         }
-                        
                         TextField("#yourTag", text: $tagToAdd)
                             .tagTextField(text: $tagToAdd, active: addTag)
                         
@@ -71,16 +85,27 @@ struct ImportRecipesOverlay: View {
                             showOverlay = false
                             
                             do {
-                                let recipesImported = try recipesManager.importRecipes(url: fileURL, resetTimesCooked: resetTimesCooked, specialTag: tagForImport)
+                                let recipesImported = try recipesManager.importRecipes(url: fileURL, resetTimesCooked: resetTimesCooked, specialTag: tagForImport, deleteFolder: deleteFolder)
                                 alertText = "\(recipesImported) recipes imported!"
                                 alertPositive = true
                                 showRecipesGotImported = true
+                                
+                                // reset values
+                                tagToAdd = ""
+                                addTag = false
+                                deleteFolder = false
+                                resetTimesCooked = false
                                 
                             } catch {
                                 alertText = "Error importing the recipes.\n\nIf you tried to import files, use the \"Import File(s)\" option in the menu located at the top right-hand corner instead."
                                 alertPositive = false
                                 showRecipesGotImported = true
                                 
+                                // reset values
+                                tagToAdd = ""
+                                addTag = false
+                                deleteFolder = false
+                                resetTimesCooked = false
                             }
                         }, label: {
                             Label("Import", systemImage: "checkmark")
