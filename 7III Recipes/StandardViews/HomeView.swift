@@ -242,17 +242,14 @@ struct HomeView: View {
                     let fileExtension = url.pathExtension.lowercased()
                     
                     if fileExtension == "md" {
-                        print(url.path)
-                        print(url.lastPathComponent)
                         // check if we are coming from our own folder
                         if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
-                            print("opening internal file, now to finding")
+
                             // find the recipe in the recipesArray open it if it's in there
                             let foundRecipe = recipesManager.findAndGoToInternalRecipe(url: url)
                             
                             // if not found try to import the recipe
                             if foundRecipe == false {
-                                print("not found")
                                 markdownString = try String(contentsOf: url, encoding: .utf8)
                                 let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                 newRecipeData = recipeStruct.recipe.data

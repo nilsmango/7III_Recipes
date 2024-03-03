@@ -1619,7 +1619,6 @@ struct Parser {
             if components.count == 2 {
                 let relativePath = components[0].trimmingCharacters(in: .whitespacesAndNewlines)
                 let path = recipesDirectory + relativePath
-                print(path)
                 let caption = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
                 images.append(RecipeImage(imagePath: path, caption: caption))
             }
@@ -1632,7 +1631,6 @@ struct Parser {
             let range2 = Range(match.range(at: 2), in: text)!
             let relativePath = String(text[range2]).trimmingCharacters(in: .whitespacesAndNewlines)
             let path = recipesDirectory + relativePath
-            print(path)
             images.append(RecipeImage(imagePath: path, caption: caption))
         }
         

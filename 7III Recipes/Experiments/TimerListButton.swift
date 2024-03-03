@@ -87,7 +87,7 @@ struct TimerListButton: View {
         .onAppear() {
             notificationCenter.requestAuthorization(options: [.alert, .sound]) { success, error in
                 if success {
-                    print("All set!")
+//                    print("All set!")
                 } else if let error = error {
                     print(error.localizedDescription)
                 }

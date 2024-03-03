@@ -35,15 +35,16 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         // Handle user's response to the notification
         let identifier = response.notification.request.identifier
+        
         // Extract information from the notification content and perform actions
         if let recipeTitle = identifier.components(separatedBy: Constants.notificationSeparator).first {
-            print("Result: \(recipeTitle)")
             // change path to the recipe of the notification
             if let recipeIndex = recipes.firstIndex(where: { $0.title == recipeTitle }) {
                 path = NavigationPath()
                 path.append(recipes[recipeIndex])
             }
         }
+        
         completionHandler()
     }
     
@@ -263,6 +264,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func loadMarkdownFilesAndStart(completion: @escaping (Result<Void, Error>) -> Void) {
         // empty the recipes if we have still some in the array (this is to not load everything twice
         recipes = []
+        
         do {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: recipesDirectory, includingPropertiesForKeys: nil)
             let markdownFiles = directoryContents.filter { $0.pathExtension == "md" }
@@ -297,7 +299,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         }
     }
     
-    
     /// Update a recipe in the Markdown file as well the recipes array
     func updateRecipe(updatedRecipe: Recipe) {
         if let index = recipes.firstIndex(where: { $0.id == updatedRecipe.id }) {
@@ -312,7 +313,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     private func saveRecipeAsMarkdownFile(recipe: Recipe, exportDirectory: Bool = false) {
         let markdownFile = Parser.makeMarkdownFromRecipe(recipe: recipe)
-        
         let fileURL: URL
         
         if exportDirectory {
@@ -1262,7 +1262,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     /// removes the Inbox folder items and the copy folder
     func removeInboxAndCopyFolder() throws {
-        print("Cleaning up some folders if they exist.")
         let fileManager = FileManager.default
         let inboxURL = recipesDirectory.appendingPathComponent("Inbox")
         if fileManager.fileExists(atPath: inboxURL.path) {

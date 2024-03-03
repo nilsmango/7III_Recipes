@@ -230,7 +230,7 @@ struct RecipeViewTryOne: View {
             .onAppear() {
                 notificationCenter.requestAuthorization(options: [.alert, .sound]) { success, error in
                     if success {
-                        print("All set!")
+                        print("Got notification authorization!")
                     } else if let error = error {
                         print(error.localizedDescription)
                     }

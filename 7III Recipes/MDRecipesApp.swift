@@ -65,7 +65,6 @@ struct MDRecipesApp: App {
                         let fileExtension = url.pathExtension.lowercased()
                         
                         if fileExtension == "md" {
-                            print(url.path)
 
                             // check if we are coming from our own folder
                             if url.path.contains(recipesManager.recipesDirectory.path) && !url.path.contains("/Inbox/") {
@@ -75,7 +74,6 @@ struct MDRecipesApp: App {
                                 
                                 // if not found try to import the recipe
                                 if foundRecipe == false {
-                                    print("not found")
                                     markdownString = try String(contentsOf: url, encoding: .utf8)
                                     let recipeStruct = Parser.makeRecipeFromString(string: markdownString)
                                     recipeData = recipeStruct.recipe.data

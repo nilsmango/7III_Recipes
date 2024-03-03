@@ -19,10 +19,8 @@ struct RecipeImageView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 25.0))
                     } else {
                         Text("Error loading image")
-                            .onAppear {
-                                print("could not load this image: \(imagePath)")
-                            }
                     }
+            
             Text(caption)
         }
     }
