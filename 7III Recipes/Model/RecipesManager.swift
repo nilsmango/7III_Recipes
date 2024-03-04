@@ -12,6 +12,8 @@ import ZIPFoundation
 
 class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
+    @AppStorage("sorting") var sortingSelection: Sorting = .updated
+    
     // MARK: Alerts
     @Published var tagAlert = TagAlert()
     
@@ -289,6 +291,8 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                 }
             }
             
+            sortRecipes()
+            
             updateMetaData()
             
             completion(.success(()))
@@ -344,7 +348,7 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     func delete(at indexSet: IndexSet, filteringCategory: String = "", filteringTags: Bool = false) {
         
         // find the id for later removing the markdown
-        var recipesToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: currentCategory.isEmpty || currentCategory == "All" || filteringCategory.isEmpty ? [] : [currentCategory], tags: filteringTags ? chosenTags : [])[$0] }
+        var recipesToDelete = indexSet.map { filterTheRecipes(string: "", ingredients: [], categories: filteringCategory.isEmpty ? [] : [filteringCategory], tags: filteringTags ? chosenTags : [])[$0] }
         let idsToDelete = recipesToDelete.map( { $0.id })
         
         // we use the titles to remove the Markdown files later on
@@ -454,6 +458,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                                         language: data.language)
         
         recipes[index].update(from: newRecipeData)
+        
+        // sort the recipes
+        sortRecipes()
         
         // update the metaData
         updateMetaData()
@@ -565,8 +572,9 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
                                language: newRecipeData.language)
         
         
-        // save the new recipe in the recipes Array
+        // save and sort the new recipe in the recipes Array
         recipes.append(newRecipe)
+        sortRecipes()
         
         if withoutMovingPath == false {
             // move the path to the new recipe
@@ -744,11 +752,6 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
         if let index = trash.firstIndex(where: { $0.id == recipeToRestore.id }) {
             trash.remove(at: index)
         }
-    }
-    
-    /// move a recipe in the list
-    func move(from offset: IndexSet, to newPlace: Int) {
-        recipes.move(fromOffsets: offset, toOffset: newPlace)
     }
 
     /// sets the times Cooked of a recipe and resets the steps done and ingredients selected, also updates the Markdown file
@@ -1056,11 +1059,10 @@ class RecipesManager: NSObject, ObservableObject, UNUserNotificationCenterDelega
     
     // Sorting
     
-    func sortRecipes(selection: Sorting) {
-        
-        switch selection {
-        case .standard:
-            recipes.sort(by: { $0.updated < $1.updated})
+    func sortRecipes() {
+        switch sortingSelection {
+        case .updated:
+            recipes.sort(by: { $0.updated > $1.updated})
         case .name:
             recipes.sort(by: { $0.title < $1.title })
         case .time:

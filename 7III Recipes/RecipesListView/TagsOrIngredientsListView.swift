@@ -71,6 +71,29 @@ struct TagsOrIngredientsListView: View {
                 .opacity(0.1)
         )
         .navigationTitle(Text(recipesManager.chosenTags.count < 2 ? recipesManager.chosenTags.first ?? "Filter by Tags" : recipesManager.chosenTags.first! + " +"))
+        .toolbar {
+            Menu {
+                Picker("Sorting", selection: $recipesManager.sortingSelection) {
+                    ForEach(Sorting.allCases) { sortCase in
+                        if sortCase == .cooked {
+                            Text("Times Cooked")
+                        } else if sortCase == .time {
+                            Text("Total Time")
+                        } else {
+                            Text(sortCase.rawValue.capitalized)
+                        }
+                    }
+                }
+            }
+        label: {
+            Label("Sort by", systemImage: "arrow.up.arrow.down.circle")
+                .labelStyle(.iconOnly)
+        }
+        }
+        .environment(\.editMode, $editMode)
+        .onChange(of: recipesManager.sortingSelection) { _ in
+            recipesManager.sortRecipes()
+        }
         
     }
 }
