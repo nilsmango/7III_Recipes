@@ -57,6 +57,9 @@ struct CustomPopupModifier<PopupContent: View>: ViewModifier {
                                     }
                                 }
                         )
+                        .onTapGesture {
+                            isPresented = false
+                        }
                 }
 
             }
