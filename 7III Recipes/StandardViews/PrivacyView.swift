@@ -20,11 +20,9 @@ struct PrivacyView: View {
                 The 7III Recipes app does not integrate with any third-party services that could compromise your data privacy. We do not engage in any data-sharing practices with external entities.
 
                 Contact Information:
-                If you have any questions or concerns regarding the privacy practices of the 7III Recipes app, please contact us at [recipes@project7iii.com](recipes@project7iii.com).
+                If you have any questions or concerns regarding the privacy practices of the 7III Recipes app, please contact us at [0@project7iii.com](0@project7iii.com).
 
                 By using the 7III Recipes app, you acknowledge and agree to the terms outlined in this privacy notice. We reserve the right to update this notice to reflect any changes in our data practices. Please check back periodically for the latest information.
-
-                Thank you for choosing 7III Recipes.
                 """)
         }
         

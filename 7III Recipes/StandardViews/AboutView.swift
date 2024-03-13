@@ -13,10 +13,12 @@ struct AboutView: View {
             Text("""
                 7III Recipes is a cookbook app that utilizes markdown files in the background to save and retrieve recipes. This ensures that you never lose your recipes and always maintain complete control over them.
                 
-                If you have any questions, or bugs to report, or if you want to see a feature, send us an [email](recipes@project7iii.com)!
-
+                If you have any questions, bugs to report, or if you want to see a feature, send us an [email](0@project7iii.com).
+                
+                We make useful things, find us at [project7iii.com](https://project7iii.com)
+                
+                **Licenses**
                 This app uses some parts of [ConfettiSwiftUI](https://github.com/simibac/ConfettiSwiftUI):
-
                 ConfettiSwiftUI is Copyright (c) 2020 Simon Bachmann.
 
                 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,8 +39,9 @@ struct AboutView: View {
                 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
                 SOFTWARE.
                 
+                ---
+                
                 This app also uses [ZIP Foundation](https://github.com/weichsel/ZIPFoundation) to zip and unzip files:
-
                 ZIP Foundation is Copyright (c) 2017-2024 Thomas Zoechling (https://www.peakstep.com)
 
                 Permission is hereby granted, free of charge, to any person obtaining a copy
