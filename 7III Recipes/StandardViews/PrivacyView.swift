@@ -14,7 +14,7 @@ struct PrivacyView: View {
                 This privacy notice outlines the data practices of the 7III Recipes app. We are committed to ensuring the privacy and security of your personal information. Please read this notice carefully to understand how we handle your data.
 
                 Data Collection and Usage:
-                We want to make it clear that we do not collect, view, save, or sell any user data through the 7III Recipes app. Your recipes and any related information are stored exclusively on your device, ensuring that you have complete control over your data.
+                We want to make it clear that we do not collect, view, store, or sell any user data through the 7III Recipes app. Your recipes and any related information are stored exclusively on your device, ensuring that you have complete control over your data.
 
                 Third-Party Services:
                 The 7III Recipes app does not integrate with any third-party services that could compromise your data privacy. We do not engage in any data-sharing practices with external entities.
