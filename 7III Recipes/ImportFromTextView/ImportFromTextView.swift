@@ -64,7 +64,7 @@ struct ImportFromTextView: View {
                 saveDisabled = true
             }
             .fullScreenCover(isPresented: $showingSheet, content: {
-                NavigationView {
+                NavigationStack {
                     SegmentsImportView(importer: importer, recipeLanguage: $recipeLanguage)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
