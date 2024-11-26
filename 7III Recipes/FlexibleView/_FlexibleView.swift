@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 /// This view is responsible to lay down the given elements and wrap them into
 /// multiple rows if needed.
 struct _FlexibleView<Data: Collection, Content: View>: View where Data.Element: Hashable {

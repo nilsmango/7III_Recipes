@@ -80,9 +80,6 @@ struct DirectionTimerView: View {
     }
 }
 
-struct DirectionTimerView_Previews: PreviewProvider {
-    static var previews: some View {
-        DirectionTimerView(fileManager: RecipesManager(),direction: .constant(Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2)), recipe: RecipesManager().recipes.first!, timer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", stepString: "Let her rip for 10 minutes", step: 2, running: .running, id: UUID()))
-    }
+#Preview {
+    DirectionTimerView(fileManager: RecipesManager(),direction: .constant(Direction(step: 2, text: "2. Drink it all up for 2 minutes", hasTimer: true, timerInMinutes: 2)), recipe: RecipesManager().recipes.first!, timer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 2344), timerInMinutes: 10, recipeTitle: "Misty Eye", stepString: "Let her rip for 10 minutes", step: 2, running: .running, id: UUID()))
 }
-

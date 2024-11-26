@@ -120,8 +120,6 @@ struct TimerButtonView: View {
     }
 }
 
-struct TimerButtonView_Previews: PreviewProvider {
-    static var previews: some View {
-        TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", stepString: "Let her rip for 10 minutes", step: 2, running: .stopped, id: UUID()))
-    }
+#Preview {
+    TimerButtonView(fileManager: RecipesManager(), dirTimer: DirectionTimer(targetDate: Date(timeIntervalSinceNow: 27), timerInMinutes: 10, recipeTitle: "Misty Eye", stepString: "Let her rip for 10 minutes", step: 2, running: .stopped, id: UUID()))
 }
